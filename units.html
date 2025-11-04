@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Units - Taa Academy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  :root {
+    --primary-blue: #115879;
+    --primary-yellow: #fcd40a;
+    --bg-gradient-start: #f8fafc;
+    --bg-gradient-end: #e8f1f8;
+    --card-shadow: 0 4px 12px rgba(17, 88, 121, 0.06);
+    --card-shadow-hover: 0 16px 32px rgba(17, 88, 121, 0.18);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --locked-bg: #f1f5f9;
+    --hover-bg: #f0f9ff;
+    --focus-outline: 3px solid var(--primary-blue);
+    --success-green: #10b981;
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    min-height: 100vh;
+    color: var(--text-primary);
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(17, 88, 121, 0.02) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(252, 212, 10, 0.02) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  body[dir="rtl"] {
+    font-family: 'Cairo', 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .units-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .page-header h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin-bottom: 0.6rem;
+    text-shadow: 0 2px 4px rgba(17, 88, 121, 0.08);
+  }
+
+  .page-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .back-btn,
+  .lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.5rem;
+    background: white;
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+  }
+
+  .back-btn:hover,
+  .lang-toggle:hover {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(17, 88, 121, 0.25);
+  }
+
+  .back-btn:focus,
+  .lang-toggle:focus {
+    outline: var(--focus-outline);
+    outline-offset: 2px;
+  }
+
+  .units-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2.2rem;
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .unit-card {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .unit-card.locked {
+    background: var(--locked-bg);
+    cursor: not-allowed;
+    opacity: 0.9;
+    transform: none !important;
+    box-shadow: var(--card-shadow);
+  }
+
+  .unit-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-yellow), var(--primary-blue));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+    z-index: 1;
+  }
+
+  [dir="rtl"] .unit-card::before {
+    transform-origin: right;
+  }
+
+  .unit-card:not(.locked):hover {
+    transform: translateY(-10px);
+    box-shadow: var(--card-shadow-hover);
+    background: var(--hover-bg);
+  }
+
+  .unit-card:not(.locked):hover::before {
+    transform: scaleX(1);
+  }
+
+  .unit-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--primary-yellow), #e6c009);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-blue);
+    font-weight: 800;
+    font-size: 1.7rem;
+    margin: 0 auto 1.4rem;
+    box-shadow: 0 6px 16px rgba(252, 212, 10, 0.4);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .unit-card:not(.locked):hover .unit-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 10px 24px rgba(252, 212, 10, 0.6);
+  }
+
+  .unit-card.locked .unit-icon {
+    background: #e2e8f0;
+    color: #94a3b8;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    opacity: 0;
+    transition: opacity 0.3s ease, background 0.3s ease;
+    z-index: 2;
+  }
+
+  .unit-card.locked .lock-overlay {
+    opacity: 1;
+  }
+
+  .lock-icon {
+    font-size: 2.2rem;
+    color: #94a3b8;
+  }
+
+  .unit-card h3 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.9rem;
+    line-height: 1.4;
+    transition: color 0.3s ease;
+  }
+
+  .unit-card:not(.locked):hover h3 {
+    color: var(--primary-blue);
+  }
+
+  .unit-card p {
+    font-size: 0.98rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    transition: color 0.3s ease;
+  }
+
+  .unit-card:not(.locked):hover p {
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 900px) {
+    .units-grid {
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .units-grid {
+      grid-template-columns: 1fr;
+    }
+    body {
+      padding: 1.8rem 1.2rem;
+    }
+    .page-header h1 {
+      font-size: 2rem;
+    }
+    .top-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .back-btn,
+    .lang-toggle {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .unit-card {
+      padding: 1.6rem 1.4rem;
+      min-height: 200px;
+    }
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
+    .page-header p {
+      font-size: 1rem;
+    }
+    .unit-icon {
+      width: 56px;
+      height: 56px;
+      font-size: 1.5rem;
+    }
+  }
+
+  .unit-card:not(.locked):focus {
+    outline: var(--focus-outline);
+    outline-offset: 4px;
+    z-index: 3;
+  }
+
+  .unit-card:not(.locked) {
+    animation: subtlePulse 8s infinite alternate;
+  }
+
+  @keyframes subtlePulse {
+    0%, 100% { box-shadow: var(--card-shadow); }
+    50% { box-shadow: 0 6px 18px rgba(17, 88, 121, 0.1); }
+  }
+</style>
+</head>
+<body>
+  <div class="units-wrapper">
+    <div class="top-bar">
+      <a href="dashboard.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> <span id="backText">Back to Dashboard</span>
+      </a>
+      <button class="lang-toggle" id="langToggle">
+        🌐 <span id="langText">AR</span>
+      </button>
+    </div>
+    
+    <div class="page-header">
+      <h1 id="gradeTitle">Grade X Units</h1>
+      <p id="selectUnitText">Select a unit to begin your lesson</p>
+    </div>
+    <div class="units-grid" id="unitsContainer">
+      <!-- Units will be injected here -->
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const grade = urlParams.get('grade');
+    const userGrade = localStorage.getItem('userGrade');
+
+    let currentLang = localStorage.getItem('language') || 'en';
+    
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('language', lang);
+      document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+      document.documentElement.lang = lang;
+      updateUILanguage();
+      renderUnits();
+    }
+
+    function updateUILanguage() {
+      const translations = {
+        en: {
+          backText: 'Back to Dashboard',
+          selectUnitText: 'Select a unit to begin your lesson',
+          langText: 'AR',
+          gradeTitle: `Grade ${grade} Units`
+        },
+        ar: {
+          backText: 'العودة إلى لوحة التحكم',
+          selectUnitText: 'اختر وحدة لبدء درسك',
+          langText: 'EN',
+          gradeTitle: `وحدات الصف ${grade}`
+        }
+      };
+
+      const t = translations[currentLang];
+      document.getElementById('backText').textContent = t.backText;
+      document.getElementById('selectUnitText').textContent = t.selectUnitText;
+      document.getElementById('langText').textContent = t.langText;
+      document.getElementById('gradeTitle').textContent = t.gradeTitle;
+    }
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      setLanguage(currentLang === 'en' ? 'ar' : 'en');
+    });
+
+    if (userGrade && grade !== userGrade) {
+      alert('You can only access your assigned grade level.');
+      window.location.href = 'dashboard.html';
+    }
+
+    if (!grade) {
+      window.location.href = 'dashboard.html';
+    }
+
+    function getCompletedUnits() {
+      const completed = localStorage.getItem('taa_completed_units');
+      return completed ? new Set(JSON.parse(completed)) : new Set();
+    }
+
+    function isUnitUnlocked(grade, unitId) {
+      // All units unlocked for now
+      if (unitId === 1 || unitId === 2 || unitId === 3 || unitId === 4 || unitId === 5) return true;
+      return false;
+    }
+
+    const gradeUnits = {
+      '1': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: My First Code', ar: 'الوحدة الأولى: أتعرف على الحاسوب' }, 
+          desc: { en: 'Print your first message using code blocks.', ar: 'اطبع أول رسالة لك باستخدام كتل البرمجة.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Digital Drawing', ar: 'الوحدة الثانية: أرسم باستخدام الحاسوب' }, 
+          desc: { en: 'Draw colorful shapes on the screen.', ar: 'ارسم أشكالاً ملونة على الشاشة.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Word Processor', ar: 'الوحدة الثالثة: برنامج معالج النصوص' }, 
+          desc: { en: 'Move a character using directional commands.', ar: 'حرّك شخصية باستخدام أوامر الاتجاه.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: Build My Computer', ar: 'الوحدة الرابعة: أصنع حاسوبي الشخصي' }, 
+          desc: { en: 'Create a short interactive story.', ar: 'أنشئ قصة تفاعلية قصيرة.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Scratch Jr', ar: 'الوحدة الخامسة: اتعلم البرمجة مع سكراتش جونيور' }, 
+          desc: { en: 'Solve fun puzzles to test your thinking.', ar: 'حل ألغاز ممتعة لاختبار تفكيرك.' } 
+        }
+      ],
+      '2': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: Loops', ar: 'الوحدة الأولى: الحلقات' }, 
+          desc: { en: 'Repeat actions efficiently with loop blocks.', ar: 'كرر الإجراءات بكفاءة باستخدام كتل الحلقات.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Patterns', ar: 'الوحدة الثانية: الأنماط' }, 
+          desc: { en: 'Create beautiful repeating patterns.', ar: 'أنشئ أنماطاً متكررة جميلة.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Debugging Basics', ar: 'الوحدة الثالثة: أساسيات تصحيح الأخطاء' }, 
+          desc: { en: 'Find and fix errors in simple programs.', ar: 'ابحث عن الأخطاء وصححها في البرامج البسيطة.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: Maze Runner', ar: 'الوحدة الرابعة: عابر المتاهة' }, 
+          desc: { en: 'Guide a robot through a tricky maze.', ar: 'وجه روبوت عبر متاهة صعبة.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Animal Sounds', ar: 'الوحدة الخامسة: أصوات الحيوانات' }, 
+          desc: { en: 'Make animals speak using code!', ar: 'اجعل الحيوانات تتكلم باستخدام البرمجة!' } 
+        }
+      ],
+      '3': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: Conditions', ar: 'الوحدة الأولى: الشروط' }, 
+          desc: { en: 'Make decisions using if-then logic.', ar: 'اتخذ قرارات باستخدام المنطق الشرطي.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Interactive Stories', ar: 'الوحدة الثانية: القصص التفاعلية' }, 
+          desc: { en: 'Build a choose-your-own-adventure game.', ar: 'ابنِ لعبة مغامرات تفاعلية.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Events & Clicks', ar: 'الوحدة الثالثة: الأحداث والنقرات' }, 
+          desc: { en: 'Respond to user clicks and actions.', ar: 'استجب لنقرات المستخدم وإجراءاته.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: Score Tracker', ar: 'الوحدة الرابعة: متتبع النقاط' }, 
+          desc: { en: 'Keep track of points in a mini-game.', ar: 'تتبع النقاط في لعبة صغيرة.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Emoji Reactions', ar: 'الوحدة الخامسة: ردود الفعل بالإيموجي' }, 
+          desc: { en: 'React with emojis based on choices.', ar: 'تفاعل بالإيموجي بناءً على الخيارات.' } 
+        }
+      ],
+      '4': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: Variables', ar: 'الوحدة الأولى: المتغيرات' }, 
+          desc: { en: 'Store and manage data like scores or names.', ar: 'خزّن وأدر البيانات مثل النقاط أو الأسماء.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Functions', ar: 'الوحدة الثانية: الدوال' }, 
+          desc: { en: 'Create reusable code blocks for efficiency.', ar: 'أنشئ كتل برمجية قابلة لإعادة الاستخدام.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Mini Games', ar: 'الوحدة الثالثة: الألعاب الصغيرة' }, 
+          desc: { en: 'Build a number guessing or memory game.', ar: 'ابنِ لعبة تخمين أرقام أو لعبة ذاكرة.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: Timers & Delays', ar: 'الوحدة الرابعة: المؤقتات والتأخيرات' }, 
+          desc: { en: 'Add countdowns and timed events.', ar: 'أضف عدّاً تنازلياً وأحداثاً مؤقتة.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Digital Art Studio', ar: 'الوحدة الخامسة: استوديو الفن الرقمي' }, 
+          desc: { en: 'Create pixel art with code.', ar: 'أنشئ فناً بكسل باستخدام البرمجة.' } 
+        }
+      ],
+      '5': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: Algorithms', ar: 'الوحدة الأولى: الخوارزميات' }, 
+          desc: { en: 'Design step-by-step solutions to problems.', ar: 'صمم حلولاً خطوة بخطوة للمشكلات.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Team Projects', ar: 'الوحدة الثانية: مشاريع جماعية' }, 
+          desc: { en: 'Collaborate on a shared coding challenge.', ar: 'تعاون في تحدي برمجي جماعي.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Error Handling', ar: 'الوحدة الثالثة: معالجة الأخطاء' }, 
+          desc: { en: 'Prevent crashes with smart error checks.', ar: 'تجنب الأعطال باستخدام فحوصات ذكية.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: Data Charts', ar: 'الوحدة الرابعة: مخططات البيانات' }, 
+          desc: { en: 'Visualize numbers with bar graphs.', ar: 'مثل الأرقام باستخدام المخططات الشريطية.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Final Quest', ar: 'الوحدة الخامسة: المهمة النهائية' }, 
+          desc: { en: 'Complete a multi-level coding adventure.', ar: 'أكمل مغامرة برمجية متعددة المستويات.' } 
+        }
+      ],
+      '6': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: Advanced Logic', ar: 'الوحدة الأولى: المنطق المتقدم' }, 
+          desc: { en: 'Master nested conditions and complex flows.', ar: 'تمكّن من الشروط المتداخلة والتدفقات المعقدة.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Robotics Intro', ar: 'الوحدة الثانية: مقدمة إلى الروبوتات' }, 
+          desc: { en: 'Control virtual robots with code.', ar: 'تحكّم بالروبوتات الافتراضية بالبرمجة.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Real Apps', ar: 'الوحدة الثالثة: تطبيقات حقيقية' }, 
+          desc: { en: 'Build a to-do list or weather app.', ar: 'ابنِ تطبيق مهام أو تطبيق طقس.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: APIs & Data', ar: 'الوحدة الرابعة: واجهات برمجة التطبيقات والبيانات' }, 
+          desc: { en: 'Fetch real-world data from the internet.', ar: 'اجلب بيانات من العالم الحقيقي من الإنترنت.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Portfolio Project', ar: 'الوحدة الخامسة: مشروع الحافظة' }, 
+          desc: { en: 'Showcase your best work in a final project.', ar: 'قدّم أفضل أعمالك في مشروع نهائي.' } 
+        }
+      ],
+      '7': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: HTML & CSS Basics', ar: 'الوحدة الأولى: أساسيات HTML وCSS' }, 
+          desc: { en: 'Learn the building blocks of web pages.', ar: 'تعلم اللبنات الأساسية لبناء صفحات الويب.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: JavaScript Fundamentals', ar: 'الوحدة الثانية: أساسيات الجافاسكريبت' }, 
+          desc: { en: 'Add interactivity to your pages with JavaScript.', ar: 'أضف تفاعلاً إلى صفحاتك باستخدام الجافاسكريبت.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Responsive Design', ar: 'الوحدة الثالثة: التصميم المتجاوب' }, 
+          desc: { en: 'Create websites that work on all devices.', ar: 'أنشئ مواقع تعمل على جميع الأجهزة.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: Web Forms', ar: 'الوحدة الرابعة: نماذج الويب' }, 
+          desc: { en: 'Build interactive forms and validate inputs.', ar: 'ابنِ نماذج تفاعلية وتحقّق من صحة المدخلات.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Personal Website Project', ar: 'الوحدة الخامسة: مشروع الموقع الشخصي' }, 
+          desc: { en: 'Design and publish your own website online.', ar: 'صمّم وانشر موقعك الخاص على الإنترنت.' } 
+        }
+      ],
+      '8': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: Arrays & Lists', ar: 'الوحدة الأولى: المصفوفات والقوائم' }, 
+          desc: { en: 'Organize and manipulate data collections.', ar: 'نظّم وتمكّن من معالجة مجموعات البيانات.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Sorting Algorithms', ar: 'الوحدة الثانية: خوارزميات الترتيب' }, 
+          desc: { en: 'Learn bubble sort, quicksort, and more.', ar: 'تعلّم الترتيب بالفقاعات، الترتيب السريع، وأكثر.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Search Algorithms', ar: 'الوحدة الثالثة: خوارزميات البحث' }, 
+          desc: { en: 'Find data efficiently even in large sets.', ar: 'ابحث عن البيانات بكفاءة حتى في المجموعات الكبيرة.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: Recursion', ar: 'الوحدة الرابعة: الاستدعاء الذاتي' }, 
+          desc: { en: 'Solve problems by breaking them into smaller parts.', ar: 'حل المشكلات بتقسيمها إلى أجزاء أصغر.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Algorithm Competition', ar: 'الوحدة الخامسة: مسابقة الخوارزميات' }, 
+          desc: { en: 'Test your skills in coding challenges.', ar: 'اختبر مهاراتك في تحديات برمجية.' } 
+        }
+      ],
+      '9': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: OOP Concepts', ar: 'الوحدة الأولى: مفاهيم البرمجة كائنية التوجه' }, 
+          desc: { en: 'Learn classes, objects, and inheritance.', ar: 'تعلّم الكلاسات، الكائنات، والتوريث.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Database Design', ar: 'الوحدة الثانية: تصميم قواعد البيانات' }, 
+          desc: { en: 'Structure and organize data efficiently.', ar: 'نظّم ورتّب البيانات بكفاءة.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: SQL Queries', ar: 'الوحدة الثالثة: استعلامات SQL' }, 
+          desc: { en: 'Retrieve and modify database records.', ar: 'استرجع وغيّر سجلات قاعدة البيانات.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: API Integration', ar: 'الوحدة الرابعة: تكامل واجهات برمجة التطبيقات' }, 
+          desc: { en: 'Connect your app to external services.', ar: 'وصّل تطبيقك بخدمات خارجية.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Inventory System', ar: 'الوحدة الخامسة: نظام الجرد' }, 
+          desc: { en: 'Build a full inventory management app.', ar: 'ابنِ تطبيقًا كاملاً لإدارة المخزون.' } 
+        }
+      ],
+      '10': [
+        { 
+          id: 1, 
+          title: { en: 'Unit 1: Frontend Frameworks', ar: 'الوحدة الأولى: إطارات الواجهات الأمامية' }, 
+          desc: { en: 'Dive into React, Vue, or Angular basics.', ar: 'تعمّق في أساسيات React أو Vue أو Angular.' } 
+        },
+        { 
+          id: 2, 
+          title: { en: 'Unit 2: Backend Development', ar: 'الوحدة الثانية: تطوير الواجهات الخلفية' }, 
+          desc: { en: 'Build servers using Node.js or Python.', ar: 'ابنِ خوادم باستخدام Node.js أو Python.' } 
+        },
+        { 
+          id: 3, 
+          title: { en: 'Unit 3: Authentication Systems', ar: 'الوحدة الثالثة: أنظمة المصادقة' }, 
+          desc: { en: 'Implement secure login systems.', ar: 'نفّذ أنظمة تسجيل دخول آمنة.' } 
+        },
+        { 
+          id: 4, 
+          title: { en: 'Unit 4: Cloud Deployment', ar: 'الوحدة الرابعة: النشر على السحابة' }, 
+          desc: { en: 'Launch your app on the internet.', ar: 'اطلق تطبيقك على الإنترنت.' } 
+        },
+        { 
+          id: 5, 
+          title: { en: 'Unit 5: Capstone Project', ar: 'الوحدة الخامسة: مشروع التخرّج' }, 
+          desc: { en: 'Create a full-stack app from scratch.', ar: 'أنشئ تطبيقًا كاملاً من البداية للنهاية.' } 
+        }
+      ]
+    };
+
+    function renderUnits() {
+      const units = gradeUnits[grade] || gradeUnits['1'];
+      const container = document.getElementById('unitsContainer');
+
+      container.innerHTML = units.map((unit, index) => {
+        const unlocked = isUnitUnlocked(grade, unit.id);
+        const cardClass = unlocked ? '' : 'locked';
+        const clickAction = unlocked 
+          ? `window.location.href='lesson.html?grade=${grade}&unit=${unit.id}'` 
+          : '';
+        
+        const title = typeof unit.title === 'object' ? unit.title[currentLang] : unit.title;
+        const desc = typeof unit.desc === 'object' ? unit.desc[currentLang] : unit.desc;
+        
+        return `
+          <div class="unit-card ${cardClass}" ${unlocked ? `onclick="${clickAction}"` : ''}>
+            <div class="unit-icon">${index + 1}</div>
+            <h3>${title}</h3>
+            <p>${desc}</p>
+            ${!unlocked ? `<div class="lock-overlay"><i class="fas fa-lock lock-icon"></i></div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    setLanguage(currentLang);
+  </script>
+</body>
+</html>

@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">LearnWithTaa - Programming Community for Kids</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 1.2rem 5%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo-image {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-image:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #fcd40a 0%, #e6c009 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #115879;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(252, 212, 10, 0.25);
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #115879;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: #fcd40a;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .login-btn {
+            background: #115879;
+            color: #ffffff;
+            padding: 0.65rem 1.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .login-btn:hover {
+            background: #0d4460;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(17, 88, 121, 0.3);
+        }
+
+        .lang-btn {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            color: #115879;
+            padding: 0.65rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .lang-btn:hover {
+            background: #e8e9ea;
+            border-color: #115879;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #115879 0%, #0a3d54 100%);
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5rem 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(252, 212, 10, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -200px;
+            right: 10%;
+            animation: pulse 8s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        .hero-content {
+            flex: 1;
+            color: #ffffff;
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(252, 212, 10, 0.15);
+            color: #fcd40a;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(252, 212, 10, 0.3);
+        }
+
+        .hero-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.15;
+            letter-spacing: -1px;
+        }
+
+        .hero-title span {
+            color: #fcd40a;
+            position: relative;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .hero-features {
+            list-style: none;
+            margin-bottom: 2.5rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .hero-features li {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .hero-features li:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+
+        .hero-features li::before {
+            content: '✓';
+            background: #fcd40a;
+            color: #115879;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .visual-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .device-mockup {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f1 100%);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        .code-preview {
+            width: 100%;
+            background: rgba(17, 88, 121, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #115879;
+            text-align: left;
+        }
+
+        .play-button {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #fcd40a 0%, #e6c009 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(252, 212, 10, 0.3);
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(252, 212, 10, 0.4);
+        }
+
+        .play-button::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 12px 0 12px 20px;
+            border-color: transparent transparent transparent #115879;
+            margin-left: 4px;
+        }
+
+        .floating-card {
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        .card-1 {
+            top: 10%;
+            left: -15%;
+            animation-delay: 0s;
+        }
+
+        .card-2 {
+            bottom: 10%;
+            right: -15%;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #fcd40a 0%, #e6c009 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #115879;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            background: #f8f9fa;
+            padding: 4rem 5% 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer-section h3 {
+            color: #115879;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #666;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .footer-section a:hover {
+            color: #115879;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 6px;
+        }
+
+        .social-links a:hover .social-icon {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: #fcd40a;
+        }
+
+        .contact-info {
+            margin-top: 1rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .contact-item span:first-child {
+            font-size: 1.1rem;
+            margin-top: 2px;
+        }
+
+        .newsletter-form {
+            display: flex;
+            margin-top: 1.5rem;
+            gap: 0.5rem;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 0.85rem 1.2rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .newsletter-input:focus {
+            border-color: #115879;
+            box-shadow: 0 0 0 3px rgba(17, 88, 121, 0.1);
+        }
+
+        .newsletter-btn {
+            padding: 0.85rem 1.8rem;
+            background: #115879;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .newsletter-btn:hover {
+            background: #0d4460;
+            transform: translateY(-1px);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 3rem 2rem;
+                min-height: auto;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                margin-bottom: 3rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-features li {
+                justify-content: center;
+            }
+
+            .hero-features li:hover {
+                transform: translateX(0);
+            }
+
+            .visual-container {
+                max-width: 400px;
+            }
+
+            .floating-card {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header {
+                padding: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                gap: 1rem;
+            }
+
+            .logo-image {
+                height: 40px;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 1rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            footer {
+                padding: 2rem 1rem;
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+        }
+
+        /* RTL Support */
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        [dir="rtl"] .logo {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .header-right {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .hero {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .hero-content {
+            text-align: right;
+        }
+
+        [dir="rtl"] .hero-features li::before {
+            order: 1;
+            margin-right: 0;
+            margin-left: 1rem;
+        }
+
+        [dir="rtl"] .hero-features li:hover {
+            transform: translateX(-5px);
+        }
+
+        [dir="rtl"] .card-1 {
+            left: auto;
+            right: -15%;
+        }
+
+        [dir="rtl"] .card-2 {
+            right: auto;
+            left: -15%;
+        }
+
+        [dir="rtl"] .footer-section {
+            text-align: right;
+        }
+
+        [dir="rtl"] .social-links {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .contact-item {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .newsletter-form {
+            flex-direction: row-reverse;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="icons/img.png" alt="Logo 1" class="logo-image">
+            <img src="icons/logo_al_manhal.jpeg" alt="Logo Al Manhal" class="logo-image">
+            <div class="logo-text">عالمي الرقمي</div>
+        </div>
+        <div class="header-right">
+            <a href="login.html" class="login-btn" id="login-btn">Login</a>
+            <button class="lang-btn" id="lang-btn">🌐 EN</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge" id="hero-badge"></div>
+            <h1 class="hero-title" id="hero-title">
+                Programming <span>Community</span> for Kids
+            </h1>
+            <p class="hero-subtitle" id="hero-subtitle">
+                A unique educational experience designed specifically to spark your child's creativity
+            </p>
+            <ul class="hero-features" id="hero-features">
+                <li>Develop their thinking skills</li>
+                <li>Improve their communication skills</li>
+                <li>Enhance their academic skills</li>
+            </ul>
+        </div>
+
+        <div class="hero-visual">
+            <div class="visual-container">
+                <div class="floating-card card-1">
+                    <div class="card-icon">🎯</div>
+                    <span class="card-text">Interactive</span>
+                </div>
+                
+                <div class="device-mockup">
+                    <div class="device-screen">
+                        <div class="code-preview">
+                            &lt;code&gt;<br>
+                            &nbsp;&nbsp;Learn to code<br>
+                            &nbsp;&nbsp;Have fun!<br>
+                            &lt;/code&gt;
+                        </div>
+                        <div class="play-button"></div>
+                    </div>
+                </div>
+
+                <div class="floating-card card-2">
+                    <div class="card-icon">🚀</div>
+                    <span class="card-text">Fun Learning</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-section">
+            <div class="logo">
+                <div class="logo-text">عالمي الرقمي</div>
+            </div>
+            <p style="margin-top: 1rem;" id="footer-tagline">
+                A world of learning at your fingertips
+            </p>
+            <div class="social-links">
+                <a href="https://web.facebook.com/ta2ai" target="_blank" aria-label="Facebook">
+                    <img src="icons/facebook.png" alt="Facebook" class="social-icon">
+                </a>
+                <a href="https://www.instagram.com/taa_academy?igsh=YnV3eXU3ZnFueXFk" target="_blank" aria-label="Instagram">
+                    <img src="icons/instagram.png" alt="Instagram" class="social-icon">
+                </a>
+                <a href="https://wa.me/962799670628" target="_blank" aria-label="WhatsApp">
+                    <img src="icons/whatsapp.png" alt="WhatsApp" class="social-icon">
+                </a>
+                <a href="https://maps.google.com/?cid=3240599870435748634" target="_blank" rel="noopener" aria-label="Location">
+                    <img src="icons/location.png" alt="Location" class="social-icon">
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3 id="useful-links"></h3>
+            <div id="useful-links-list"></div>
+        </div>
+
+        <div class="footer-section">
+            <h3 id="contact-us">Contact Us</h3>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span>📞</span>
+                    <span>0799670628</span>
+                </div>
+                <div class="contact-item">
+                    <span>✉️</span>
+                    <span>geek_amal@hotmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <span>📍</span>
+                    <span id="address"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3 id="newsletter">Newsletter</h3>
+            <p id="subscribe-text">Subscribe to our newsletter for the latest updates and promotions</p>
+            <form class="newsletter-form">
+                <input type="email" id="newsletter-input" class="newsletter-input" required>
+                <button type="submit" id="newsletter-btn" class="newsletter-btn"></button>
+            </form>
+        </div>
+    </footer>
+
+    <script>
+        // Get saved language from localStorage or default to 'en'
+        let currentLang = localStorage.getItem('userLanguage') || 'en';
+        let translations = {};
+
+        async function loadTranslations(lang) {
+            try {
+                const response = await fetch(`lang/${lang}.json`);
+                if (!response.ok) throw new Error(`Failed to load ${lang} translations`);
+                translations = await response.json();
+                applyTranslations();
+            } catch (error) {
+                console.error('Error loading translations:', error);
+            }
+        }
+
+        function applyTranslations() {
+            document.getElementById('page-title').textContent = translations.title;
+            document.getElementById('hero-title').innerHTML = translations.hero_title;
+            document.getElementById('hero-subtitle').textContent = translations.hero_subtitle;
+            document.getElementById('hero-badge').textContent = translations.hero_badge; 
+            document.getElementById('address').textContent = translations.address;
+            document.getElementById('newsletter-input').placeholder = translations.newsletter_placeholder;
+            document.getElementById('newsletter-btn').textContent = translations.newsletter_button;
+            document.getElementById('hero-features').innerHTML = `
+                <li>${translations.feature1}</li>
+                <li>${translations.feature2}</li>
+                <li>${translations.feature3}</li>
+            `;
+            document.getElementById('footer-tagline').textContent = translations.footer_tagline;
+            document.getElementById('useful-links').textContent = translations.useful_links;
+            const linksContainer = document.getElementById('useful-links-list');
+            if (linksContainer) {
+                linksContainer.innerHTML = `
+                    <a href="#">${translations.link_levels}</a>
+                    <a href="#">${translations.link_school_copy}</a>
+                    <a href="#">${translations.link_terms}</a>
+                    <a href="#">${translations.link_privacy}</a>
+                    <a href="#">${translations.link_privacy_policy}</a>
+                `;
+            }
+            document.getElementById('contact-us').textContent = translations.contact_us;
+            document.getElementById('newsletter').textContent = translations.newsletter;
+            document.getElementById('subscribe-text').textContent = translations.subscribe_text;
+            document.getElementById('login-btn').textContent = translations.login;
+            document.getElementById('lang-btn').textContent = translations.lang_btn;
+
+            if (currentLang === 'ar') {
+                document.documentElement.dir = 'rtl';
+            } else {
+                document.documentElement.dir = 'ltr';
+            }
+        }
+
+        document.getElementById('lang-btn').addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            localStorage.setItem('userLanguage', currentLang);
+            loadTranslations(currentLang);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTranslations(currentLang);
+        });
+    </script>
+</body>
+</html>

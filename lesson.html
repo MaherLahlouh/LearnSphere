@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lesson - Taa Academy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  :root {
+    --primary-blue: #115879;
+    --primary-yellow: #fcd40a;
+    --bg-gradient-start: #f0f9ff;
+    --bg-gradient-end: #e0f2fe;
+    --card-shadow: 0 8px 16px rgba(17, 88, 121, 0.08);
+    --card-shadow-hover: 0 12px 24px rgba(17, 88, 121, 0.12);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #cbd5e1;
+    --success-green: #10b981;
+    --error-red: #ef4444;
+    --lesson-active-bg: #e0f2fe;
+    --hover-bg: #f8fafc;
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --focus-outline: 3px solid var(--primary-blue);
+  }
+
+  [dir="rtl"] {
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 2rem;
+    position: relative;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(17, 88, 121, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(252, 212, 10, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .lesson-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .lesson-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    animation: slideDown 0.6s ease-out;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    text-shadow: 0 2px 4px rgba(17, 88, 121, 0.1);
+  }
+
+  .back-btn {
+    background: white;
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.7rem 1.4rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .back-btn:hover,
+  .back-btn:focus {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(17, 88, 121, 0.2);
+    outline: none;
+  }
+
+  .back-btn:focus {
+    box-shadow: var(--focus-outline), 0 4px 8px rgba(17, 88, 121, 0.2);
+  }
+
+  .lesson-layout {
+    display: flex;
+    gap: 2rem;
+    height: calc(100vh - 180px);
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .lessons-sidebar {
+    width: 320px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 1.8rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    overflow-y: auto;
+    transition: all 0.3s ease;
+  }
+
+  .lessons-sidebar::-webkit-scrollbar,
+  .main-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  .lessons-sidebar::-webkit-scrollbar-track,
+  .main-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .lessons-sidebar::-webkit-scrollbar-thumb,
+  .main-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+  }
+  .lessons-sidebar::-webkit-scrollbar-thumb:hover,
+  .main-content::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-blue);
+  }
+
+  .sidebar-header {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--primary-blue);
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--primary-yellow);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .sidebar-header::before {
+    content: '📚';
+    font-size: 1.5rem;
+  }
+
+  .lesson-item {
+    padding: 1.2rem;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: white;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lesson-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary-yellow);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+
+  .lesson-item:hover,
+  .lesson-item:active {
+    background: var(--hover-bg);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(17, 88, 121, 0.1);
+  }
+
+  .lesson-item:hover::before,
+  .lesson-item.active::before {
+    transform: scaleY(1);
+  }
+
+  .lesson-item.active {
+    background: var(--lesson-active-bg);
+    border-color: var(--primary-blue);
+    box-shadow: 0 4px 12px rgba(17, 88, 121, 0.15);
+  }
+
+  .lesson-item.active::before {
+    background: var(--primary-blue);
+  }
+
+  .lesson-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, #f0b90b 100%);
+    color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(252, 212, 10, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .lesson-item.active .lesson-icon {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #0d3f54 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(17, 88, 121, 0.4);
+    transform: scale(1.1);
+  }
+
+  .lesson-item.completed .lesson-icon {
+    background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+    color: white;
+  }
+
+  .lesson-info h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lesson-info p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .check-icon {
+    color: var(--success-green);
+    opacity: 0;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    transform: scale(0);
+  }
+
+  .lesson-item.completed .check-icon {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto;
+  }
+
+  .book-container,
+  .video-container {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    min-height: 400px;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .book-container:hover,
+  .video-container:hover {
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  .book-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #0d3f54 100%);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .book-header h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .page-info {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .book-container iframe,
+  .video-container iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    border: none;
+  }
+
+  .quiz-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .quiz-header h3 {
+    font-size: 1.5rem;
+    color: var(--primary-blue);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .quiz-progress {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .question-container {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .question-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .answers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .answer-option {
+    background: var(--hover-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .answer-option:hover,
+  .answer-option:focus {
+    background: white;
+    border-color: var(--primary-blue);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(17, 88, 121, 0.1);
+    outline: none;
+  }
+
+  .answer-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary-blue);
+  }
+
+  .answer-option.correct {
+    background: #d1fae5;
+    border-color: var(--success-green);
+    color: var(--success-green);
+    font-weight: 700;
+  }
+
+  .answer-option.incorrect {
+    background: #fee2e2;
+    border-color: var(--error-red);
+    color: var(--error-red);
+    font-weight: 700;
+  }
+
+  .answer-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .feedback-message {
+    margin-top: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback-message.correct {
+    background: #d1fae5;
+    color: var(--success-green);
+    border: 2px solid var(--success-green);
+  }
+
+  .feedback-message.incorrect {
+    background: #fee2e2;
+    color: var(--error-red);
+    border: 2px solid var(--error-red);
+  }
+
+  .quiz-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+
+  .quiz-btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .quiz-btn:focus {
+    outline: var(--focus-outline);
+    outline-offset: 2px;
+  }
+
+  .quiz-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .check-answer-btn {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #0d3f54 100%);
+    color: white;
+  }
+
+  .check-answer-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(17, 88, 121, 0.4);
+  }
+
+  .next-question-btn {
+    background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+    color: white;
+  }
+
+  .next-question-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+  }
+
+  .lesson-details {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .details-header h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-blue);
+    font-weight: 800;
+  }
+
+  .step {
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding: 1.2rem;
+    background: white;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-yellow);
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .step:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateX(4px);
+  }
+
+  .step h4 {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-blue);
+    font-weight: 700;
+  }
+
+  .step p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  .actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .finish-btn {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #0d3f54 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(17, 88, 121, 0.3);
+  }
+
+  .finish-btn:focus {
+    outline: var(--focus-outline);
+    outline-offset: 2px;
+  }
+
+  .finish-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(17, 88, 121, 0.4);
+  }
+
+  .finish-btn:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .finish-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .finish-btn.completed {
+    background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+    cursor: default;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  /* ✅ NEW: Try on Compiler Button Style */
+  .try-compiler-btn {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  .try-compiler-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+  }
+
+  .try-compiler-btn:focus {
+    outline: 3px solid #6366f1;
+    outline-offset: 2px;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: rgba(203, 213, 225, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(17, 88, 121, 0.5);
+  }
+
+  @media (max-width: 1200px) {
+    .lessons-sidebar {
+      width: 280px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .lesson-layout {
+      flex-direction: column;
+      height: auto;
+    }
+    .lessons-sidebar {
+      width: 100%;
+      max-height: 250px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    body {
+      padding: 1rem;
+      font-size: 16px;
+    }
+    .lesson-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .page-title {
+      font-size: 1.5rem;
+    }
+    .lessons-sidebar {
+      padding: 1.2rem;
+    }
+    .quiz-container,
+    .lesson-details {
+      padding: 1.5rem;
+    }
+    .quiz-actions {
+      flex-direction: column;
+    }
+    .quiz-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  [dir="rtl"] .lesson-header,
+  [dir="rtl"] .quiz-header,
+  [dir="rtl"] .actions {
+    flex-direction: row-reverse;
+    text-align: right;
+  }
+
+  [dir="rtl"] .lesson-item::before {
+    left: auto;
+    right: 0;
+  }
+
+  [dir="rtl"] .lesson-item:hover,
+  [dir="rtl"] .lesson-item.active,
+  [dir="rtl"] .step:hover {
+    transform: translateX(-4px);
+  }
+
+  [dir="rtl"] .back-btn i {
+    margin-left: 0.6rem;
+    margin-right: 0;
+  }
+
+  [dir="rtl"] .lesson-info h4,
+  [dir="rtl"] .lesson-info p {
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+  <div class="lesson-wrapper">
+    <div class="lesson-header">
+      <h1 class="page-title" id="unitTitle">Grade X - Unit Y</h1>
+      <a href="#" class="back-btn" id="backBtn">
+        <i class="fas fa-arrow-left"></i> Back to Units
+      </a>
+    </div>
+
+    <div class="lesson-layout">
+      <div class="lessons-sidebar">
+        <div class="sidebar-header">Lessons</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div id="lessonsList"></div>
+      </div>
+
+      <div class="main-content">
+        <div class="book-container" id="bookContainer" style="display: none;">
+          <div class="book-header">
+            <h3><i class="fas fa-book-open"></i> <span id="bookTitle">Digital Book</span></h3>
+            <div class="page-info" id="pageInfo">Pages: 1-10</div>
+          </div>
+          <iframe id="lessonBook" src="" allowfullscreen></iframe>
+        </div>
+
+        <div class="video-container" id="videoContainer" style="display: none;">
+          <iframe id="lessonVideo" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+
+        <div class="quiz-container" id="quizContainer">
+          <div class="quiz-header">
+            <h3><i class="fas fa-question-circle"></i> Quiz</h3>
+            <div class="quiz-progress" id="quizProgress">Question 1 of 3</div>
+          </div>
+          <div class="question-container">
+            <div class="question-text" id="questionText">Loading question...</div>
+            <div class="answers-list" id="answersList"></div>
+            <div id="feedbackMessage"></div>
+          </div>
+          <div class="quiz-actions">
+            <button class="quiz-btn check-answer-btn" id="checkAnswerBtn" disabled>
+              <i class="fas fa-check"></i> Check My Answer
+            </button>
+            <button class="quiz-btn next-question-btn" id="nextQuestionBtn" disabled style="display: none;">
+              <i class="fas fa-arrow-right"></i> Next Question
+            </button>
+          </div>
+        </div>
+
+        <div class="lesson-details">
+          <div class="details-header">
+            <h2 id="currentLessonTitle">Select a lesson to begin</h2>
+          </div>
+          <div class="steps" id="lessonSteps">
+            <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Click on a lesson from the list to view its content.</p>
+          </div>
+          <div class="actions">
+            <button class="finish-btn" id="finishBtn" disabled>
+              <i class="fas fa-flag-checkered"></i> Mark as Completed
+            </button>
+            <!-- ✅ NEW BUTTON -->
+            <button class="try-compiler-btn" id="tryCompilerBtn" style="display: none;">
+              <i class="fas fa-code"></i> Try on Compiler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const grade = urlParams.get('grade') || '1';
+    const unitId = parseInt(urlParams.get('unit')) || 1;
+    const userGrade = localStorage.getItem('userGrade');
+
+    if (userGrade && grade !== userGrade) {
+      alert('You can only access lessons from your assigned grade level.');
+      window.location.href = 'dashboard.html';
+    }
+
+    const currentLanguage = localStorage.getItem('language') || 'ar';
+    console.log('🌍 Current Language:', currentLanguage);
+    console.log('📚 Current Grade:', grade, 'Unit:', unitId);
+
+    const bookUrls = {
+      '1': 'https://www.manhal.com/platform/books/1595/index.html?o=qr',
+      '2': 'https://www.manhal.com/platform/books/1596/index.html?o=qr',
+      '3': 'https://www.manhal.com/platform/books/1588/index.html?o=qr',
+      '4': 'https://www.manhal.com/platform/books/1586/index.html?o=qr',
+      '5': 'https://www.manhal.com/platform/books/1587/index.html?o=qr',
+      '6': 'https://www.manhal.com/platform/books/1597/index.html?o=qr',
+      '7': {
+        'ar': 'pdfs/arabic/my_digital_world_ar_7.pdf',
+        'en': 'pdfs/english/my_digital_world_7.pdf'
+      },
+      '8': {
+        'ar': 'pdfs/arabic/my_digital_world_ar_8.pdf',
+        'en': 'pdfs/english/my_digital_world_8.pdf'
+      },
+      '9': {
+        'ar': 'pdfs/arabic/my_digital_world_ar_9.pdf',
+        'en': 'pdfs/english/my_digital_world_9.pdf'
+      },
+      '10': {
+        'ar': 'pdfs/arabic/my_digital_world_ar_10.pdf',
+        'en': 'pdfs/english/my_digital_world_10.pdf'
+      }
+    };
+
+    function getBookUrl(grade, language) {
+      const bookData = bookUrls[grade];
+      if (typeof bookData === 'string') {
+        return bookData;
+      }
+      if (typeof bookData === 'object' && bookData !== null) {
+        const url = bookData[language] || bookData['ar'];
+        return url;
+      }
+      return null;
+    }
+
+    function getYouTubeEmbedUrl(url) {
+      if (!url) return '';
+      if (url.includes('youtube.com/embed/')) return url;
+      let videoId = '';
+      if (url.includes('youtube.com/watch?v=')) {
+        const match = url.match(/[?&]v=([^&]+)/);
+        videoId = match ? match[1] : '';
+      } else if (url.includes('youtu.be/')) {
+        const match = url.match(/youtu\.be\/([^?]+)/);
+        videoId = match ? match[1] : '';
+      }
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+    }
+
+    const quizData = {
+      '1': {
+        1: {
+          1: [
+            { question: 'ما هي الأماكن التي نستخدم فيها الحاسوب؟', answers: ['المنزل والمدرسة', 'الغابة فقط', 'تحت الماء', 'في الفضاء فقط'], correct: 0 },
+            { question: 'أي من هذه الأماكن يستخدم فيها الحاسوب؟', answers: ['الصحراء', 'المستشفى', 'القمر', 'البحر'], correct: 1 },
+            { question: 'هل يستخدم الحاسوب في البنوك؟', answers: ['نعم', 'لا', 'أحياناً', 'لا أعرف'], correct: 0 }
+          ]
+        }
+      }
+    };
+
+    const unitLessons = {
+      '1': {
+        1: [
+          { id: 1, title: 'أين الحاسوب', desc: 'تعرف على اماكن استخدام الحاسوب', video: 'https://www.youtube.com/watch?v=45LtBSwxfcU', bookPages: '6-15', steps: [{ heading: 'المقدمة', text: 'في هذا الدرس سنتعرف على الأماكن المختلفة التي يستخدم فيها الحاسوب في حياتنا اليومية.' }] },   
+          { id: 2, title: 'أجزاء الحاسوب', desc: 'ماهي اجزاء الحاسوب', video: 'https://youtu.be/wsv7SH5dC4k', bookPages: '16-25', steps: [{ heading: 'الأجزاء الأساسية', text: 'سنتعلم عن المكونات الرئيسية للحاسوب مثل الشاشة، لوحة المفاتيح، والفأرة.' }] },
+          { id: 3, title: 'وحدات الادخال و الاخراج', desc: 'الفرق بين وحدات الإدخال و الإخراج', video: 'https://youtu.be/rwrtaBtnRag', bookPages: '26-35', steps: [{ heading: 'وحدات الإدخال', text: 'وحدات الإدخال هي الأجهزة التي نستخدمها لإدخال البيانات إلى الحاسوب.' }] },
+          { id: 4, title: 'كيف يعمل الحاسوب', desc: 'تعرف على كيفية عمل الحاسوب', video: 'https://youtu.be/0-pHpAjYxM8', bookPages: '36-45', steps: [{ heading: 'آلية العمل', text: 'يعمل الحاسوب من خلال معالجة البيانات وتحويلها إلى معلومات مفيدة.' }] }
+        ]
+      },
+      '7': {
+        1: [
+          { id: 1, title: 'Introduction to HTML', desc: 'Learn HTML basics', video: 'https://www.youtube.com/watch?v=UB1O30fR-EE', bookPages: 'Full Book', steps: [{ heading: 'HTML Basics', text: 'HTML is the standard markup language for web pages.' }] },
+          { id: 2, title: 'CSS Styling', desc: 'Style your web pages', video: 'https://www.youtube.com/watch?v=1Rs2ND1ryYc', bookPages: 'Full Book', steps: [{ heading: 'CSS Introduction', text: 'Learn how to make your websites beautiful.' }] }
+        ],
+        2: [
+          { id: 1, title: 'JavaScript Basics', desc: 'Programming fundamentals', video: 'https://www.youtube.com/watch?v=W6NZfCO5SIk', bookPages: 'Full Book', steps: [{ heading: 'Getting Started', text: 'Your first JavaScript program.' }] }
+        ],
+        3: [
+          { id: 1, title: 'Responsive Design', desc: 'Mobile-first design', video: 'https://www.youtube.com/watch?v=srvUrASNj0s', bookPages: 'Full Book', steps: [{ heading: 'Media Queries', text: 'Make your site work on all devices.' }] }
+        ],
+        4: [
+          { id: 1, title: 'Forms and Validation', desc: 'User input handling', video: 'https://www.youtube.com/watch?v=fNcJuPIZ2WE', bookPages: 'Full Book', steps: [{ heading: 'Form Elements', text: 'Create interactive forms.' }] }
+        ],
+        5: [
+          { id: 1, title: 'Final Project', desc: 'Build your website', video: 'https://www.youtube.com/watch?v=erEgovG9WBs', bookPages: 'Full Book', steps: [{ heading: 'Project Planning', text: 'Plan and build your personal website.' }] }
+        ]
+      },
+      '8': {
+        1: [
+          { id: 1, title: 'Arrays Introduction', desc: 'Working with collections', video: 'https://www.youtube.com/watch?v=RBSGKlAvoiM', bookPages: 'Full Book', steps: [{ heading: 'Array Basics', text: 'Learn to store multiple values.' }] }
+        ],
+        2: [
+          { id: 1, title: 'Sorting Algorithms', desc: 'Organize your data', video: 'https://www.youtube.com/watch?v=kPRA0W1kECg', bookPages: 'Full Book', steps: [{ heading: 'Bubble Sort', text: 'Understand sorting techniques.' }] }
+        ],
+        3: [
+          { id: 1, title: 'Search Algorithms', desc: 'Find data efficiently', video: 'https://www.youtube.com/watch?v=TwsgCHYmbbA', bookPages: 'Full Book', steps: [{ heading: 'Linear Search', text: 'Basic search techniques.' }] }
+        ],
+        4: [
+          { id: 1, title: 'Recursion', desc: 'Functions calling themselves', video: 'https://www.youtube.com/watch?v=IJDJ0kBx2LM', bookPages: 'Full Book', steps: [{ heading: 'Recursion Basics', text: 'Solve problems with recursion.' }] }
+        ],
+        5: [
+          { id: 1, title: 'Algorithm Challenge', desc: 'Test your skills', video: 'https://www.youtube.com/watch?v=8hly31xKli0', bookPages: 'Full Book', steps: [{ heading: 'Practice', text: 'Apply what you learned.' }] }
+        ]
+      },
+      '9': {
+        1: [
+          { id: 1, title: 'OOP Fundamentals', desc: 'Object-oriented programming', video: 'https://www.youtube.com/watch?v=pTB0EiLXUC8', bookPages: 'Full Book', steps: [{ heading: 'Classes', text: 'Learn about classes and objects.' }] }
+        ],
+        2: [
+          { id: 1, title: 'Database Design', desc: 'Organizing data', video: 'https://www.youtube.com/watch?v=ztHopE5Wnpc', bookPages: 'Full Book', steps: [{ heading: 'Tables', text: 'Design database tables.' }] }
+        ],
+        3: [
+          { id: 1, title: 'SQL Queries', desc: 'Database operations', video: 'https://www.youtube.com/watch?v=HXV3zeQKqGY', bookPages: 'Full Book', steps: [{ heading: 'SELECT Statements', text: 'Query your database.' }] }
+        ],
+        4: [
+          { id: 1, title: 'API Integration', desc: 'Connect to services', video: 'https://www.youtube.com/watch?v=GZvSYJDk-us', bookPages: 'Full Book', steps: [{ heading: 'REST APIs', text: 'Work with external APIs.' }] }
+        ],
+        5: [
+          { id: 1, title: 'Inventory System', desc: 'Complete project', video: 'https://www.youtube.com/watch?v=OK_JCtrrv-c', bookPages: 'Full Book', steps: [{ heading: 'Build System', text: 'Create inventory management app.' }] }
+        ]
+      },
+      '10': {
+        1: [
+          { id: 1, title: 'Frontend Frameworks', desc: 'React/Vue/Angular', video: 'https://www.youtube.com/watch?v=Tn6-PIqc4UM', bookPages: 'Full Book', steps: [{ heading: 'Framework Basics', text: 'Modern frontend development.' }] }
+        ],
+        2: [
+          { id: 1, title: 'Backend Development', desc: 'Server-side programming', video: 'https://www.youtube.com/watch?v=Oe421EPjeBE', bookPages: 'Full Book', steps: [{ heading: 'Node.js', text: 'Build server applications.' }] }
+        ],
+        3: [
+          { id: 1, title: 'Authentication', desc: 'Secure login systems', video: 'https://www.youtube.com/watch?v=Ud5xKCYQTjM', bookPages: 'Full Book', steps: [{ heading: 'JWT', text: 'Implement authentication.' }] }
+        ],
+        4: [
+          { id: 1, title: 'Cloud Deployment', desc: 'Deploy your app', video: 'https://www.youtube.com/watch?v=RyiPj_flqWU', bookPages: 'Full Book', steps: [{ heading: 'Hosting', text: 'Launch your application online.' }] }
+        ],
+        5: [
+          { id: 1, title: 'Capstone Project', desc: 'Final project', video: 'https://www.youtube.com/watch?v=OK_JCtrrv-c', bookPages: 'Full Book', steps: [{ heading: 'Full Stack', text: 'Build complete application.' }] }
+        ]
+      }
+    };
+
+    const unitTitleEl = document.getElementById('unitTitle');
+    const lessonsListEl = document.getElementById('lessonsList');
+    const currentLessonTitleEl = document.getElementById('currentLessonTitle');
+    const lessonStepsEl = document.getElementById('lessonSteps');
+    const lessonVideoEl = document.getElementById('lessonVideo');
+    const lessonBookEl = document.getElementById('lessonBook');
+    const bookContainerEl = document.getElementById('bookContainer');
+    const videoContainerEl = document.getElementById('videoContainer');
+    const bookTitleEl = document.getElementById('bookTitle');
+    const pageInfoEl = document.getElementById('pageInfo');
+    const finishBtn = document.getElementById('finishBtn');
+    const backBtn = document.getElementById('backBtn');
+    const progressBar = document.getElementById('progressBar');
+    const tryCompilerBtn = document.getElementById('tryCompilerBtn');
+
+    const questionText = document.getElementById('questionText');
+    const answersList = document.getElementById('answersList');
+    const feedbackMessage = document.getElementById('feedbackMessage');
+    const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+    const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+    const quizProgress = document.getElementById('quizProgress');
+
+    let currentQuestionIndex = 0;
+    let selectedAnswer = null;
+    let quizCompleted = false;
+    let currentQuizData = [];
+
+    backBtn.href = `units.html?grade=${grade}`;
+    unitTitleEl.textContent = `Grade ${grade} - Unit ${unitId}`;
+
+    const lessons = unitLessons[grade]?.[unitId] || [];
+    let currentLessonIndex = 0;
+
+    function getCompletedLessons() {
+      const key = `grade${grade}_unit${unitId}_lessons`;
+      const stored = localStorage.getItem(key);
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    }
+
+    function saveCompletedLesson(lessonId) {
+      const key = `grade${grade}_unit${unitId}_lessons`;
+      const completed = getCompletedLessons();
+      completed.add(lessonId);
+      localStorage.setItem(key, JSON.stringify([...completed]));
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const completed = getCompletedLessons();
+      const percentage = (completed.size / lessons.length) * 100;
+      progressBar.style.width = `${percentage}%`;
+    }
+
+    function loadQuiz(lessonId) {
+      currentQuizData = quizData[grade]?.[unitId]?.[lessonId] || [];
+      if (currentQuizData.length === 0) {
+        document.getElementById('quizContainer').style.display = 'none';
+        finishBtn.disabled = false;
+        return;
+      }
+      document.getElementById('quizContainer').style.display = 'block';
+      currentQuestionIndex = 0;
+      quizCompleted = false;
+      displayQuestion();
+    }
+
+    function displayQuestion() {
+      if (currentQuestionIndex >= currentQuizData.length) {
+        quizCompleted = true;
+        showQuizComplete();
+        return;
+      }
+      const question = currentQuizData[currentQuestionIndex];
+      questionText.textContent = question.question;
+      quizProgress.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuizData.length}`;
+      checkAnswerBtn.style.display = 'flex';
+      nextQuestionBtn.style.display = 'none';
+      checkAnswerBtn.disabled = true;
+      feedbackMessage.innerHTML = '';
+      answersList.innerHTML = question.answers.map((answer, index) => `
+        <label class="answer-option" data-index="${index}">
+          <input type="radio" name="answer" value="${index}">
+          <span>${answer}</span>
+        </label>
+      `).join('');
+      document.querySelectorAll('.answer-option').forEach(option => {
+        option.addEventListener('click', function() {
+          selectedAnswer = parseInt(this.getAttribute('data-index'));
+          document.querySelectorAll('input[name="answer"]').forEach(radio => {
+            radio.checked = false;
+          });
+          this.querySelector('input[name="answer"]').checked = true;
+          checkAnswerBtn.disabled = false;
+        });
+      });
+    }
+
+    function checkAnswer() {
+      if (selectedAnswer === null) return;
+      const question = currentQuizData[currentQuestionIndex];
+      const isCorrect = selectedAnswer === question.correct;
+      const options = document.querySelectorAll('.answer-option');
+      options.forEach((option, index) => {
+        option.classList.add('disabled');
+        option.style.pointerEvents = 'none';
+        if (index === question.correct) {
+          option.classList.add('correct');
+        } else if (index === selectedAnswer && !isCorrect) {
+          option.classList.add('incorrect');
+        }
+      });
+      if (isCorrect) {
+        feedbackMessage.innerHTML = `
+          <div class="feedback-message correct">
+            <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+            <span>صحيح! إجابة ممتازة</span>
+          </div>
+        `;
+        nextQuestionBtn.style.display = 'flex';
+        nextQuestionBtn.disabled = false;
+      } else {
+        feedbackMessage.innerHTML = `
+          <div class="feedback-message incorrect">
+            <i class="fas fa-times-circle" style="font-size: 1.5rem;"></i>
+            <span>خطأ! حاول مرة أخرى</span>
+          </div>
+        `;
+        setTimeout(() => {
+          options.forEach(option => {
+            option.classList.remove('disabled', 'incorrect');
+            option.style.pointerEvents = 'auto';
+          });
+          feedbackMessage.innerHTML = '';
+          selectedAnswer = null;
+          checkAnswerBtn.disabled = true;
+          document.querySelectorAll('input[name="answer"]').forEach(radio => {
+            radio.checked = false;
+          });
+        }, 1500);
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      displayQuestion();
+    }
+
+    function showQuizComplete() {
+      questionText.textContent = '🎉 أحسنت! لقد أكملت جميع الأسئلة';
+      answersList.innerHTML = '';
+      feedbackMessage.innerHTML = `
+        <div class="feedback-message correct">
+          <i class="fas fa-trophy" style="font-size: 1.5rem;"></i>
+          <span>ممتاز! يمكنك الآن إنهاء الدرس</span>
+        </div>
+      `;
+      checkAnswerBtn.style.display = 'none';
+      nextQuestionBtn.style.display = 'none';
+      finishBtn.disabled = false;
+    }
+
+    checkAnswerBtn.addEventListener('click', checkAnswer);
+    nextQuestionBtn.addEventListener('click', nextQuestion);
+
+    function renderLessonList() {
+      const completed = getCompletedLessons();
+      lessonsListEl.innerHTML = lessons.map((lesson, index) => {
+        const isActive = index === currentLessonIndex;
+        const isCompleted = completed.has(lesson.id);
+        return `
+          <div class="lesson-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}" data-index="${index}">
+            <div class="lesson-icon">${lesson.id}</div>
+            <div class="lesson-info">
+              <h4>${lesson.title}</h4>
+              <p>${lesson.desc}</p>
+            </div>
+            <i class="fas fa-check check-icon"></i>
+          </div>
+        `;
+      }).join('');
+      document.querySelectorAll('.lesson-item').forEach(item => {
+        item.addEventListener('click', () => {
+          currentLessonIndex = parseInt(item.getAttribute('data-index'));
+          loadLesson(lessons[currentLessonIndex]);
+          renderLessonList();
+        });
+      });
+    }
+
+    function loadLesson(lesson) {
+      currentLessonTitleEl.textContent = lesson.title;
+      const bookUrl = getBookUrl(grade, currentLanguage);
+      if (bookUrl) {
+        bookContainerEl.style.display = 'flex';
+        bookTitleEl.textContent = currentLanguage === 'ar' ? `عالمي الرقمي ${grade}` : `My Digital World ${grade}`;
+        pageInfoEl.textContent = `Pages: ${lesson.bookPages || 'Full Book'}`;
+        lessonBookEl.src = bookUrl;
+      } else {
+        bookContainerEl.style.display = 'none';
+      }
+      if (lesson.video) {
+        videoContainerEl.style.display = 'block';
+        const embedUrl = getYouTubeEmbedUrl(lesson.video);
+        lessonVideoEl.src = embedUrl || '';
+      } else {
+        videoContainerEl.style.display = 'none';
+      }
+      lessonStepsEl.innerHTML = lesson.steps.map(step => `
+        <div class="step">
+          <h4>${step.heading}</h4>
+          <p>${step.text}</p>
+        </div>
+      `).join('');
+      loadQuiz(lesson.id);
+      const completed = getCompletedLessons();
+      finishBtn.disabled = !quizCompleted;
+      finishBtn.classList.toggle('completed', completed.has(lesson.id));
+      finishBtn.innerHTML = completed.has(lesson.id) 
+        ? '<i class="fas fa-check-circle"></i> Completed' 
+        : '<i class="fas fa-flag-checkered"></i> Mark as Completed';
+      // ✅ Show "Try on Compiler" only for grades 7–10
+      const showCompiler = ['1','2','3','4','5','6','7', '8', '9', '10'].includes(grade);
+      tryCompilerBtn.style.display = showCompiler ? 'flex' : 'none';
+    }
+
+    finishBtn.addEventListener('click', () => {
+      const currentLesson = lessons[currentLessonIndex];
+      if (currentLesson && !finishBtn.disabled && (quizCompleted || currentQuizData.length === 0)) {
+        saveCompletedLesson(currentLesson.id);
+        loadLesson(currentLesson);
+        renderLessonList();
+        alert('🎉 Congratulations! Lesson completed successfully!');
+      }
+    });
+
+    // tryCompilerBtn.addEventListener('click', () => {
+    //   window.open('https://replit.com/~', '_blank');
+    // });
+    tryCompilerBtn.addEventListener('click', () => {
+    + window.open('code_editor.html', '_blank');
+    });
+
+    if (lessons.length > 0) {
+      loadLesson(lessons[0]);
+    } else {
+      currentLessonTitleEl.textContent = 'No lessons available for this unit';
+      lessonStepsEl.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No lessons found for this grade and unit.</p>';
+    }
+    renderLessonList();
+    updateProgress();
+  </script>
+</body>
+</html>

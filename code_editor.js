@@ -1,6 +1,5 @@
-// Live Code Editor JavaScript with Python Support
+// ===== START OF JAVASCRIPT =====
 document.addEventListener('DOMContentLoaded', function() {
-    // Get elements
     const htmlCode = document.getElementById('html-code');
     const cssCode = document.getElementById('css-code');
     const jsCode = document.getElementById('js-code');
@@ -21,54 +20,35 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentTab = 'html';
     let autoRunTimeout;
 
-    // Check if code was passed from lesson page
     checkLessonCode();
 
-    // Tab switching
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
             const tabName = this.getAttribute('data-tab');
             currentTab = tabName;
             
-            // Remove active class from all tabs and sections
             tabs.forEach(t => t.classList.remove('active'));
             editorSections.forEach(s => s.classList.remove('active'));
             
-            // Add active class to clicked tab
             this.classList.add('active');
             document.getElementById(`${tabName}-editor`).classList.add('active');
             
-            // Update output if Python
-            if (tabName === 'python') {
-                updateOutput();
-            }
+            if (tabName === 'python') updateOutput();
         });
     });
 
-    // Auto-run on input with debounce
     [htmlCode, cssCode, jsCode].forEach(editor => {
         editor.addEventListener('input', function() {
             clearTimeout(autoRunTimeout);
             autoRunTimeout = setTimeout(() => {
-                if (currentTab !== 'python') {
-                    updateOutput();
-                }
+                if (currentTab !== 'python') updateOutput();
             }, 1000);
         });
     });
 
-    // Python doesn't auto-run, only on manual run
-    pythonCode.addEventListener('input', function() {
-        // Python requires manual run
-    });
-
-    // Manual run button
     runBtn.addEventListener('click', updateOutput);
-
-    // Refresh button
     refreshBtn.addEventListener('click', updateOutput);
 
-    // Clear button
     clearBtn.addEventListener('click', function() {
         if (confirm('Are you sure you want to clear all code?')) {
             htmlCode.value = '<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello World!</h1>\n    <p>Start coding here...</p>\n</body>\n</html>';
@@ -79,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Save code to localStorage
     saveBtn.addEventListener('click', function() {
         const code = {
             html: htmlCode.value,
@@ -88,106 +67,66 @@ document.addEventListener('DOMContentLoaded', function() {
             python: pythonCode.value,
             timestamp: new Date().toLocaleString()
         };
-        
-        // Get existing saved codes
         let savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-        
-        // Add new code
         savedCodes.unshift(code);
-        
-        // Keep only last 10 saves
-        if (savedCodes.length > 10) {
-            savedCodes = savedCodes.slice(0, 10);
-        }
-        
+        if (savedCodes.length > 10) savedCodes = savedCodes.slice(0, 10);
         localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
-        
-        // Show success message
         showMessage('Code saved successfully! ✅', 'success');
     });
 
-    // Load code from localStorage
     loadBtn.addEventListener('click', function() {
         const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-        
         if (savedCodes.length === 0) {
             showMessage('No saved codes found!', 'error');
             return;
         }
-        
-        // Create modal to show saved codes
         const modal = createLoadModal(savedCodes);
         document.body.appendChild(modal);
     });
 
-    // Clear console
     clearConsoleBtn.addEventListener('click', function() {
         consoleOutput.innerHTML = '';
     });
 
-    // Check for lesson code
     function checkLessonCode() {
         const lessonCodeData = localStorage.getItem('compilerLessonCode');
-        
         if (lessonCodeData) {
             try {
                 const data = JSON.parse(lessonCodeData);
-                
-                // Load code based on language
                 switch(data.language.toLowerCase()) {
-                    case 'html':
-                        htmlCode.value = data.code;
-                        currentTab = 'html';
-                        break;
-                    case 'css':
-                        cssCode.value = data.code;
-                        currentTab = 'css';
-                        // Switch to CSS tab
-                        tabs.forEach(t => t.classList.remove('active'));
-                        editorSections.forEach(s => s.classList.remove('active'));
-                        document.querySelector('[data-tab="css"]').classList.add('active');
-                        document.getElementById('css-editor').classList.add('active');
+                    case 'html': htmlCode.value = data.code; currentTab = 'html'; break;
+                    case 'css': 
+                        cssCode.value = data.code; currentTab = 'css';
+                        activateTab('css');
                         break;
                     case 'javascript':
-                    case 'js':
-                        jsCode.value = data.code;
-                        currentTab = 'js';
-                        // Switch to JS tab
-                        tabs.forEach(t => t.classList.remove('active'));
-                        editorSections.forEach(s => s.classList.remove('active'));
-                        document.querySelector('[data-tab="js"]').classList.add('active');
-                        document.getElementById('js-editor').classList.add('active');
+                    case 'js': 
+                        jsCode.value = data.code; currentTab = 'js';
+                        activateTab('js');
                         break;
-                    case 'python':
-                        pythonCode.value = data.code;
-                        currentTab = 'python';
-                        // Switch to Python tab
-                        tabs.forEach(t => t.classList.remove('active'));
-                        editorSections.forEach(s => s.classList.remove('active'));
-                        document.querySelector('[data-tab="python"]').classList.add('active');
-                        document.getElementById('python-editor').classList.add('active');
+                    case 'python': 
+                        pythonCode.value = data.code; currentTab = 'python';
+                        activateTab('python');
                         break;
                 }
-                
-                // Clear the stored lesson code
                 localStorage.removeItem('compilerLessonCode');
-                
-                // Show message
                 showMessage(`Code loaded from lesson (${data.language})! 🎓`, 'success');
-                
-                // Run the code
                 setTimeout(() => updateOutput(), 500);
-                
             } catch (error) {
                 console.error('Error loading lesson code:', error);
             }
         }
     }
 
-    // Update output function
+    function activateTab(tabName) {
+        tabs.forEach(t => t.classList.remove('active'));
+        editorSections.forEach(s => s.classList.remove('active'));
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}-editor`).classList.add('active');
+    }
+
     function updateOutput() {
         consoleOutput.innerHTML = '';
-        
         if (currentTab === 'python') {
             runPythonCode();
         } else {
@@ -195,59 +134,55 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Run Python code using Skulpt
     function runPythonCode() {
+        // Safely check if Skulpt is loaded
+        if (typeof Sk === 'undefined') {
+            const errorEntry = document.createElement('div');
+            errorEntry.className = 'console-error';
+            errorEntry.textContent = '[ERROR] Skulpt failed to load. Python execution unavailable.';
+            consoleOutput.appendChild(errorEntry);
+            return;
+        }
+
         const code = pythonCode.value;
-        
-        // Clear output frame for Python
         const iframe = outputFrame.contentDocument || outputFrame.contentWindow.document;
         iframe.open();
         iframe.write('<html><body style="font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4;"><h3 style="color: #4CAF50;">Python Output:</h3><pre id="python-output"></pre></body></html>');
         iframe.close();
-        
-        // Configure Skulpt
+
         Sk.configure({
             output: function(text) {
-                // Output to console
                 const logEntry = document.createElement('div');
                 logEntry.className = 'console-log';
                 logEntry.textContent = text;
                 consoleOutput.appendChild(logEntry);
                 consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                
-                // Output to iframe
+
                 const pythonOutput = iframe.getElementById('python-output');
-                if (pythonOutput) {
-                    pythonOutput.textContent += text;
-                }
+                if (pythonOutput) pythonOutput.textContent += text;
             },
             read: function(filename) {
-                if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][filename] === undefined) {
+                if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][filename] === undefined)
                     throw "File not found: '" + filename + "'";
-                }
                 return Sk.builtinFiles["files"][filename];
             },
             __future__: Sk.python3
         });
-        
-        // Run the code
+
         try {
             const myPromise = Sk.misceval.asyncToPromise(function() {
                 return Sk.importMainWithBody("<stdin>", false, code, true);
             });
-            
             myPromise.then(
                 function(mod) {
-                    // Success
                     if (consoleOutput.innerHTML.trim() === '') {
-                        const logEntry = document.createElement('div');
-                        logEntry.className = 'console-log';
-                        logEntry.textContent = '[LOG] Code executed successfully (no output)';
-                        consoleOutput.appendChild(logEntry);
+                        const logEntry2 = document.createElement('div');
+                        logEntry2.className = 'console-log';
+                        logEntry2.textContent = '[LOG] Code executed successfully (no output)';
+                        consoleOutput.appendChild(logEntry2);
                     }
                 },
                 function(err) {
-                    // Error
                     const errorEntry = document.createElement('div');
                     errorEntry.className = 'console-error';
                     errorEntry.textContent = `[ERROR] ${err.toString()}`;
@@ -263,13 +198,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Run HTML/CSS/JS code
     function runWebCode() {
         const html = htmlCode.value;
         const css = `<style>${cssCode.value}</style>`;
         const js = jsCode.value;
-        
-        // Create iframe content with console capture
+
         const iframeContent = `
             <!DOCTYPE html>
             <html>
@@ -280,7 +213,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <body>
                 ${html}
                 <script>
-                    // Capture console.log
                     (function() {
                         const originalLog = console.log;
                         const originalError = console.error;
@@ -312,7 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             }, '*');
                         };
                         
-                        // Capture errors
                         window.addEventListener('error', function(e) {
                             window.parent.postMessage({
                                 type: 'error',
@@ -320,8 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }, '*');
                         });
                     })();
-                    
-                    // User code
+
                     try {
                         ${js}
                     } catch(e) {
@@ -331,15 +261,13 @@ document.addEventListener('DOMContentLoaded', function() {
             </body>
             </html>
         `;
-        
-        // Write to iframe
+
         const iframe = outputFrame.contentDocument || outputFrame.contentWindow.document;
         iframe.open();
         iframe.write(iframeContent);
         iframe.close();
     }
 
-    // Listen for console messages from iframe
     window.addEventListener('message', function(e) {
         if (e.data && e.data.type) {
             const logEntry = document.createElement('div');
@@ -350,7 +278,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Helper function to show messages
     function showMessage(message, type) {
         const messageDiv = document.createElement('div');
         messageDiv.style.cssText = `
@@ -366,16 +293,13 @@ document.addEventListener('DOMContentLoaded', function() {
             animation: slideIn 0.3s ease-out;
         `;
         messageDiv.textContent = message;
-        
         document.body.appendChild(messageDiv);
-        
         setTimeout(() => {
             messageDiv.style.animation = 'slideOut 0.3s ease-in';
             setTimeout(() => messageDiv.remove(), 300);
         }, 3000);
     }
 
-    // Create load modal
     function createLoadModal(savedCodes) {
         const modal = document.createElement('div');
         modal.style.cssText = `
@@ -390,7 +314,6 @@ document.addEventListener('DOMContentLoaded', function() {
             justify-content: center;
             z-index: 10000;
         `;
-        
         const content = document.createElement('div');
         content.style.cssText = `
             background: white;
@@ -401,9 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
             overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         `;
-        
         let html = '<h2 style="margin-bottom: 20px; color: #333;">📂 Saved Codes</h2>';
-        
         savedCodes.forEach((code, index) => {
             html += `
                 <div style="
@@ -417,102 +338,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 onmouseover="this.style.borderColor='#667eea'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.2)'"
                 onmouseout="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'"
                 onclick="window.loadSavedCode(${index})">
-                    <div style="font-weight: 600; color: #495057; margin-bottom: 5px;">
-                        Save #${index + 1}
-                    </div>
-                    <div style="font-size: 0.9em; color: #6c757d;">
-                        ${code.timestamp}
-                    </div>
-                    <div style="font-size: 0.85em; color: #adb5bd; margin-top: 5px;">
-                        Click to load
-                    </div>
+                    <div style="font-weight: 600; color: #495057; margin-bottom: 5px;">Save #${index + 1}</div>
+                    <div style="font-size: 0.9em; color: #6c757d;">${code.timestamp}</div>
+                    <div style="font-size: 0.85em; color: #adb5bd; margin-top: 5px;">Click to load</div>
                 </div>
             `;
         });
-        
-        html += `
-            <button onclick="this.closest('[style*=fixed]').remove()" style="
-                width: 100%;
-                padding: 12px;
-                background: #6c757d;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 1em;
-                cursor: pointer;
-                margin-top: 10px;
-            ">Close</button>
-        `;
-        
+        html += `<button onclick="this.closest('[style*=fixed]').remove()" style="width: 100%; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 8px; font-size: 1em; cursor: pointer; margin-top: 10px;">Close</button>`;
         content.innerHTML = html;
         modal.appendChild(content);
-        
-        // Make loadSavedCode globally accessible
         window.loadSavedCode = function(index) {
             const code = savedCodes[index];
             htmlCode.value = code.html;
             cssCode.value = code.css;
             jsCode.value = code.js;
-            if (code.python) {
-                pythonCode.value = code.python;
-            }
+            if (code.python) pythonCode.value = code.python;
             updateOutput();
             modal.remove();
             showMessage('Code loaded successfully! ✅', 'success');
         };
-        
-        // Close on background click
         modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                modal.remove();
-            }
+            if (e.target === modal) modal.remove();
         });
-        
         return modal;
     }
 
-    // Add keyboard shortcuts
     document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + S to save
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();
             saveBtn.click();
         }
-        
-        // Ctrl/Cmd + Enter to run
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             e.preventDefault();
             updateOutput();
         }
     });
 
-    // Add CSS animations
     const style = document.createElement('style');
     style.textContent = `
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
     `;
     document.head.appendChild(style);
 
-    // Initial run
     updateOutput();
 });
+// ===== END OF JAVASCRIPT =====

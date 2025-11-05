@@ -453,6 +453,293 @@
     opacity: 0.6;
   }
 
+  /* ===== NEW STYLES FOR INTERACTIVE QUESTIONS ===== */
+  
+  /* Image Selection Styles */
+  .image-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .image-option {
+    background: white;
+    border: 3px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .image-option:hover {
+    border-color: var(--primary-blue);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(17, 88, 121, 0.15);
+  }
+
+  .image-option.selected {
+    border-color: var(--primary-blue);
+    background: var(--lesson-active-bg);
+    box-shadow: 0 4px 12px rgba(17, 88, 121, 0.2);
+  }
+
+  .image-option.correct {
+    border-color: var(--success-green);
+    background: #d1fae5;
+  }
+
+  .image-option.incorrect {
+    border-color: var(--error-red);
+    background: #fee2e2;
+  }
+
+  .image-option img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .image-option .image-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+  }
+
+  .image-option .check-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--success-green);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .image-option.correct .check-badge {
+    display: flex;
+  }
+
+  /* Drag and Drop Styles */
+  .drag-drop-container {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .drag-items,
+  .drop-zones {
+    flex: 1;
+  }
+
+  .drag-items h4,
+  .drop-zones h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .draggable-item {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, #f0b90b 100%);
+    color: var(--primary-blue);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    cursor: grab;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(252, 212, 10, 0.3);
+    transition: all 0.3s ease;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    font-size: 1.1rem;
+  }
+
+  .draggable-item span {
+    pointer-events: none;
+    color: var(--primary-blue);
+    font-weight: 700;
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+  }
+
+  .draggable-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(252, 212, 10, 0.4);
+  }
+
+  .draggable-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+  }
+
+  .draggable-item.correct {
+    background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+    color: white;
+    cursor: default;
+  }
+
+  .draggable-item.correct span {
+    color: white;
+  }
+
+  .draggable-item.incorrect {
+    background: linear-gradient(135deg, var(--error-red) 0%, #dc2626 100%);
+    color: white;
+    animation: shake 0.5s;
+  }
+
+  .draggable-item.incorrect span {
+    color: white;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+
+  .drop-zone {
+    background: var(--hover-bg);
+    border: 3px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    margin-bottom: 1rem;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .drop-zone.drag-over {
+    background: var(--lesson-active-bg);
+    border-color: var(--primary-blue);
+    border-style: solid;
+  }
+
+  .drop-zone .zone-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .drop-zone.filled .zone-label {
+    display: none;
+  }
+
+  .drop-zone.correct {
+    background: #d1fae5;
+    border-color: var(--success-green);
+    border-style: solid;
+  }
+
+  .drop-zone.incorrect {
+    background: #fee2e2;
+    border-color: var(--error-red);
+    border-style: solid;
+  }
+
+  /* Matching Styles */
+  .matching-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .matching-column h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+  }
+
+  .matching-item {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+  }
+
+  .matching-item:hover {
+    border-color: var(--primary-blue);
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(17, 88, 121, 0.1);
+  }
+
+  .matching-item.selected {
+    border-color: var(--primary-yellow);
+    background: #fffbeb;
+    box-shadow: 0 4px 12px rgba(252, 212, 10, 0.3);
+  }
+
+  .matching-item.matched {
+    border-color: var(--success-green);
+    background: #d1fae5;
+    cursor: default;
+  }
+
+  .matching-item .item-number {
+    width: 30px;
+    height: 30px;
+    background: var(--primary-blue);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .matching-item.matched .item-number {
+    background: var(--success-green);
+  }
+
+  .matching-line-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+
   .feedback-message {
     margin-top: 1rem;
     padding: 1rem 1.5rem;
@@ -626,7 +913,6 @@
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
   }
 
-  /* ✅ NEW: Try on Compiler Button Style */
   .try-compiler-btn {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
@@ -684,6 +970,10 @@
       width: 100%;
       max-height: 250px;
     }
+    .drag-drop-container,
+    .matching-container {
+      flex-direction: column;
+    }
   }
 
   @media (max-width: 600px) {
@@ -712,6 +1002,9 @@
     .quiz-btn {
       width: 100%;
       justify-content: center;
+    }
+    .image-options {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -806,7 +1099,6 @@
             <button class="finish-btn" id="finishBtn" disabled>
               <i class="fas fa-flag-checkered"></i> Mark as Completed
             </button>
-            <!-- ✅ NEW BUTTON -->
             <button class="try-compiler-btn" id="tryCompilerBtn" style="display: none;">
               <i class="fas fa-code"></i> Try on Compiler
             </button>
@@ -882,13 +1174,89 @@
       return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
     }
 
+    // ===== ENHANCED QUIZ DATA WITH INTERACTIVE QUESTION TYPES =====
     const quizData = {
       '1': {
         1: {
           1: [
-            { question: 'ما هي الأماكن التي نستخدم فيها الحاسوب؟', answers: ['المنزل والمدرسة', 'الغابة فقط', 'تحت الماء', 'في الفضاء فقط'], correct: 0 },
-            { question: 'أي من هذه الأماكن يستخدم فيها الحاسوب؟', answers: ['الصحراء', 'المستشفى', 'القمر', 'البحر'], correct: 1 },
-            { question: 'هل يستخدم الحاسوب في البنوك؟', answers: ['نعم', 'لا', 'أحياناً', 'لا أعرف'], correct: 0 }
+            // Traditional multiple choice
+            { 
+              type: 'multiple-choice',
+              question: 'ما هي الأماكن التي نستخدم فيها الحاسوب؟', 
+              answers: ['المنزل والمدرسة', 'الغابة فقط', 'تحت الماء', 'في الفضاء فقط'], 
+              correct: 0 
+            },
+            // Image selection question
+            { 
+              type: 'image-selection',
+              question: 'اختر الصورة التي تحتوي على حاسوب',
+              options: [
+                { image: 'https://via.placeholder.com/150?text=Computer', label: 'حاسوب', correct: true },
+                { image: 'https://via.placeholder.com/150?text=Book', label: 'كتاب', correct: false },
+                { image: 'https://via.placeholder.com/150?text=Ball', label: 'كرة', correct: false },
+                { image: 'https://via.placeholder.com/150?text=Tree', label: 'شجرة', correct: false }
+              ]
+            },
+            // Drag and drop question
+            { 
+              type: 'drag-drop',
+              question: 'اسحب كل جهاز إلى الفئة الصحيحة',
+              items: [
+                { id: 1, text: 'لوحة المفاتيح', category: 'input' },
+                { id: 2, text: 'الشاشة', category: 'output' },
+                { id: 3, text: 'الفأرة', category: 'input' },
+                { id: 4, text: 'الطابعة', category: 'output' }
+              ],
+              zones: [
+                { id: 'input', label: 'أجهزة الإدخال' },
+                { id: 'output', label: 'أجهزة الإخراج' }
+              ]
+            }
+          ],
+          2: [
+            {
+              type: 'multiple-choice',
+              question: 'أي من هذه الأجزاء يعرض المعلومات؟',
+              answers: ['الشاشة', 'لوحة المفاتيح', 'الفأرة', 'الطابعة'],
+              correct: 0
+            },
+            {
+              type: 'image-selection',
+              question: 'اختر صورة الشاشة',
+              options: [
+                { image: 'https://via.placeholder.com/150?text=Monitor', label: 'شاشة', correct: true },
+                { image: 'https://via.placeholder.com/150?text=Keyboard', label: 'لوحة مفاتيح', correct: false },
+                { image: 'https://via.placeholder.com/150?text=Mouse', label: 'فأرة', correct: false }
+              ]
+            }
+          ]
+        }
+      },
+      '7': {
+        1: {
+          1: [
+            {
+              type: 'multiple-choice',
+              question: 'What does HTML stand for?',
+              answers: ['HyperText Markup Language', 'Home Tool Markup Language', 'Hyperlinks and Text Markup Language'],
+              correct: 0
+            },
+            {
+              type: 'drag-drop',
+              question: 'Match each HTML tag with its purpose',
+              items: [
+                { id: 1, text: '<p>', category: 'paragraph' },
+                { id: 2, text: '<h1>', category: 'heading' },
+                { id: 3, text: '<img>', category: 'image' },
+                { id: 4, text: '<a>', category: 'link' }
+              ],
+              zones: [
+                { id: 'paragraph', label: 'Paragraph' },
+                { id: 'heading', label: 'Heading' },
+                { id: 'image', label: 'Image' },
+                { id: 'link', label: 'Link' }
+              ]
+            }
           ]
         }
       }
@@ -907,69 +1275,6 @@
         1: [
           { id: 1, title: 'Introduction to HTML', desc: 'Learn HTML basics', video: 'https://www.youtube.com/watch?v=UB1O30fR-EE', bookPages: 'Full Book', steps: [{ heading: 'HTML Basics', text: 'HTML is the standard markup language for web pages.' }] },
           { id: 2, title: 'CSS Styling', desc: 'Style your web pages', video: 'https://www.youtube.com/watch?v=1Rs2ND1ryYc', bookPages: 'Full Book', steps: [{ heading: 'CSS Introduction', text: 'Learn how to make your websites beautiful.' }] }
-        ],
-        2: [
-          { id: 1, title: 'JavaScript Basics', desc: 'Programming fundamentals', video: 'https://www.youtube.com/watch?v=W6NZfCO5SIk', bookPages: 'Full Book', steps: [{ heading: 'Getting Started', text: 'Your first JavaScript program.' }] }
-        ],
-        3: [
-          { id: 1, title: 'Responsive Design', desc: 'Mobile-first design', video: 'https://www.youtube.com/watch?v=srvUrASNj0s', bookPages: 'Full Book', steps: [{ heading: 'Media Queries', text: 'Make your site work on all devices.' }] }
-        ],
-        4: [
-          { id: 1, title: 'Forms and Validation', desc: 'User input handling', video: 'https://www.youtube.com/watch?v=fNcJuPIZ2WE', bookPages: 'Full Book', steps: [{ heading: 'Form Elements', text: 'Create interactive forms.' }] }
-        ],
-        5: [
-          { id: 1, title: 'Final Project', desc: 'Build your website', video: 'https://www.youtube.com/watch?v=erEgovG9WBs', bookPages: 'Full Book', steps: [{ heading: 'Project Planning', text: 'Plan and build your personal website.' }] }
-        ]
-      },
-      '8': {
-        1: [
-          { id: 1, title: 'Arrays Introduction', desc: 'Working with collections', video: 'https://www.youtube.com/watch?v=RBSGKlAvoiM', bookPages: 'Full Book', steps: [{ heading: 'Array Basics', text: 'Learn to store multiple values.' }] }
-        ],
-        2: [
-          { id: 1, title: 'Sorting Algorithms', desc: 'Organize your data', video: 'https://www.youtube.com/watch?v=kPRA0W1kECg', bookPages: 'Full Book', steps: [{ heading: 'Bubble Sort', text: 'Understand sorting techniques.' }] }
-        ],
-        3: [
-          { id: 1, title: 'Search Algorithms', desc: 'Find data efficiently', video: 'https://www.youtube.com/watch?v=TwsgCHYmbbA', bookPages: 'Full Book', steps: [{ heading: 'Linear Search', text: 'Basic search techniques.' }] }
-        ],
-        4: [
-          { id: 1, title: 'Recursion', desc: 'Functions calling themselves', video: 'https://www.youtube.com/watch?v=IJDJ0kBx2LM', bookPages: 'Full Book', steps: [{ heading: 'Recursion Basics', text: 'Solve problems with recursion.' }] }
-        ],
-        5: [
-          { id: 1, title: 'Algorithm Challenge', desc: 'Test your skills', video: 'https://www.youtube.com/watch?v=8hly31xKli0', bookPages: 'Full Book', steps: [{ heading: 'Practice', text: 'Apply what you learned.' }] }
-        ]
-      },
-      '9': {
-        1: [
-          { id: 1, title: 'OOP Fundamentals', desc: 'Object-oriented programming', video: 'https://www.youtube.com/watch?v=pTB0EiLXUC8', bookPages: 'Full Book', steps: [{ heading: 'Classes', text: 'Learn about classes and objects.' }] }
-        ],
-        2: [
-          { id: 1, title: 'Database Design', desc: 'Organizing data', video: 'https://www.youtube.com/watch?v=ztHopE5Wnpc', bookPages: 'Full Book', steps: [{ heading: 'Tables', text: 'Design database tables.' }] }
-        ],
-        3: [
-          { id: 1, title: 'SQL Queries', desc: 'Database operations', video: 'https://www.youtube.com/watch?v=HXV3zeQKqGY', bookPages: 'Full Book', steps: [{ heading: 'SELECT Statements', text: 'Query your database.' }] }
-        ],
-        4: [
-          { id: 1, title: 'API Integration', desc: 'Connect to services', video: 'https://www.youtube.com/watch?v=GZvSYJDk-us', bookPages: 'Full Book', steps: [{ heading: 'REST APIs', text: 'Work with external APIs.' }] }
-        ],
-        5: [
-          { id: 1, title: 'Inventory System', desc: 'Complete project', video: 'https://www.youtube.com/watch?v=OK_JCtrrv-c', bookPages: 'Full Book', steps: [{ heading: 'Build System', text: 'Create inventory management app.' }] }
-        ]
-      },
-      '10': {
-        1: [
-          { id: 1, title: 'Frontend Frameworks', desc: 'React/Vue/Angular', video: 'https://www.youtube.com/watch?v=Tn6-PIqc4UM', bookPages: 'Full Book', steps: [{ heading: 'Framework Basics', text: 'Modern frontend development.' }] }
-        ],
-        2: [
-          { id: 1, title: 'Backend Development', desc: 'Server-side programming', video: 'https://www.youtube.com/watch?v=Oe421EPjeBE', bookPages: 'Full Book', steps: [{ heading: 'Node.js', text: 'Build server applications.' }] }
-        ],
-        3: [
-          { id: 1, title: 'Authentication', desc: 'Secure login systems', video: 'https://www.youtube.com/watch?v=Ud5xKCYQTjM', bookPages: 'Full Book', steps: [{ heading: 'JWT', text: 'Implement authentication.' }] }
-        ],
-        4: [
-          { id: 1, title: 'Cloud Deployment', desc: 'Deploy your app', video: 'https://www.youtube.com/watch?v=RyiPj_flqWU', bookPages: 'Full Book', steps: [{ heading: 'Hosting', text: 'Launch your application online.' }] }
-        ],
-        5: [
-          { id: 1, title: 'Capstone Project', desc: 'Final project', video: 'https://www.youtube.com/watch?v=OK_JCtrrv-c', bookPages: 'Full Book', steps: [{ heading: 'Full Stack', text: 'Build complete application.' }] }
         ]
       }
     };
@@ -1000,6 +1305,8 @@
     let selectedAnswer = null;
     let quizCompleted = false;
     let currentQuizData = [];
+    let dragDropState = {};
+    let matchingState = { selected: [], matched: [] };
 
     backBtn.href = `units.html?grade=${grade}`;
     unitTitleEl.textContent = `Grade ${grade} - Unit ${unitId}`;
@@ -1040,25 +1347,47 @@
       displayQuestion();
     }
 
+    // ===== DISPLAY QUESTION BASED ON TYPE =====
     function displayQuestion() {
       if (currentQuestionIndex >= currentQuizData.length) {
         quizCompleted = true;
         showQuizComplete();
         return;
       }
+
       const question = currentQuizData[currentQuestionIndex];
       questionText.textContent = question.question;
       quizProgress.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuizData.length}`;
+      
       checkAnswerBtn.style.display = 'flex';
       nextQuestionBtn.style.display = 'none';
-      checkAnswerBtn.disabled = true;
+      checkAnswerBtn.disabled = false;
       feedbackMessage.innerHTML = '';
+      selectedAnswer = null;
+
+      // Render based on question type
+      if (question.type === 'image-selection') {
+        renderImageSelection(question);
+      } else if (question.type === 'drag-drop') {
+        renderDragDrop(question);
+      } else if (question.type === 'matching') {
+        renderMatching(question);
+      } else {
+        renderMultipleChoice(question);
+      }
+    }
+
+    // ===== MULTIPLE CHOICE RENDERING =====
+    function renderMultipleChoice(question) {
       answersList.innerHTML = question.answers.map((answer, index) => `
         <label class="answer-option" data-index="${index}">
           <input type="radio" name="answer" value="${index}">
           <span>${answer}</span>
         </label>
       `).join('');
+      
+      checkAnswerBtn.disabled = true;
+      
       document.querySelectorAll('.answer-option').forEach(option => {
         option.addEventListener('click', function() {
           selectedAnswer = parseInt(this.getAttribute('data-index'));
@@ -1071,11 +1400,141 @@
       });
     }
 
+    // ===== IMAGE SELECTION RENDERING =====
+    function renderImageSelection(question) {
+      answersList.innerHTML = `
+        <div class="image-options">
+          ${question.options.map((option, index) => `
+            <div class="image-option" data-index="${index}">
+              <img src="${option.image}" alt="${option.label}">
+              <div class="image-label">${option.label}</div>
+              <div class="check-badge"><i class="fas fa-check"></i></div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      checkAnswerBtn.disabled = true;
+
+      document.querySelectorAll('.image-option').forEach((option, index) => {
+        option.addEventListener('click', function() {
+          document.querySelectorAll('.image-option').forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedAnswer = index;
+          checkAnswerBtn.disabled = false;
+        });
+      });
+    }
+
+    // ===== DRAG AND DROP RENDERING =====
+    function renderDragDrop(question) {
+      dragDropState = {};
+      question.items.forEach(item => {
+        dragDropState[item.id] = { placed: false, zone: null };
+      });
+
+      // Create the HTML structure
+      const itemsHTML = question.items.map(item => {
+        // Escape HTML in text to prevent rendering issues
+        const safeText = item.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `
+          <div class="draggable-item" draggable="true" data-id="${item.id}" data-category="${item.category}">
+            <span>${safeText}</span>
+          </div>
+        `;
+      }).join('');
+
+      const zonesHTML = question.zones.map(zone => `
+        <div class="drop-zone" data-zone="${zone.id}">
+          <div class="zone-label">${zone.label}</div>
+        </div>
+      `).join('');
+
+      answersList.innerHTML = `
+        <div class="drag-drop-container">
+          <div class="drag-items">
+            <h4>📦 Items to Sort</h4>
+            <div class="items-list" id="itemsList">
+              ${itemsHTML}
+            </div>
+          </div>
+          <div class="drop-zones">
+            <h4>🎯 Categories</h4>
+            ${zonesHTML}
+          </div>
+        </div>
+      `;
+
+      setupDragAndDrop();
+      checkAnswerBtn.disabled = true;
+    }
+
+    // ===== DRAG AND DROP LOGIC =====
+    function setupDragAndDrop() {
+      const draggables = document.querySelectorAll('.draggable-item');
+      const dropZones = document.querySelectorAll('.drop-zone');
+
+      draggables.forEach(draggable => {
+        draggable.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', e.target.dataset.id);
+          e.target.classList.add('dragging');
+        });
+
+        draggable.addEventListener('dragend', e => {
+          e.target.classList.remove('dragging');
+        });
+      });
+
+      dropZones.forEach(zone => {
+        zone.addEventListener('dragover', e => {
+          e.preventDefault();
+          zone.classList.add('drag-over');
+        });
+
+        zone.addEventListener('dragleave', () => {
+          zone.classList.remove('drag-over');
+        });
+
+        zone.addEventListener('drop', e => {
+          e.preventDefault();
+          zone.classList.remove('drag-over');
+          
+          const itemId = e.dataTransfer.getData('text/plain');
+          const draggable = document.querySelector(`[data-id="${itemId}"]`);
+          
+          if (draggable && !zone.classList.contains('filled')) {
+            zone.appendChild(draggable);
+            zone.classList.add('filled');
+            dragDropState[itemId] = { placed: true, zone: zone.dataset.zone };
+            
+            const allPlaced = Object.values(dragDropState).every(state => state.placed);
+            checkAnswerBtn.disabled = !allPlaced;
+          }
+        });
+      });
+    }
+
+    // ===== CHECK ANSWER LOGIC =====
     function checkAnswer() {
-      if (selectedAnswer === null) return;
       const question = currentQuizData[currentQuestionIndex];
+      
+      if (question.type === 'image-selection') {
+        checkImageSelection(question);
+      } else if (question.type === 'drag-drop') {
+        checkDragDrop(question);
+      } else if (question.type === 'matching') {
+        checkMatching(question);
+      } else {
+        checkMultipleChoice(question);
+      }
+    }
+
+    function checkMultipleChoice(question) {
+      if (selectedAnswer === null) return;
+      
       const isCorrect = selectedAnswer === question.correct;
       const options = document.querySelectorAll('.answer-option');
+      
       options.forEach((option, index) => {
         option.classList.add('disabled');
         option.style.pointerEvents = 'none';
@@ -1085,34 +1544,94 @@
           option.classList.add('incorrect');
         }
       });
+
+      showFeedback(isCorrect);
+    }
+
+    function checkImageSelection(question) {
+      const options = document.querySelectorAll('.image-option');
+      const selectedOption = question.options[selectedAnswer];
+      const isCorrect = selectedOption.correct;
+
+      options.forEach((option, index) => {
+        option.style.pointerEvents = 'none';
+        if (question.options[index].correct) {
+          option.classList.add('correct');
+        } else if (index === selectedAnswer && !isCorrect) {
+          option.classList.add('incorrect');
+        }
+      });
+
+      showFeedback(isCorrect);
+    }
+
+    function checkDragDrop(question) {
+      let allCorrect = true;
+      const draggables = document.querySelectorAll('.draggable-item');
+      
+      draggables.forEach(draggable => {
+        const itemId = parseInt(draggable.dataset.id);
+        const correctCategory = draggable.dataset.category;
+        const placedZone = dragDropState[itemId].zone;
+        
+        if (placedZone === correctCategory) {
+          draggable.classList.add('correct');
+        } else {
+          draggable.classList.add('incorrect');
+          allCorrect = false;
+        }
+        draggable.draggable = false;
+      });
+
+      document.querySelectorAll('.drop-zone').forEach(zone => {
+        if (allCorrect && zone.querySelector('.draggable-item.correct')) {
+          zone.classList.add('correct');
+        } else if (zone.querySelector('.draggable-item.incorrect')) {
+          zone.classList.add('incorrect');
+        }
+      });
+
+      showFeedback(allCorrect);
+    }
+
+    function showFeedback(isCorrect) {
       if (isCorrect) {
         feedbackMessage.innerHTML = `
           <div class="feedback-message correct">
             <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
-            <span>صحيح! إجابة ممتازة</span>
+            <span>صحيح! إجابة ممتازة 🎉</span>
           </div>
         `;
         nextQuestionBtn.style.display = 'flex';
         nextQuestionBtn.disabled = false;
+        checkAnswerBtn.style.display = 'none';
       } else {
         feedbackMessage.innerHTML = `
           <div class="feedback-message incorrect">
             <i class="fas fa-times-circle" style="font-size: 1.5rem;"></i>
-            <span>خطأ! حاول مرة أخرى</span>
+            <span>خطأ! حاول مرة أخرى 💪</span>
           </div>
         `;
+        
         setTimeout(() => {
-          options.forEach(option => {
-            option.classList.remove('disabled', 'incorrect');
-            option.style.pointerEvents = 'auto';
-          });
-          feedbackMessage.innerHTML = '';
-          selectedAnswer = null;
-          checkAnswerBtn.disabled = true;
-          document.querySelectorAll('input[name="answer"]').forEach(radio => {
-            radio.checked = false;
-          });
-        }, 1500);
+          const question = currentQuizData[currentQuestionIndex];
+          if (question.type === 'multiple-choice') {
+            document.querySelectorAll('.answer-option').forEach(option => {
+              option.classList.remove('disabled', 'incorrect');
+              option.style.pointerEvents = 'auto';
+            });
+            feedbackMessage.innerHTML = '';
+            selectedAnswer = null;
+            checkAnswerBtn.disabled = true;
+            document.querySelectorAll('input[name="answer"]').forEach(radio => {
+              radio.checked = false;
+            });
+          } else if (question.type === 'image-selection') {
+            displayQuestion();
+          } else if (question.type === 'drag-drop') {
+            displayQuestion();
+          }
+        }, 2000);
       }
     }
 
@@ -1154,6 +1673,7 @@
           </div>
         `;
       }).join('');
+      
       document.querySelectorAll('.lesson-item').forEach(item => {
         item.addEventListener('click', () => {
           currentLessonIndex = parseInt(item.getAttribute('data-index'));
@@ -1165,6 +1685,7 @@
 
     function loadLesson(lesson) {
       currentLessonTitleEl.textContent = lesson.title;
+      
       const bookUrl = getBookUrl(grade, currentLanguage);
       if (bookUrl) {
         bookContainerEl.style.display = 'flex';
@@ -1174,6 +1695,7 @@
       } else {
         bookContainerEl.style.display = 'none';
       }
+      
       if (lesson.video) {
         videoContainerEl.style.display = 'block';
         const embedUrl = getYouTubeEmbedUrl(lesson.video);
@@ -1181,21 +1703,24 @@
       } else {
         videoContainerEl.style.display = 'none';
       }
+      
       lessonStepsEl.innerHTML = lesson.steps.map(step => `
         <div class="step">
           <h4>${step.heading}</h4>
           <p>${step.text}</p>
         </div>
       `).join('');
+      
       loadQuiz(lesson.id);
+      
       const completed = getCompletedLessons();
       finishBtn.disabled = !quizCompleted;
       finishBtn.classList.toggle('completed', completed.has(lesson.id));
       finishBtn.innerHTML = completed.has(lesson.id) 
         ? '<i class="fas fa-check-circle"></i> Completed' 
         : '<i class="fas fa-flag-checkered"></i> Mark as Completed';
-      // ✅ Show "Try on Compiler" only for grades 7–10
-      const showCompiler = ['1','2','3','4','5','6','7', '8', '9', '10'].includes(grade);
+      
+      const showCompiler = ['7', '8', '9', '10'].includes(grade);
       tryCompilerBtn.style.display = showCompiler ? 'flex' : 'none';
     }
 
@@ -1209,11 +1734,8 @@
       }
     });
 
-    // tryCompilerBtn.addEventListener('click', () => {
-    //   window.open('https://replit.com/~', '_blank');
-    // });
     tryCompilerBtn.addEventListener('click', () => {
-    + window.open('code_editor.html', '_blank');
+      window.open('https://replit.com/~', '_blank');
     });
 
     if (lessons.length > 0) {
@@ -1222,6 +1744,7 @@
       currentLessonTitleEl.textContent = 'No lessons available for this unit';
       lessonStepsEl.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No lessons found for this grade and unit.</p>';
     }
+    
     renderLessonList();
     updateProgress();
   </script>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -319,6 +319,7 @@ for i in range(5):
     <script>
         let pyodide = null;
         let pyodideReady = false;
+        let pyodideLoading = false;
 
         const htmlCode = document.getElementById('html-code');
         const cssCode = document.getElementById('css-code');
@@ -336,22 +337,25 @@ for i in range(5):
         let currentTab = 'html';
         let autoRunTimeout;
 
-        // Load Pyodide
-        async function loadPyodide() {
+        // Load Pyodide only when needed
+        async function initPyodide() {
+            if (pyodideReady || pyodideLoading) return;
+            
+            pyodideLoading = true;
             loadingStatus.classList.add('show');
+            
             try {
-                pyodide = await loadPyodide();
+                pyodide = await window.loadPyodide();
                 pyodideReady = true;
                 loadingStatus.classList.remove('show');
                 logToConsole('Python environment loaded! ✅', 'log');
             } catch (error) {
                 loadingStatus.classList.remove('show');
                 logToConsole('Failed to load Python: ' + error, 'error');
+            } finally {
+                pyodideLoading = false;
             }
         }
-
-        // Start loading Python in background
-        loadPyodide();
 
         // Tab switching
         tabs.forEach(tab => {
@@ -361,7 +365,13 @@ for i in range(5):
                 editorSections.forEach(s => s.classList.remove('active'));
                 this.classList.add('active');
                 document.getElementById(`${currentTab}-editor`).classList.add('active');
-                if (currentTab !== 'python') updateOutput();
+                
+                // Load Python when user switches to Python tab
+                if (currentTab === 'python' && !pyodideReady && !pyodideLoading) {
+                    initPyodide();
+                } else if (currentTab !== 'python') {
+                    updateOutput();
+                }
             });
         });
 
@@ -375,7 +385,15 @@ for i in range(5):
             });
         });
 
-        runBtn.addEventListener('click', updateOutput);
+        runBtn.addEventListener('click', () => {
+            if (currentTab === 'python' && !pyodideReady && !pyodideLoading) {
+                initPyodide().then(() => {
+                    if (pyodideReady) updateOutput();
+                });
+            } else {
+                updateOutput();
+            }
+        });
 
         clearBtn.addEventListener('click', () => {
             if (confirm('Clear all code?')) {
@@ -383,6 +401,7 @@ for i in range(5):
                 cssCode.value = 'body { font-family: Arial; margin: 20px; }';
                 jsCode.value = 'console.log("Hello!");';
                 pythonCode.value = 'print("Hello from Python!")';
+                consoleOutput.innerHTML = '';
                 updateOutput();
             }
         });
@@ -408,7 +427,11 @@ for i in range(5):
 
         async function runPython() {
             if (!pyodideReady) {
-                logToConsole('Python is still loading... Please wait.', 'error');
+                if (pyodideLoading) {
+                    logToConsole('Python is loading... Please wait.', 'log');
+                } else {
+                    logToConsole('Python not loaded. Click Python tab first or wait for initialization.', 'error');
+                }
                 return;
             }
 
@@ -476,7 +499,7 @@ for i in range(5):
 
         function showMessage(msg) {
             const div = document.createElement('div');
-            div.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 25px; background: #28a745; color: white; border-radius: 8px; z-index: 10000;';
+            div.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 25px; background: #28a745; color: white; border-radius: 8px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
             div.textContent = msg;
             document.body.appendChild(div);
             setTimeout(() => div.remove(), 2000);
@@ -485,14 +508,1040 @@ for i in range(5):
         // Load saved code
         const saved = localStorage.getItem('savedCode');
         if (saved) {
-            const code = JSON.parse(saved);
-            htmlCode.value = code.html;
-            cssCode.value = code.css;
-            jsCode.value = code.js;
-            pythonCode.value = code.python;
+            try {
+                const code = JSON.parse(saved);
+                htmlCode.value = code.html;
+                cssCode.value = code.css;
+                jsCode.value = code.js;
+                pythonCode.value = code.python;
+            } catch (e) {
+                console.error('Failed to load saved code:', e);
+            }
         }
 
+        // Run the initial tab (HTML)
         updateOutput();
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Code Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .editor-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .editor-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 15s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+
+        .editor-header h1 { 
+            font-size: 2.8em; 
+            margin-bottom: 12px; 
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .editor-header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 3px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tabs { display: flex; gap: 12px; }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .tab-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .tab-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2); 
+        }
+
+        .tab-btn.active { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25); 
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; }
+        .btn-secondary { background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; }
+        .btn-success { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: calc(100vh - 320px);
+            min-height: 600px;
+        }
+
+        .editor-panel {
+            border-right: 3px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+        }
+
+        .editor-wrapper { 
+            flex: 1; 
+            overflow: hidden;
+            background: #282a36;
+        }
+
+        .editor-section {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .editor-section.active { display: flex; }
+
+        .editor-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #343a40 0%, #212529 100%);
+            border-bottom: 2px solid #495057;
+            font-weight: 700;
+            color: white;
+            font-size: 1.05em;
+            letter-spacing: 0.5px;
+        }
+
+        .language-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-size: 15px !important;
+            line-height: 1.6 !important;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace !important;
+        }
+
+        .CodeMirror-gutters {
+            background: #21252b !important;
+            border-right: 1px solid #181a1f !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: #636d83 !important;
+            padding: 0 8px !important;
+            font-weight: 500 !important;
+        }
+
+        .output-panel {
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+            border-bottom: 2px solid #6c757d;
+            font-weight: 700;
+            color: white;
+            font-size: 1.05em;
+            letter-spacing: 0.5px;
+        }
+
+        #output-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: white;
+        }
+
+        .console-panel {
+            height: 180px;
+            border-top: 3px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #343a40 0%, #212529 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+
+        .console-clear-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .console-clear-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        #console-output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 24px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+
+        .console-log { 
+            margin: 6px 0; 
+            padding: 8px 12px; 
+            border-left: 4px solid #4CAF50; 
+            background: #252526; 
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .console-error { 
+            margin: 6px 0; 
+            padding: 8px 12px; 
+            border-left: 4px solid #f44336; 
+            background: #2d1f1f; 
+            color: #f48771;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .loading-status {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px 60px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            z-index: 10000;
+            display: none;
+            text-align: center;
+        }
+
+        .loading-status.show { display: block; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-status p {
+            font-size: 1.1em;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .editor-container { 
+                grid-template-columns: 1fr; 
+                grid-template-rows: 1fr 1fr; 
+                height: auto;
+            }
+            .editor-panel { 
+                border-right: none; 
+                border-bottom: 3px solid #e9ecef; 
+                height: 500px;
+            }
+            .output-panel {
+                height: 500px;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a5a5a;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-status" id="loadingStatus">
+        <div class="spinner"></div>
+        <p>Loading Python environment...</p>
+    </div>
+
+    <div class="container">
+        <header class="editor-header">
+            <h1>🚀 Professional Code Editor</h1>
+            <p>HTML, CSS, JavaScript, and Python - All in one powerful IDE!</p>
+        </header>
+
+        <div class="controls">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="html"><span>📄 HTML</span></button>
+                <button class="tab-btn" data-tab="css"><span>🎨 CSS</span></button>
+                <button class="tab-btn" data-tab="js"><span>⚡ JavaScript</span></button>
+                <button class="tab-btn" data-tab="python"><span>🐍 Python</span></button>
+            </div>
+            <div class="action-buttons">
+                <button id="runBtn" class="btn btn-primary"><span>▶️ Run Code</span></button>
+                <button id="clearBtn" class="btn btn-secondary"><span>🗑️ Clear</span></button>
+                <button id="saveBtn" class="btn btn-success"><span>💾 Save</span></button>
+            </div>
+        </div>
+
+        <div class="editor-container">
+            <div class="editor-panel">
+                <div class="editor-wrapper">
+                    <div class="editor-section active" id="html-editor">
+                        <div class="editor-label">
+                            <span>HTML Editor</span>
+                            <span class="language-badge">HTML5</span>
+                        </div>
+                        <textarea id="html-code"><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Awesome Page</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <p>Start coding something amazing...</p>
+    <button onclick="alert('Hello!')">Click Me!</button>
+</body>
+</html></textarea>
+                    </div>
+
+                    <div class="editor-section" id="css-editor">
+                        <div class="editor-label">
+                            <span>CSS Editor</span>
+                            <span class="language-badge">CSS3</span>
+                        </div>
+                        <textarea id="css-code">body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    color: #ffd700;
+    font-size: 3em;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+    animation: fadeIn 1s ease-in;
+}
+
+button {
+    background: #ffd700;
+    color: #333;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+button:hover {
+    transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}</textarea>
+                    </div>
+
+                    <div class="editor-section" id="js-editor">
+                        <div class="editor-label">
+                            <span>JavaScript Editor</span>
+                            <span class="language-badge">ES6+</span>
+                        </div>
+                        <textarea id="js-code">// JavaScript Demo
+console.log('🚀 JavaScript is running!');
+
+// Variables and Constants
+const greeting = 'Hello from JavaScript!';
+const year = new Date().getFullYear();
+console.log(`${greeting} - Year: ${year}`);
+
+// Array Operations
+const numbers = [1, 2, 3, 4, 5];
+const sum = numbers.reduce((acc, num) => acc + num, 0);
+console.log(`📊 Sum of numbers: ${sum}`);
+
+// Object
+const user = {
+    name: 'Developer',
+    role: 'Coder',
+    skills: ['HTML', 'CSS', 'JS', 'Python']
+};
+console.log('👤 User:', user);
+
+// Function
+function greetUser(name) {
+    return `Welcome, ${name}! 🎉`;
+}
+console.log(greetUser('Awesome Coder'));</textarea>
+                    </div>
+
+                    <div class="editor-section" id="python-editor">
+                        <div class="editor-label">
+                            <span>Python Editor</span>
+                            <span class="language-badge">Python 3</span>
+                        </div>
+                        <textarea id="python-code"># Python Demo
+print('🐍 Python is running!')
+
+# Variables
+name = 'Developer'
+age = 25
+print(f'Name: {name}, Age: {age}')
+
+# Lists and Operations
+numbers = [1, 2, 3, 4, 5]
+print(f'Numbers: {numbers}')
+print(f'Sum: {sum(numbers)}')
+print(f'Average: {sum(numbers)/len(numbers)}')
+
+# Dictionary
+person = {
+    'name': 'Alice',
+    'role': 'Python Developer',
+    'skills': ['Python', 'Django', 'Flask']
+}
+print(f'\nPerson: {person}')
+
+# Loop
+print('\n📊 Counting:')
+for i in range(1, 6):
+    print(f'  Count {i}: {"⭐" * i}')
+
+# Function
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-panel">
+                <div class="output-header">
+                    <span>📺 Live Output</span>
+                </div>
+                <iframe id="output-frame"></iframe>
+                <div class="console-panel">
+                    <div class="console-header">
+                        <span>📋 Console Output</span>
+                        <button class="console-clear-btn" id="clearConsole">Clear</button>
+                    </div>
+                    <div id="console-output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CodeMirror -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/indent-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/comment-fold.min.js"></script>
+
+    <!-- Pyodide -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+
+    <script>
+        let pyodide = null;
+        let pyodideReady = false;
+        let pyodideLoading = false;
+
+        // Initialize CodeMirror editors
+        const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), {
+            mode: 'htmlmixed',
+            theme: 'dracula',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            autoCloseTags: true,
+            lineWrapping: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false
+        });
+
+        const cssEditor = CodeMirror.fromTextArea(document.getElementById('css-code'), {
+            mode: 'css',
+            theme: 'dracula',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            lineWrapping: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false
+        });
+
+        const jsEditor = CodeMirror.fromTextArea(document.getElementById('js-code'), {
+            mode: 'javascript',
+            theme: 'dracula',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            lineWrapping: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false
+        });
+
+        const pythonEditor = CodeMirror.fromTextArea(document.getElementById('python-code'), {
+            mode: 'python',
+            theme: 'dracula',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            lineWrapping: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false
+        });
+
+        const editors = {
+            html: htmlEditor,
+            css: cssEditor,
+            js: jsEditor,
+            python: pythonEditor
+        };
+
+        const outputFrame = document.getElementById('output-frame');
+        const consoleOutput = document.getElementById('console-output');
+        const tabs = document.querySelectorAll('.tab-btn');
+        const editorSections = document.querySelectorAll('.editor-section');
+        const runBtn = document.getElementById('runBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const clearConsole = document.getElementById('clearConsole');
+        const loadingStatus = document.getElementById('loadingStatus');
+
+        let currentTab = 'html';
+        let autoRunTimeout;
+
+        // Refresh editors on tab switch
+        function refreshEditor(tab) {
+            setTimeout(() => {
+                editors[tab].refresh();
+            }, 100);
+        }
+
+        // Load Pyodide
+        async function initPyodide() {
+            if (pyodideReady || pyodideLoading) return;
+            
+            pyodideLoading = true;
+            loadingStatus.classList.add('show');
+            
+            try {
+                pyodide = await window.loadPyodide();
+                pyodideReady = true;
+                loadingStatus.classList.remove('show');
+                logToConsole('✅ Python environment loaded successfully!', 'log');
+            } catch (error) {
+                loadingStatus.classList.remove('show');
+                logToConsole('❌ Failed to load Python: ' + error, 'error');
+            } finally {
+                pyodideLoading = false;
+            }
+        }
+
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                currentTab = this.getAttribute('data-tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                editorSections.forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(`${currentTab}-editor`).classList.add('active');
+                refreshEditor(currentTab);
+                
+                if (currentTab === 'python' && !pyodideReady && !pyodideLoading) {
+                    initPyodide();
+                } else if (currentTab !== 'python') {
+                    updateOutput();
+                }
+            });
+        });
+
+        // Auto-run for web languages
+        [htmlEditor, cssEditor, jsEditor].forEach(editor => {
+            editor.on('change', () => {
+                clearTimeout(autoRunTimeout);
+                autoRunTimeout = setTimeout(() => {
+                    if (currentTab !== 'python') updateOutput();
+                }, 1500);
+            });
+        });
+
+        runBtn.addEventListener('click', () => {
+            if (currentTab === 'python' && !pyodideReady && !pyodideLoading) {
+                initPyodide().then(() => {
+                    if (pyodideReady) updateOutput();
+                });
+            } else {
+                updateOutput();
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if (confirm('⚠️ Clear all code? This cannot be undone.')) {
+                htmlEditor.setValue('<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello!</h1>\n</body>\n</html>');
+                cssEditor.setValue('body {\n    font-family: Arial;\n    margin: 20px;\n}');
+                jsEditor.setValue('console.log("Hello from JavaScript!");');
+                pythonEditor.setValue('print("Hello from Python!")');
+                consoleOutput.innerHTML = '';
+                updateOutput();
+                showMessage('✅ All code cleared!');
+            }
+        });
+
+        clearConsole.addEventListener('click', () => {
+            consoleOutput.innerHTML = '';
+            showMessage('🗑️ Console cleared!');
+        });
+
+        saveBtn.addEventListener('click', () => {
+            localStorage.setItem('savedCode', JSON.stringify({
+                html: htmlEditor.getValue(),
+                css: cssEditor.getValue(),
+                js: jsEditor.getValue(),
+                python: pythonEditor.getValue()
+            }));
+            showMessage('💾 Code saved successfully!');
+        });
+
+        function updateOutput() {
+            consoleOutput.innerHTML = '';
+            if (currentTab === 'python') {
+                runPython();
+            } else {
+                runWeb();
+            }
+        }
+
+        async function runPython() {
+            if (!pyodideReady) {
+                if (pyodideLoading) {
+                    logToConsole('⏳ Python is loading... Please wait.', 'log');
+                } else {
+                    logToConsole('⚠️ Python not loaded. Switch to Python tab first.', 'error');
+                }
+                return;
+            }
+
+            const code = pythonEditor.getValue();
+            const iframe = outputFrame.contentDocument || outputFrame.contentWindow.document;
+            iframe.open();
+            iframe.write(`
+                <html>
+                <head>
+                    <style>
+                        body {
+                            font-family: 'Consolas', 'Monaco', monospace;
+                            padding: 24px;
+                            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+                            color: #d4d4d4;
+                            margin: 0;
+                        }
+                        h3 {
+                            color: #4CAF50;
+                            margin-top: 0;
+                            font-size: 1.4em;
+                            border-bottom: 2px solid #4CAF50;
+                            padding-bottom: 10px;
+                        }
+                        pre {
+                            background: #252526;
+                            padding: 15px;
+                            border-radius: 8px;
+                            border-left: 4px solid #4CAF50;
+                            overflow-x: auto;
+                            line-height: 1.6;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h3>🐍 Python Output:</h3>
+                    <pre id="python-output"></pre>
+                </body>
+                </html>
+            `);
+            iframe.close();
+
+            try {
+                pyodide.setStdout({
+                    batched: (text) => {
+                        logToConsole(text, 'log');
+                        const pythonOutput = iframe.getElementById('python-output');
+                        if (pythonOutput) pythonOutput.textContent += text + '\n';
+                    }
+                });
+
+                await pyodide.runPythonAsync(code);
+                logToConsole('✅ Python executed successfully', 'log');
+            } catch (error) {
+                logToConsole('❌ Python Error: ' + error, 'error');
+                const pythonOutput = iframe.getElementById('python-output');
+                if (pythonOutput) {
+                    pythonOutput.textContent += '\n❌ ERROR:\n' + error;
+                    pythonOutput.style.borderLeft = '4px solid #f44336';
+                    pythonOutput.style.color = '#f48771';
+                }
+            }
+        }
+
+        function runWeb() {
+            const html = htmlEditor.getValue();
+            const css = `<style>${cssEditor.getValue()}</style>`;
+            const js = jsEditor.getValue();
+
+            const content = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    ${css}
+</head>
+<body>
+    ${html}
+    <script>
+        (function() {
+            const originalLog = console.log;
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            
+            console.log = function(...args) {
+                originalLog.apply(console, args);
+                window.parent.postMessage({ 
+                    type: 'log', 
+                    message: args.map(arg => 
+                        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                    ).join(' ') 
+                }, '*');
+            };
+            
+            console.error = function(...args) {
+                originalError.apply(console, args);
+                window.parent.postMessage({ 
+                    type: 'error', 
+                    message: args.map(arg => String(arg)).join(' ') 
+                }, '*');
+            };
+            
+            console.warn = function(...args) {
+                originalWarn.apply(console, args);
+                window.parent.postMessage({ 
+                    type: 'log', 
+                    message: '⚠️ ' + args.map(arg => String(arg)).join(' ') 
+                }, '*');
+            };
+            
+            window.addEventListener('error', e => {
+                window.parent.postMessage({ 
+                    type: 'error', 
+                    message: e.message + ' (Line: ' + e.lineno + ')' 
+                }, '*');
+            });
+            
+            try { 
+                ${js} 
+            } catch(e) { 
+                console.error('Execution Error: ' + e.message); 
+            }
+        })();
+    <\/script>
+</body>
+</html>`;
+
+            const iframe = outputFrame.contentDocument || outputFrame.contentWindow.document;
+            iframe.open();
+            iframe.write(content);
+            iframe.close();
+        }
+
+        window.addEventListener('message', e => {
+            if (e.data && e.data.type) {
+                logToConsole(e.data.message, e.data.type);
+            }
+        });
+
+        function logToConsole(message, type = 'log') {
+            const entry = document.createElement('div');
+            entry.className = `console-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            consoleOutput.appendChild(entry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        function showMessage(msg) {
+            const div = document.createElement('div');
+            div.style.cssText = `
+                position: fixed;
+                top: 30px;
+                right: 30px;
+                padding: 18px 30px;
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+                border-radius: 10px;
+                z-index: 10000;
+                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+                font-weight: 600;
+                font-size: 1.05em;
+                animation: slideInRight 0.3s ease;
+            `;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => {
+                div.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => div.remove(), 300);
+            }, 2500);
+        }
+
+        // Load saved code
+        const saved = localStorage.getItem('savedCode');
+        if (saved) {
+            try {
+                const code = JSON.parse(saved);
+                htmlEditor.setValue(code.html);
+                cssEditor.setValue(code.css);
+                jsEditor.setValue(code.js);
+                pythonEditor.setValue(code.python);
+            } catch (e) {
+                console.error('Failed to load saved code:', e);
+            }
+        }
+
+        // Initial refresh and run
+        refreshEditor('html');
+        updateOutput();
+
+        // Add slide animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

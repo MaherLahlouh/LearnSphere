@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lesson - Taa Academy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- PDF.js Library for PDF viewing with restrictions -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
   * {
     margin: 0;
@@ -334,6 +336,116 @@
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 600;
+  }
+
+  /* PDF Viewer Styles */
+  .pdf-viewer-container {
+    width: 100%;
+    height: 600px;
+    background: #525659;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .pdf-controls {
+    background: #323639;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .pdf-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .pdf-nav button {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .pdf-nav button:hover:not(:disabled) {
+    background: #0d3f54;
+    transform: translateY(-2px);
+  }
+
+  .pdf-nav button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .pdf-page-info {
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .pdf-zoom {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .pdf-zoom button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .pdf-zoom button:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .pdf-zoom span {
+    color: white;
+    font-weight: 600;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  #pdf-canvas-wrapper {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+  }
+
+  #pdf-canvas {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: white;
+  }
+
+  .pdf-restriction-notice {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    color: #856404;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pdf-restriction-notice.show {
+    display: flex;
   }
 
   .book-container iframe,
@@ -1061,7 +1173,32 @@
             <h3><i class="fas fa-book-open"></i> <span id="bookTitle">Digital Book</span></h3>
             <div class="page-info" id="pageInfo">Pages: 1-10</div>
           </div>
-          <iframe id="lessonBook" src="" allowfullscreen></iframe>
+          <!-- PDF Viewer for Local PDFs -->
+          <div class="pdf-viewer-container" id="pdfViewerContainer" style="display: none;">
+            <div class="pdf-restriction-notice" id="pdfRestrictionNotice">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>You can only view pages <span id="allowedPagesText"></span> for this lesson</span>
+            </div>
+            <div class="pdf-controls">
+              <div class="pdf-nav">
+                <button id="prevPage"><i class="fas fa-chevron-left"></i> Previous</button>
+                <span class="pdf-page-info">
+                  Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                </span>
+                <button id="nextPage">Next <i class="fas fa-chevron-right"></i></button>
+              </div>
+              <div class="pdf-zoom">
+                <button id="zoomOut"><i class="fas fa-search-minus"></i></button>
+                <span id="zoomLevel">100%</span>
+                <button id="zoomIn"><i class="fas fa-search-plus"></i></button>
+              </div>
+            </div>
+            <div id="pdf-canvas-wrapper">
+              <canvas id="pdf-canvas"></canvas>
+            </div>
+          </div>
+          <!-- Iframe for External Books (Manhal) -->
+          <iframe id="lessonBook" src="" allowfullscreen style="display: none;"></iframe>
         </div>
 
         <div class="video-container" id="videoContainer" style="display: none;">
@@ -1109,6 +1246,9 @@
   </div>
 
   <script>
+    // Initialize PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
     const urlParams = new URLSearchParams(window.location.search);
     const grade = urlParams.get('grade') || '1';
     const unitId = parseInt(urlParams.get('unit')) || 1;
@@ -1174,19 +1314,166 @@
       return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
     }
 
-    // ===== ENHANCED QUIZ DATA WITH INTERACTIVE QUESTION TYPES =====
+    // ===== PDF VIEWER WITH PAGE RESTRICTIONS =====
+    let pdfDoc = null;
+    let currentPageNum = 1;
+    let pageIsRendering = false;
+    let pageNumIsPending = null;
+    let zoomScale = 1.5;
+    let allowedPageRange = { start: 1, end: 999 };
+
+    const pdfCanvas = document.getElementById('pdf-canvas');
+    const ctx = pdfCanvas.getContext('2d');
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const currentPageSpan = document.getElementById('currentPage');
+    const totalPagesSpan = document.getElementById('totalPages');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+    const zoomLevelSpan = document.getElementById('zoomLevel');
+    const pdfRestrictionNotice = document.getElementById('pdfRestrictionNotice');
+    const allowedPagesText = document.getElementById('allowedPagesText');
+
+    // Render the page
+    const renderPage = num => {
+      if (num < allowedPageRange.start || num > allowedPageRange.end) {
+        pdfRestrictionNotice.classList.add('show');
+        setTimeout(() => {
+          pdfRestrictionNotice.classList.remove('show');
+        }, 3000);
+        return;
+      }
+
+      pageIsRendering = true;
+
+      pdfDoc.getPage(num).then(page => {
+        const viewport = page.getViewport({ scale: zoomScale });
+        pdfCanvas.height = viewport.height;
+        pdfCanvas.width = viewport.width;
+
+        const renderCtx = {
+          canvasContext: ctx,
+          viewport
+        };
+
+        page.render(renderCtx).promise.then(() => {
+          pageIsRendering = false;
+
+          if (pageNumIsPending !== null) {
+            renderPage(pageNumIsPending);
+            pageNumIsPending = null;
+          }
+        });
+
+        currentPageSpan.textContent = num;
+      });
+    };
+
+    // Check for pages to render
+    const queueRenderPage = num => {
+      if (pageIsRendering) {
+        pageNumIsPending = num;
+      } else {
+        renderPage(num);
+      }
+    };
+
+    // Show prev page
+    const showPrevPage = () => {
+      if (currentPageNum <= allowedPageRange.start) {
+        pdfRestrictionNotice.classList.add('show');
+        setTimeout(() => {
+          pdfRestrictionNotice.classList.remove('show');
+        }, 3000);
+        return;
+      }
+      currentPageNum--;
+      queueRenderPage(currentPageNum);
+    };
+
+    // Show next page
+    const showNextPage = () => {
+      if (currentPageNum >= allowedPageRange.end) {
+        pdfRestrictionNotice.classList.add('show');
+        setTimeout(() => {
+          pdfRestrictionNotice.classList.remove('show');
+        }, 3000);
+        return;
+      }
+      currentPageNum++;
+      queueRenderPage(currentPageNum);
+    };
+
+    // Zoom in
+    const zoomIn = () => {
+      if (zoomScale < 3) {
+        zoomScale += 0.25;
+        zoomLevelSpan.textContent = Math.round(zoomScale * 100) + '%';
+        queueRenderPage(currentPageNum);
+      }
+    };
+
+    // Zoom out
+    const zoomOut = () => {
+      if (zoomScale > 0.5) {
+        zoomScale -= 0.25;
+        zoomLevelSpan.textContent = Math.round(zoomScale * 100) + '%';
+        queueRenderPage(currentPageNum);
+      }
+    };
+
+    prevPageBtn.addEventListener('click', showPrevPage);
+    nextPageBtn.addEventListener('click', showNextPage);
+    zoomInBtn.addEventListener('click', zoomIn);
+    zoomOutBtn.addEventListener('click', zoomOut);
+
+    // Disable right-click on PDF canvas to prevent easy downloads
+    pdfCanvas.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      return false;
+    });
+
+    // Load PDF with page restrictions
+    const loadPDFWithRestrictions = (url, pageRange) => {
+      allowedPageRange = pageRange;
+      currentPageNum = pageRange.start;
+      zoomScale = 1.5;
+      zoomLevelSpan.textContent = '150%';
+      allowedPagesText.textContent = `${pageRange.start}-${pageRange.end}`;
+
+      // Prevent download by loading with specific options
+      const loadingTask = pdfjsLib.getDocument({
+        url: url,
+        disableAutoFetch: true,
+        disableStream: true
+      });
+
+      loadingTask.promise.then(pdf => {
+        pdfDoc = pdf;
+        totalPagesSpan.textContent = pdf.numPages;
+        
+        renderPage(currentPageNum);
+        
+        // Update button states
+        prevPageBtn.disabled = currentPageNum <= allowedPageRange.start;
+        nextPageBtn.disabled = currentPageNum >= allowedPageRange.end;
+      }).catch(err => {
+        console.error('Error loading PDF:', err);
+        alert('Error loading PDF. Please try again.');
+      });
+    };
+
+    // ===== QUIZ DATA WITH INTERACTIVE QUESTION TYPES =====
     const quizData = {
       '1': {
         1: {
           1: [
-            // Traditional multiple choice
             { 
               type: 'multiple-choice',
               question: 'ما هي الأماكن التي نستخدم فيها الحاسوب؟', 
               answers: ['المنزل والمدرسة', 'الغابة فقط', 'تحت الماء', 'في الفضاء فقط'], 
               correct: 0 
             },
-            // Image selection question
             { 
               type: 'image-selection',
               question: 'اختر الصورة التي تحتوي على حاسوب',
@@ -1197,7 +1484,6 @@
                 { image: 'https://via.placeholder.com/150?text=Tree', label: 'شجرة', correct: false }
               ]
             },
-            // Drag and drop question
             { 
               type: 'drag-drop',
               question: 'اسحب كل جهاز إلى الفئة الصحيحة',
@@ -1265,16 +1551,34 @@
     const unitLessons = {
       '1': {
         1: [
-          { id: 1, title: 'أين الحاسوب', desc: 'تعرف على اماكن استخدام الحاسوب', video: 'https://www.youtube.com/watch?v=45LtBSwxfcU', bookPages: '6-15', steps: [{ heading: 'المقدمة', text: 'في هذا الدرس سنتعرف على الأماكن المختلفة التي يستخدم فيها الحاسوب في حياتنا اليومية.' }] },   
-          { id: 2, title: 'أجزاء الحاسوب', desc: 'ماهي اجزاء الحاسوب', video: 'https://youtu.be/wsv7SH5dC4k', bookPages: '16-25', steps: [{ heading: 'الأجزاء الأساسية', text: 'سنتعلم عن المكونات الرئيسية للحاسوب مثل الشاشة، لوحة المفاتيح، والفأرة.' }] },
-          { id: 3, title: 'وحدات الادخال و الاخراج', desc: 'الفرق بين وحدات الإدخال و الإخراج', video: 'https://youtu.be/rwrtaBtnRag', bookPages: '26-35', steps: [{ heading: 'وحدات الإدخال', text: 'وحدات الإدخال هي الأجهزة التي نستخدمها لإدخال البيانات إلى الحاسوب.' }] },
-          { id: 4, title: 'كيف يعمل الحاسوب', desc: 'تعرف على كيفية عمل الحاسوب', video: 'https://youtu.be/0-pHpAjYxM8', bookPages: '36-45', steps: [{ heading: 'آلية العمل', text: 'يعمل الحاسوب من خلال معالجة البيانات وتحويلها إلى معلومات مفيدة.' }] }
+          { id: 1, title: 'أين الحاسوب', desc: 'تعرف على اماكن استخدام الحاسوب', video: 'https://www.youtube.com/watch?v=45LtBSwxfcU', bookPages: '6-15', pageRange: { start: 6, end: 15 }, steps: [{ heading: 'المقدمة', text: 'في هذا الدرس سنتعرف على الأماكن المختلفة التي يستخدم فيها الحاسوب في حياتنا اليومية.' }] },   
+          { id: 2, title: 'أجزاء الحاسوب', desc: 'ماهي اجزاء الحاسوب', video: 'https://youtu.be/wsv7SH5dC4k', bookPages: '16-25', pageRange: { start: 16, end: 25 }, steps: [{ heading: 'الأجزاء الأساسية', text: 'سنتعلم عن المكونات الرئيسية للحاسوب مثل الشاشة، لوحة المفاتيح، والفأرة.' }] },
+          { id: 3, title: 'وحدات الادخال و الاخراج', desc: 'الفرق بين وحدات الإدخال و الإخراج', video: 'https://youtu.be/rwrtaBtnRag', bookPages: '26-35', pageRange: { start: 26, end: 35 }, steps: [{ heading: 'وحدات الإدخال', text: 'وحدات الإدخال هي الأجهزة التي نستخدمها لإدخال البيانات إلى الحاسوب.' }] },
+          { id: 4, title: 'كيف يعمل الحاسوب', desc: 'تعرف على كيفية عمل الحاسوب', video: 'https://youtu.be/0-pHpAjYxM8', bookPages: '36-45', pageRange: { start: 36, end: 45 }, steps: [{ heading: 'آلية العمل', text: 'يعمل الحاسوب من خلال معالجة البيانات وتحويلها إلى معلومات مفيدة.' }] }
         ]
       },
       '7': {
         1: [
-          { id: 1, title: 'Introduction to HTML', desc: 'Learn HTML basics', video: 'https://www.youtube.com/watch?v=UB1O30fR-EE', bookPages: 'Full Book', steps: [{ heading: 'HTML Basics', text: 'HTML is the standard markup language for web pages.' }] },
-          { id: 2, title: 'CSS Styling', desc: 'Style your web pages', video: 'https://www.youtube.com/watch?v=1Rs2ND1ryYc', bookPages: 'Full Book', steps: [{ heading: 'CSS Introduction', text: 'Learn how to make your websites beautiful.' }] }
+          { id: 1, title: 'Introduction to HTML', desc: 'Learn HTML basics', video: 'https://www.youtube.com/watch?v=UB1O30fR-EE', bookPages: '4-11', pageRange: { start: 4, end: 11 }, steps: [{ heading: 'HTML Basics', text: 'HTML is the standard markup language for web pages.' }] },
+          { id: 2, title: 'CSS Styling', desc: 'Style your web pages', video: 'https://www.youtube.com/watch?v=1Rs2ND1ryYc', bookPages: '12-17', pageRange: { start: 12, end: 17 }, steps: [{ heading: 'CSS Introduction', text: 'Learn how to make your websites beautiful.' }] }
+        ]
+      },
+      '8': {
+        1: [
+          { id: 1, title: 'JavaScript Basics', desc: 'Learn programming fundamentals', video: '', bookPages: '5-15', pageRange: { start: 5, end: 15 }, steps: [{ heading: 'Getting Started', text: 'Introduction to JavaScript programming.' }] },
+          { id: 2, title: 'Variables and Data Types', desc: 'Understanding data', video: '', bookPages: '16-22', pageRange: { start: 16, end: 22 }, steps: [{ heading: 'Data Types', text: 'Learn about different types of data in programming.' }] }
+        ]
+      },
+      '9': {
+        1: [
+          { id: 1, title: 'Python Introduction', desc: 'Start with Python', video: '', bookPages: '6-14', pageRange: { start: 6, end: 14 }, steps: [{ heading: 'Python Basics', text: 'Learn the fundamentals of Python programming.' }] },
+          { id: 2, title: 'Control Structures', desc: 'Loops and conditions', video: '', bookPages: '15-23', pageRange: { start: 15, end: 23 }, steps: [{ heading: 'Flow Control', text: 'Master if statements and loops.' }] }
+        ]
+      },
+      '10': {
+        1: [
+          { id: 1, title: 'Advanced Programming', desc: 'Complex concepts', video: '', bookPages: '8-18', pageRange: { start: 8, end: 18 }, steps: [{ heading: 'Advanced Topics', text: 'Dive into advanced programming concepts.' }] },
+          { id: 2, title: 'Data Structures', desc: 'Organize your data', video: '', bookPages: '19-28', pageRange: { start: 19, end: 28 }, steps: [{ heading: 'Data Organization', text: 'Learn about arrays, lists, and dictionaries.' }] }
         ]
       }
     };
@@ -1293,6 +1597,7 @@
     const backBtn = document.getElementById('backBtn');
     const progressBar = document.getElementById('progressBar');
     const tryCompilerBtn = document.getElementById('tryCompilerBtn');
+    const pdfViewerContainer = document.getElementById('pdfViewerContainer');
 
     const questionText = document.getElementById('questionText');
     const answersList = document.getElementById('answersList');
@@ -1433,9 +1738,7 @@
         dragDropState[item.id] = { placed: false, zone: null };
       });
 
-      // Create the HTML structure
       const itemsHTML = question.items.map(item => {
-        // Escape HTML in text to prevent rendering issues
         const safeText = item.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
         return `
           <div class="draggable-item" draggable="true" data-id="${item.id}" data-category="${item.category}">
@@ -1691,7 +1994,21 @@
         bookContainerEl.style.display = 'flex';
         bookTitleEl.textContent = currentLanguage === 'ar' ? `عالمي الرقمي ${grade}` : `My Digital World ${grade}`;
         pageInfoEl.textContent = `Pages: ${lesson.bookPages || 'Full Book'}`;
-        lessonBookEl.src = bookUrl;
+        
+        // Check if it's a local PDF (grades 7-10)
+        if (bookUrl.includes('.pdf')) {
+          lessonBookEl.style.display = 'none';
+          pdfViewerContainer.style.display = 'flex';
+          
+          // Load PDF with page restrictions
+          const pageRange = lesson.pageRange || { start: 1, end: 999 };
+          loadPDFWithRestrictions(bookUrl, pageRange);
+        } else {
+          // External book (Manhal - grades 1-6)
+          pdfViewerContainer.style.display = 'none';
+          lessonBookEl.style.display = 'block';
+          lessonBookEl.src = bookUrl;
+        }
       } else {
         bookContainerEl.style.display = 'none';
       }

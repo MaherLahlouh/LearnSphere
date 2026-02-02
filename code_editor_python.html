@@ -1,530 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Code Editor with Python</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .editor-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .editor-header h1 { font-size: 2.5em; margin-bottom: 10px; }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .tabs { display: flex; gap: 10px; }
-
-        .tab-btn {
-            padding: 10px 20px;
-            border: none;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-        .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-
-        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .btn-primary { background: #28a745; color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn-success { background: #17a2b8; color: white; }
-
-        .editor-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            height: calc(100vh - 300px);
-            min-height: 600px;
-        }
-
-        .editor-panel {
-            border-right: 2px solid #e9ecef;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .editor-wrapper { flex: 1; overflow: hidden; }
-
-        .editor-section {
-            display: none;
-            height: 100%;
-            flex-direction: column;
-        }
-
-        .editor-section.active { display: flex; }
-
-        .editor-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .code-input {
-            flex: 1;
-            width: 100%;
-            padding: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            border: none;
-            resize: none;
-            background: #282c34;
-            color: #abb2bf;
-            outline: none;
-            tab-size: 4;
-        }
-
-        .output-panel {
-            display: flex;
-            flex-direction: column;
-            background: #f8f9fa;
-        }
-
-        .output-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background: #e9ecef;
-            border-bottom: 1px solid #dee2e6;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        #output-frame {
-            flex: 1;
-            width: 100%;
-            border: none;
-            background: white;
-        }
-
-        .console-panel {
-            height: 150px;
-            border-top: 2px solid #dee2e6;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .console-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 20px;
-            background: #343a40;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-
-        #console-output {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 20px;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .console-log { margin: 5px 0; padding: 5px; border-left: 3px solid #007acc; background: #252526; }
-        .console-error { margin: 5px 0; padding: 5px; border-left: 3px solid #f44336; background: #2d1f1f; color: #f48771; }
-
-        .loading-status {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px 50px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            z-index: 10000;
-            display: none;
-        }
-
-        .loading-status.show { display: block; }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @media (max-width: 1024px) {
-            .editor-container { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
-            .editor-panel { border-right: none; border-bottom: 2px solid #e9ecef; }
-        }
-    </style>
-</head>
-<body>
-    <div class="loading-status" id="loadingStatus">
-        <div class="spinner"></div>
-        <p>Loading Python environment...</p>
-    </div>
-
-    <div class="container">
-        <header class="editor-header">
-            <h1>🚀 Advanced Code Editor</h1>
-            <p>HTML, CSS, JavaScript, and Python - All in one!</p>
-        </header>
-
-        <div class="controls">
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="html">📄 HTML</button>
-                <button class="tab-btn" data-tab="css">🎨 CSS</button>
-                <button class="tab-btn" data-tab="js">⚡ JS</button>
-                <button class="tab-btn" data-tab="python">🐍 Python</button>
-            </div>
-            <div class="action-buttons">
-                <button id="runBtn" class="btn btn-primary">▶️ Run</button>
-                <button id="clearBtn" class="btn btn-secondary">🗑️ Clear</button>
-                <button id="saveBtn" class="btn btn-success">💾 Save</button>
-            </div>
-        </div>
-
-        <div class="editor-container">
-            <div class="editor-panel">
-                <div class="editor-wrapper">
-                    <div class="editor-section active" id="html-editor">
-                        <div class="editor-label"><span>HTML</span></div>
-                        <textarea id="html-code" class="code-input" spellcheck="false"><!DOCTYPE html>
-<html>
-<head><title>My Page</title></head>
-<body>
-    <h1>Hello World!</h1>
-    <p>Start coding here...</p>
-</body>
-</html></textarea>
-                    </div>
-
-                    <div class="editor-section" id="css-editor">
-                        <div class="editor-label"><span>CSS</span></div>
-                        <textarea id="css-code" class="code-input" spellcheck="false">body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-h1 {
-    color: #ffd700;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}</textarea>
-                    </div>
-
-                    <div class="editor-section" id="js-editor">
-                        <div class="editor-label"><span>JavaScript</span></div>
-                        <textarea id="js-code" class="code-input" spellcheck="false">// JavaScript code
-console.log('Hello from JavaScript!');
-
-const numbers = [1, 2, 3, 4, 5];
-console.log('Sum:', numbers.reduce((a,b) => a+b));</textarea>
-                    </div>
-
-                    <div class="editor-section" id="python-editor">
-                        <div class="editor-label"><span>Python</span></div>
-                        <textarea id="python-code" class="code-input" spellcheck="false"># Python code
-print('Hello from Python!')
-
-# Variables
-name = 'Student'
-age = 15
-print(f'Name: {name}, Age: {age}')
-
-# List
-numbers = [1, 2, 3, 4, 5]
-print(f'Sum: {sum(numbers)}')
-
-# Loop
-for i in range(5):
-    print(f'Count: {i}')</textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="output-panel">
-                <div class="output-header"><span>📺 Output</span></div>
-                <iframe id="output-frame"></iframe>
-                <div class="console-panel">
-                    <div class="console-header"><span>📋 Console</span></div>
-                    <div id="console-output"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-    <script>
-        let pyodide = null;
-        let pyodideReady = false;
-        let pyodideLoading = false;
-
-        const htmlCode = document.getElementById('html-code');
-        const cssCode = document.getElementById('css-code');
-        const jsCode = document.getElementById('js-code');
-        const pythonCode = document.getElementById('python-code');
-        const outputFrame = document.getElementById('output-frame');
-        const consoleOutput = document.getElementById('console-output');
-        const tabs = document.querySelectorAll('.tab-btn');
-        const editorSections = document.querySelectorAll('.editor-section');
-        const runBtn = document.getElementById('runBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const saveBtn = document.getElementById('saveBtn');
-        const loadingStatus = document.getElementById('loadingStatus');
-
-        let currentTab = 'html';
-        let autoRunTimeout;
-
-        // Load Pyodide only when needed
-        async function initPyodide() {
-            if (pyodideReady || pyodideLoading) return;
-            
-            pyodideLoading = true;
-            loadingStatus.classList.add('show');
-            
-            try {
-                pyodide = await window.loadPyodide();
-                pyodideReady = true;
-                loadingStatus.classList.remove('show');
-                logToConsole('Python environment loaded! ✅', 'log');
-            } catch (error) {
-                loadingStatus.classList.remove('show');
-                logToConsole('Failed to load Python: ' + error, 'error');
-            } finally {
-                pyodideLoading = false;
-            }
-        }
-
-        // Tab switching
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                currentTab = this.getAttribute('data-tab');
-                tabs.forEach(t => t.classList.remove('active'));
-                editorSections.forEach(s => s.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById(`${currentTab}-editor`).classList.add('active');
-                
-                // Load Python when user switches to Python tab
-                if (currentTab === 'python' && !pyodideReady && !pyodideLoading) {
-                    initPyodide();
-                } else if (currentTab !== 'python') {
-                    updateOutput();
-                }
-            });
-        });
-
-        // Auto-run for web languages
-        [htmlCode, cssCode, jsCode].forEach(editor => {
-            editor.addEventListener('input', () => {
-                clearTimeout(autoRunTimeout);
-                autoRunTimeout = setTimeout(() => {
-                    if (currentTab !== 'python') updateOutput();
-                }, 1000);
-            });
-        });
-
-        runBtn.addEventListener('click', () => {
-            if (currentTab === 'python' && !pyodideReady && !pyodideLoading) {
-                initPyodide().then(() => {
-                    if (pyodideReady) updateOutput();
-                });
-            } else {
-                updateOutput();
-            }
-        });
-
-        clearBtn.addEventListener('click', () => {
-            if (confirm('Clear all code?')) {
-                htmlCode.value = '<!DOCTYPE html>\n<html>\n<head><title>My Page</title></head>\n<body>\n    <h1>Hello!</h1>\n</body>\n</html>';
-                cssCode.value = 'body { font-family: Arial; margin: 20px; }';
-                jsCode.value = 'console.log("Hello!");';
-                pythonCode.value = 'print("Hello from Python!")';
-                consoleOutput.innerHTML = '';
-                updateOutput();
-            }
-        });
-
-        saveBtn.addEventListener('click', () => {
-            localStorage.setItem('savedCode', JSON.stringify({
-                html: htmlCode.value,
-                css: cssCode.value,
-                js: jsCode.value,
-                python: pythonCode.value
-            }));
-            showMessage('Saved! ✅');
-        });
-
-        function updateOutput() {
-            consoleOutput.innerHTML = '';
-            if (currentTab === 'python') {
-                runPython();
-            } else {
-                runWeb();
-            }
-        }
-
-        async function runPython() {
-            if (!pyodideReady) {
-                if (pyodideLoading) {
-                    logToConsole('Python is loading... Please wait.', 'log');
-                } else {
-                    logToConsole('Python not loaded. Click Python tab first or wait for initialization.', 'error');
-                }
-                return;
-            }
-
-            const code = pythonCode.value;
-            const iframe = outputFrame.contentDocument || outputFrame.contentWindow.document;
-            iframe.open();
-            iframe.write('<html><body style="font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4;"><h3 style="color: #4CAF50;">Python Output:</h3><pre id="python-output"></pre></body></html>');
-            iframe.close();
-
-            try {
-                pyodide.setStdout({
-                    batched: (text) => {
-                        logToConsole(text, 'log');
-                        const pythonOutput = iframe.getElementById('python-output');
-                        if (pythonOutput) pythonOutput.textContent += text + '\n';
-                    }
-                });
-
-                await pyodide.runPythonAsync(code);
-                logToConsole('✅ Python executed successfully', 'log');
-            } catch (error) {
-                logToConsole('Python Error: ' + error, 'error');
-            }
-        }
-
-        function runWeb() {
-            const html = htmlCode.value;
-            const css = `<style>${cssCode.value}</style>`;
-            const js = jsCode.value;
-
-            const content = `<!DOCTYPE html><html><head><meta charset="UTF-8">${css}</head><body>${html}<script>(function() {
-                const originalLog = console.log;
-                const originalError = console.error;
-                console.log = function(...args) {
-                    originalLog.apply(console, args);
-                    window.parent.postMessage({ type: 'log', message: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ') }, '*');
-                };
-                console.error = function(...args) {
-                    originalError.apply(console, args);
-                    window.parent.postMessage({ type: 'error', message: args.map(arg => String(arg)).join(' ') }, '*');
-                };
-                window.addEventListener('error', e => window.parent.postMessage({ type: 'error', message: e.message }, '*'));
-                try { ${js} } catch(e) { console.error(e.message); }
-            })();<\/script></body></html>`;
-
-            const iframe = outputFrame.contentDocument || outputFrame.contentWindow.document;
-            iframe.open();
-            iframe.write(content);
-            iframe.close();
-        }
-
-        window.addEventListener('message', e => {
-            if (e.data && e.data.type) {
-                logToConsole(e.data.message, e.data.type);
-            }
-        });
-
-        function logToConsole(message, type = 'log') {
-            const entry = document.createElement('div');
-            entry.className = `console-${type}`;
-            entry.textContent = `[${type.toUpperCase()}] ${message}`;
-            consoleOutput.appendChild(entry);
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        }
-
-        function showMessage(msg) {
-            const div = document.createElement('div');
-            div.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 25px; background: #28a745; color: white; border-radius: 8px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
-            div.textContent = msg;
-            document.body.appendChild(div);
-            setTimeout(() => div.remove(), 2000);
-        }
-
-        // Load saved code
-        const saved = localStorage.getItem('savedCode');
-        if (saved) {
-            try {
-                const code = JSON.parse(saved);
-                htmlCode.value = code.html;
-                cssCode.value = code.css;
-                jsCode.value = code.js;
-                pythonCode.value = code.python;
-            } catch (e) {
-                console.error('Failed to load saved code:', e);
-            }
-        }
-
-        // Run the initial tab (HTML)
-        updateOutput();
-    </script>
-</body>
-</html> -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -535,6 +8,14 @@ for i in range(5):
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#115879">
+    <!-- Enhancement CSS Files -->
+    <link rel="stylesheet" href="toast-notifications.css">
+    <link rel="stylesheet" href="loading-animations.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="print-styles.css" media="print">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -649,6 +130,12 @@ for i in range(5):
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
             color: white; 
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         .tab-btn span {
@@ -907,6 +394,78 @@ for i in range(5):
             font-weight: 600;
         }
 
+        .grade-restriction-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grade-restriction-overlay.show {
+            display: flex;
+        }
+
+        .restriction-message {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .restriction-message h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .restriction-message p {
+            color: #495057;
+            font-size: 1.3em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .restriction-message .allowed-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .restriction-message .allowed-list li {
+            margin: 10px 0;
+            font-size: 1.1em;
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .restriction-message button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .restriction-message button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
         @media (max-width: 1024px) {
             .editor-container { 
                 grid-template-columns: 1fr; 
@@ -944,6 +503,18 @@ for i in range(5):
     </style>
 </head>
 <body>
+    <div class="grade-restriction-overlay" id="gradeRestrictionOverlay">
+        <div class="restriction-message">
+            <h2>🚫 Access Restricted</h2>
+            <p id="restrictionText">Based on your grade level, you have access to specific programming languages:</p>
+            <ul class="allowed-list" id="allowedLanguagesList"></ul>
+            <p style="font-size: 1em; color: #6c757d; margin-top: 20px;">
+                Keep learning and you'll unlock more languages as you progress! 🚀
+            </p>
+            <button onclick="window.close()">Go Back</button>
+        </div>
+    </div>
+
     <div class="loading-status" id="loadingStatus">
         <div class="spinner"></div>
         <p>Loading Python environment...</p>
@@ -952,15 +523,15 @@ for i in range(5):
     <div class="container">
         <header class="editor-header">
             <h1>🚀 Professional Code Editor</h1>
-            <p>HTML, CSS, JavaScript, and Python - All in one powerful IDE!</p>
+            <p id="gradeSubtitle">HTML, CSS, JavaScript, and Python - All in one powerful IDE!</p>
         </header>
 
         <div class="controls">
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="html"><span>📄 HTML</span></button>
-                <button class="tab-btn" data-tab="css"><span>🎨 CSS</span></button>
-                <button class="tab-btn" data-tab="js"><span>⚡ JavaScript</span></button>
-                <button class="tab-btn" data-tab="python"><span>🐍 Python</span></button>
+            <div class="tabs" id="tabsContainer">
+                <button class="tab-btn" data-tab="html" id="htmlTab"><span>📄 HTML</span></button>
+                <button class="tab-btn" data-tab="css" id="cssTab"><span>🎨 CSS</span></button>
+                <button class="tab-btn" data-tab="js" id="jsTab"><span>⚡ JavaScript</span></button>
+                <button class="tab-btn" data-tab="python" id="pythonTab"><span>🐍 Python</span></button>
             </div>
             <div class="action-buttons">
                 <button id="runBtn" class="btn btn-primary"><span>▶️ Run Code</span></button>
@@ -972,7 +543,7 @@ for i in range(5):
         <div class="editor-container">
             <div class="editor-panel">
                 <div class="editor-wrapper">
-                    <div class="editor-section active" id="html-editor">
+                    <div class="editor-section" id="html-editor">
                         <div class="editor-label">
                             <span>HTML Editor</span>
                             <span class="language-badge">HTML5</span>
@@ -1150,6 +721,88 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
 
     <script>
+        // ===== GRADE-BASED ACCESS CONTROL =====
+        const urlParams = new URLSearchParams(window.location.search);
+        const userGrade = urlParams.get('grade') || '7'; // Default to grade 7 if not specified
+
+        // Define grade access levels
+        const gradeAccess = {
+            '4': ['html'],
+            '5': ['html'],
+            '6': ['html', 'css'],
+            '7': ['html', 'css', 'js'],
+            '8': ['html', 'css', 'js', 'python'],
+            '9': ['html', 'css', 'js', 'python'],
+            '10': ['html', 'css', 'js', 'python']
+        };
+
+        const allowedLanguages = gradeAccess[userGrade] || ['html'];
+        
+        console.log('👤 User Grade:', userGrade);
+        console.log('✅ Allowed Languages:', allowedLanguages);
+
+        // Update subtitle based on grade
+        const gradeSubtitle = document.getElementById('gradeSubtitle');
+        if (userGrade === '4' || userGrade === '5') {
+            gradeSubtitle.textContent = 'Start your coding journey with HTML! 🌟';
+        } else if (userGrade === '6') {
+            gradeSubtitle.textContent = 'Master HTML & CSS to create beautiful websites! 🎨';
+        } else if (userGrade === '7') {
+            gradeSubtitle.textContent = 'HTML, CSS & JavaScript - Build interactive web pages! ⚡';
+        } else {
+            gradeSubtitle.textContent = 'Full-Stack Development - HTML, CSS, JavaScript & Python! 🚀';
+        }
+
+        // Function to check if language is allowed
+        function isLanguageAllowed(language) {
+            return allowedLanguages.includes(language);
+        }
+
+        // Function to show restriction overlay
+        function showRestrictionOverlay() {
+            const overlay = document.getElementById('gradeRestrictionOverlay');
+            const allowedList = document.getElementById('allowedLanguagesList');
+            
+            const languageNames = {
+                'html': '📄 HTML - Create web page structure',
+                'css': '🎨 CSS - Style your web pages',
+                'js': '⚡ JavaScript - Add interactivity',
+                'python': '🐍 Python - Advanced programming'
+            };
+            
+            allowedList.innerHTML = allowedLanguages.map(lang => 
+                `<li>${languageNames[lang]}</li>`
+            ).join('');
+            
+            overlay.classList.add('show');
+        }
+
+        // Disable tabs based on grade
+        function setupGradeBasedAccess() {
+            const htmlTab = document.getElementById('htmlTab');
+            const cssTab = document.getElementById('cssTab');
+            const jsTab = document.getElementById('jsTab');
+            const pythonTab = document.getElementById('pythonTab');
+
+            // Disable tabs that aren't allowed
+            if (!isLanguageAllowed('html')) htmlTab.classList.add('disabled');
+            if (!isLanguageAllowed('css')) cssTab.classList.add('disabled');
+            if (!isLanguageAllowed('js')) jsTab.classList.add('disabled');
+            if (!isLanguageAllowed('python')) pythonTab.classList.add('disabled');
+
+            // Set the first allowed language as active
+            const firstAllowed = allowedLanguages[0];
+            currentTab = firstAllowed;
+            
+            // Remove all active classes
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.editor-section').forEach(section => section.classList.remove('active'));
+            
+            // Activate the first allowed tab
+            document.querySelector(`[data-tab="${firstAllowed}"]`).classList.add('active');
+            document.getElementById(`${firstAllowed}-editor`).classList.add('active');
+        }
+
         let pyodide = null;
         let pyodideReady = false;
         let pyodideLoading = false;
@@ -1164,7 +817,8 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             lineWrapping: true,
             indentUnit: 4,
             tabSize: 4,
-            indentWithTabs: false
+            indentWithTabs: false,
+            readOnly: !isLanguageAllowed('html')
         });
 
         const cssEditor = CodeMirror.fromTextArea(document.getElementById('css-code'), {
@@ -1175,7 +829,8 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             lineWrapping: true,
             indentUnit: 4,
             tabSize: 4,
-            indentWithTabs: false
+            indentWithTabs: false,
+            readOnly: !isLanguageAllowed('css')
         });
 
         const jsEditor = CodeMirror.fromTextArea(document.getElementById('js-code'), {
@@ -1186,7 +841,8 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             lineWrapping: true,
             indentUnit: 4,
             tabSize: 4,
-            indentWithTabs: false
+            indentWithTabs: false,
+            readOnly: !isLanguageAllowed('js')
         });
 
         const pythonEditor = CodeMirror.fromTextArea(document.getElementById('python-code'), {
@@ -1197,7 +853,8 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             lineWrapping: true,
             indentUnit: 4,
             tabSize: 4,
-            indentWithTabs: false
+            indentWithTabs: false,
+            readOnly: !isLanguageAllowed('python')
         });
 
         const editors = {
@@ -1227,8 +884,14 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             }, 100);
         }
 
-        // Load Pyodide
+        // Load Pyodide (only if Python is allowed)
         async function initPyodide() {
+            if (!isLanguageAllowed('python')) {
+                logToConsole('⚠️ Python is not available for your grade level.', 'error');
+                showRestrictionOverlay();
+                return;
+            }
+
             if (pyodideReady || pyodideLoading) return;
             
             pyodideLoading = true;
@@ -1247,10 +910,18 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             }
         }
 
-        // Tab switching
+        // Tab switching with grade restrictions
         tabs.forEach(tab => {
             tab.addEventListener('click', function() {
-                currentTab = this.getAttribute('data-tab');
+                const targetTab = this.getAttribute('data-tab');
+                
+                // Check if language is allowed
+                if (!isLanguageAllowed(targetTab)) {
+                    showRestrictionOverlay();
+                    return;
+                }
+
+                currentTab = targetTab;
                 tabs.forEach(t => t.classList.remove('active'));
                 editorSections.forEach(s => s.classList.remove('active'));
                 this.classList.add('active');
@@ -1265,17 +936,25 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             });
         });
 
-        // Auto-run for web languages
-        [htmlEditor, cssEditor, jsEditor].forEach(editor => {
-            editor.on('change', () => {
-                clearTimeout(autoRunTimeout);
-                autoRunTimeout = setTimeout(() => {
-                    if (currentTab !== 'python') updateOutput();
-                }, 1500);
-            });
+        // Auto-run for web languages (only if allowed)
+        [htmlEditor, cssEditor, jsEditor].forEach((editor, index) => {
+            const langs = ['html', 'css', 'js'];
+            if (isLanguageAllowed(langs[index])) {
+                editor.on('change', () => {
+                    clearTimeout(autoRunTimeout);
+                    autoRunTimeout = setTimeout(() => {
+                        if (currentTab !== 'python') updateOutput();
+                    }, 1500);
+                });
+            }
         });
 
         runBtn.addEventListener('click', () => {
+            if (!isLanguageAllowed(currentTab)) {
+                showRestrictionOverlay();
+                return;
+            }
+
             if (currentTab === 'python' && !pyodideReady && !pyodideLoading) {
                 initPyodide().then(() => {
                     if (pyodideReady) updateOutput();
@@ -1287,10 +966,18 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
 
         clearBtn.addEventListener('click', () => {
             if (confirm('⚠️ Clear all code? This cannot be undone.')) {
-                htmlEditor.setValue('<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello!</h1>\n</body>\n</html>');
-                cssEditor.setValue('body {\n    font-family: Arial;\n    margin: 20px;\n}');
-                jsEditor.setValue('console.log("Hello from JavaScript!");');
-                pythonEditor.setValue('print("Hello from Python!")');
+                if (isLanguageAllowed('html')) {
+                    htmlEditor.setValue('<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello!</h1>\n</body>\n</html>');
+                }
+                if (isLanguageAllowed('css')) {
+                    cssEditor.setValue('body {\n    font-family: Arial;\n    margin: 20px;\n}');
+                }
+                if (isLanguageAllowed('js')) {
+                    jsEditor.setValue('console.log("Hello from JavaScript!");');
+                }
+                if (isLanguageAllowed('python')) {
+                    pythonEditor.setValue('print("Hello from Python!")');
+                }
                 consoleOutput.innerHTML = '';
                 updateOutput();
                 showMessage('✅ All code cleared!');
@@ -1303,16 +990,26 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
         });
 
         saveBtn.addEventListener('click', () => {
-            localStorage.setItem('savedCode', JSON.stringify({
-                html: htmlEditor.getValue(),
-                css: cssEditor.getValue(),
-                js: jsEditor.getValue(),
-                python: pythonEditor.getValue()
-            }));
+            const codeToSave = {
+                grade: userGrade,
+                timestamp: new Date().toISOString()
+            };
+
+            if (isLanguageAllowed('html')) codeToSave.html = htmlEditor.getValue();
+            if (isLanguageAllowed('css')) codeToSave.css = cssEditor.getValue();
+            if (isLanguageAllowed('js')) codeToSave.js = jsEditor.getValue();
+            if (isLanguageAllowed('python')) codeToSave.python = pythonEditor.getValue();
+
+            localStorage.setItem(`savedCode_grade${userGrade}`, JSON.stringify(codeToSave));
             showMessage('💾 Code saved successfully!');
         });
 
         function updateOutput() {
+            if (!isLanguageAllowed(currentTab)) {
+                showRestrictionOverlay();
+                return;
+            }
+
             consoleOutput.innerHTML = '';
             if (currentTab === 'python') {
                 runPython();
@@ -1322,6 +1019,12 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
         }
 
         async function runPython() {
+            if (!isLanguageAllowed('python')) {
+                logToConsole('⚠️ Python is not available for your grade level.', 'error');
+                showRestrictionOverlay();
+                return;
+            }
+
             if (!pyodideReady) {
                 if (pyodideLoading) {
                     logToConsole('⏳ Python is loading... Please wait.', 'log');
@@ -1393,9 +1096,9 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
         }
 
         function runWeb() {
-            const html = htmlEditor.getValue();
-            const css = `<style>${cssEditor.getValue()}</style>`;
-            const js = jsEditor.getValue();
+            const html = isLanguageAllowed('html') ? htmlEditor.getValue() : '';
+            const css = isLanguageAllowed('css') ? `<style>${cssEditor.getValue()}</style>` : '';
+            const js = isLanguageAllowed('js') ? jsEditor.getValue() : '';
 
             const content = `<!DOCTYPE html>
 <html>
@@ -1499,22 +1202,25 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             }, 2500);
         }
 
-        // Load saved code
-        const saved = localStorage.getItem('savedCode');
+        // Load saved code for the specific grade
+        const saved = localStorage.getItem(`savedCode_grade${userGrade}`);
         if (saved) {
             try {
                 const code = JSON.parse(saved);
-                htmlEditor.setValue(code.html);
-                cssEditor.setValue(code.css);
-                jsEditor.setValue(code.js);
-                pythonEditor.setValue(code.python);
+                if (isLanguageAllowed('html') && code.html) htmlEditor.setValue(code.html);
+                if (isLanguageAllowed('css') && code.css) cssEditor.setValue(code.css);
+                if (isLanguageAllowed('js') && code.js) jsEditor.setValue(code.js);
+                if (isLanguageAllowed('python') && code.python) pythonEditor.setValue(code.python);
             } catch (e) {
                 console.error('Failed to load saved code:', e);
             }
         }
 
-        // Initial refresh and run
-        refreshEditor('html');
+        // Setup grade-based access on load
+        setupGradeBasedAccess();
+        
+        // Initial refresh and run for first allowed language
+        refreshEditor(currentTab);
         updateOutput();
 
         // Add slide animations
@@ -1542,6 +1248,45 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
             }
         `;
         document.head.appendChild(style);
+
+        // Log grade access info
+        console.log('🎓 Grade-Based Compiler Access Initialized');
+        console.log('Grade:', userGrade);
+        console.log('Allowed Languages:', allowedLanguages);
+    </script>
+    <!-- Enhancement JavaScript Files -->
+    <script src="toast-notifications.js"></script>
+    <script src="keyboard-shortcuts.js"></script>
+    <script src="dark-mode.js"></script>
+    <script src="analytics.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="mobile-gestures.js"></script>
+    <!-- Dark Mode Toggle Button -->
+    <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
+      <i class="fas fa-moon" id="dark-mode-icon"></i>
+    </button>
+    <script>
+      // Update dark mode icon
+      window.addEventListener('darkModeChanged', (e) => {
+        const icon = document.getElementById('dark-mode-icon');
+        if (icon) {
+          icon.className = e.detail.isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+      });
+      // Initialize dark mode icon
+      if (document.getElementById('dark-mode-icon')) {
+        document.getElementById('dark-mode-icon').className = darkMode.isEnabled() ? 'fas fa-sun' : 'fas fa-moon';
+      }
+    </script>
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(reg => console.log('Service Worker registered'))
+            .catch(err => console.log('Service Worker registration failed'));
+        });
+      }
     </script>
 </body>
 </html>

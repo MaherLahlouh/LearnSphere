@@ -55,7 +55,6 @@ const defaultTranslations = {
     login: 'Login'
 };
 
-// Load translations from JSON file
 async function loadTranslations(lang) {
     try {
         const response = await fetch(`./lang/${lang}.json`);
@@ -94,7 +93,6 @@ function applyTranslations() {
     updateElement('already-have-text', 'textContent', translations.already_have, 'Already have an account?');
     updateElement('login-link-text', 'textContent', translations.login, 'Login');
 
-    // Update placeholders
     const firstNameInput = document.getElementById('first-name');
     if (firstNameInput) firstNameInput.placeholder = translations.first_name || 'First Name';
 
@@ -119,7 +117,6 @@ function applyTranslations() {
     const confirmPasswordInput = document.getElementById('confirm-password');
     if (confirmPasswordInput) confirmPasswordInput.placeholder = translations.confirm_password || 'Confirm Password';
 
-    // Update select options for teachers
     updateElement('select-specialization', 'textContent', translations.select_specialization, 'Select Specialization');
     updateElement('opt-math', 'textContent', translations.mathematics, 'Mathematics');
     updateElement('opt-science', 'textContent', translations.science, 'Science');
@@ -127,7 +124,6 @@ function applyTranslations() {
     updateElement('opt-eng', 'textContent', translations.engineering, 'Engineering');
     updateElement('opt-other', 'textContent', translations.other, 'Other');
 
-    // Update grade selection for students (Grades 1-10)
     updateElement('select-grade', 'textContent', translations.select_grade, 'Select Your Grade');
     updateElement('opt-grade1', 'textContent', translations.grade1 || 'Grade 1', 'Grade 1');
     updateElement('opt-grade2', 'textContent', translations.grade2 || 'Grade 2', 'Grade 2');
@@ -146,7 +142,6 @@ function applyTranslations() {
     console.log('Translations applied successfully');
 }
 
-// Toggle between student and teacher
 function setupUserTypeToggle() {
     const studentBtn = document.getElementById('student-btn');
     const teacherBtn = document.getElementById('teacher-btn');
@@ -165,7 +160,6 @@ function setupUserTypeToggle() {
         studentFields.style.display = 'block';
         teacherFields.style.display = 'none';
         
-        // Clear teacher-specific fields
         document.getElementById('phone').value = '';
         document.getElementById('specialization').value = '';
         document.getElementById('qualifications').value = '';
@@ -179,7 +173,6 @@ function setupUserTypeToggle() {
         teacherFields.style.display = 'flex';
         studentFields.style.display = 'none';
         
-        // Clear student-specific fields
         document.getElementById('grade-level').value = '';
     });
 }
@@ -288,18 +281,15 @@ async function handleSignup(e) {
         formData.qualifications = document.getElementById('qualifications').value.trim();
         formData.experience = document.getElementById('experience').value;
     } else {
-        // IMPORTANT: Get the grade value for students
         formData.grade = document.getElementById('grade-level').value;
     }
 
-    // Validate form
     const validation = validateForm(formData);
     if (!validation.valid) {
         alert(validation.message);
         return;
     }
 
-    // Disable submit button
     if (submitButton) {
         submitButton.disabled = true;
         submitButton.style.opacity = '0.6';
@@ -314,6 +304,10 @@ async function handleSignup(e) {
         
         // Create user in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        // Track signup event
+        if (window.analytics) {
+            window.analytics.trackSignup('email');
+        }
         const user = userCredential.user;
         
         console.log('User created:', user.uid);
@@ -327,31 +321,25 @@ async function handleSignup(e) {
             createdAt: new Date().toISOString()
         };
 
-        // Add type-specific data and save to appropriate collection
         if (currentUserType === 'teacher') {
             userData.phone = formData.phone || '';
             userData.specialization = formData.specialization;
             userData.qualifications = formData.qualifications || '';
             userData.experience = parseInt(formData.experience) || 0;
             
-            // Save to teachers collection (root level, separate from users)
             await setDoc(doc(db, "teachers", user.uid), userData);
             console.log('Teacher profile created in teachers collection');
             
-            // Store user type
             localStorage.setItem('userType', 'teacher');
             
-            // Redirect to teacher dashboard
             alert(currentLang === 'ar' 
                 ? 'تم إنشاء حساب المعلم بنجاح!' 
                 : 'Teacher account created successfully!');
             window.location.href = './teacher_dashboard.html';
             
         } else {
-            // IMPORTANT: Store grade for students (as string to match validation)
             userData.grade = formData.grade;
             
-            // Save to users collection (students)
             await setDoc(doc(db, "users", user.uid), userData);
             console.log('Student profile created in users collection with grade:', userData.grade);
             
@@ -426,7 +414,6 @@ async function handleSignup(e) {
     }
 }
 
-// Initialize everything when DOM is ready
 function initializePage() {
     console.log('Initializing signup page...');
     console.log('Current language:', currentLang);
@@ -450,7 +437,6 @@ function initializePage() {
     }
 }
 
-// Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializePage);
 } else {

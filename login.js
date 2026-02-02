@@ -79,6 +79,10 @@ loginForm.addEventListener('submit', async (e) => {
     try {
         // Sign in with Firebase
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // Track login event
+        if (window.analytics) {
+            window.analytics.trackLogin('email');
+        }
         const user = userCredential.user;
         console.log('Login successful:', user.email);
 

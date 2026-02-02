@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Dashboard - Students</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#115879">
+    <link rel="stylesheet" href="toast-notifications.css">
+    <link rel="stylesheet" href="loading-animations.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="mobile-menu.css">
+    <link rel="stylesheet" href="print-styles.css" media="print">
     <style>
         * {
             margin: 0;
@@ -405,6 +412,149 @@
             margin-bottom: 8px;
         }
 
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .course-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .course-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-teal);
+        }
+
+        .course-stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .course-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-medium);
+            font-size: 14px;
+        }
+
+        .schedule-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 32px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background: var(--primary-teal);
+            color: white;
+            border-color: var(--primary-teal);
+        }
+
+        .calendar-day.other-month {
+            color: var(--text-light);
+            opacity: 0.5;
+        }
+
+        .calendar-day.today {
+            background: var(--primary-yellow);
+            color: var(--primary-teal);
+            border-color: var(--primary-yellow);
+        }
+
+        .settings-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 32px;
+            margin-bottom: 20px;
+        }
+
+        .settings-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-teal);
+            margin-bottom: 20px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-label {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .settings-value {
+            color: var(--text-medium);
+        }
+
+        .btn-primary-action {
+            background: var(--primary-teal);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-action:hover {
+            background: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 992px) {
             .sidebar {
                 width: 80px;
@@ -482,23 +632,23 @@
          <h1>عالمي الرقمي</h1>
         </div>
         <div class="nav-links">
-            <div class="nav-item active">
+            <div class="nav-item active" data-view="dashboard">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" data-view="students">
                 <i class="fas fa-users"></i>
                 <span>Students</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" data-view="courses">
                 <i class="fas fa-book"></i>
                 <span>Courses</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" data-view="schedule">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Schedule</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" data-view="settings">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </div>
@@ -514,70 +664,271 @@
 
     <div class="main-content">
         <div class="header">
-            <h2>Students Dashboard</h2>
+            <h2 id="page-title">Dashboard</h2>
             <div class="user-info">
                 <img src="https://ui-avatars.com/api/?name=Teacher&background=115879&color=fff" alt="Teacher" id="teacher-avatar">
                 <div class="name" id="teacher-name">Teacher</div>
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon students">
-                    <i class="fas fa-users"></i>
+        <!-- Dashboard View -->
+        <div class="view-section active" id="dashboard-view">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon students">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-students">0</h3>
+                        <p>Total Students</p>
+                    </div>
                 </div>
-                <div class="stat-info">
-                    <h3 id="total-students">0</h3>
-                    <p>Total Students</p>
+                <div class="stat-card">
+                    <div class="stat-icon grades">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-grades">10</h3>
+                        <p>Grade Levels</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="avg-grade">-</h3>
+                        <p>Average Grade</p>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon grades">
-                    <i class="fas fa-graduation-cap"></i>
+            <div class="grades-container">
+                <div class="grades-header">
+                    <h3>Recent Activity</h3>
                 </div>
-                <div class="stat-info">
-                    <h3 id="total-grades">10</h3>
-                    <p>Grade Levels</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon pending">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 id="avg-grade">-</h3>
-                    <p>Average Grade</p>
+                <div style="padding: 32px; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 16px;"></i>
+                    <p>Welcome to your dashboard! View statistics and recent activity here.</p>
                 </div>
             </div>
         </div>
 
-        <div class="grades-container">
-            <div class="grades-header">
-                <h3>All Registered Students</h3>
-                <div class="search-filter">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="search-input" placeholder="Search students...">
+        <!-- Students View -->
+        <div class="view-section" id="students-view">
+            <div class="grades-container">
+                <div class="grades-header">
+                    <h3>All Registered Students</h3>
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Search students...">
+                        </div>
+                        <select class="filter-select" id="grade-filter">
+                            <option value="all">All Grades</option>
+                            <option value="1">Grade 1</option>
+                            <option value="2">Grade 2</option>
+                            <option value="3">Grade 3</option>
+                            <option value="4">Grade 4</option>
+                            <option value="5">Grade 5</option>
+                            <option value="6">Grade 6</option>
+                            <option value="7">Grade 7</option>
+                            <option value="8">Grade 8</option>
+                            <option value="9">Grade 9</option>
+                            <option value="10">Grade 10</option>
+                        </select>
                     </div>
-                    <select class="filter-select" id="grade-filter">
-                        <option value="all">All Grades</option>
-                        <option value="1">Grade 1</option>
-                        <option value="2">Grade 2</option>
-                        <option value="3">Grade 3</option>
-                        <option value="4">Grade 4</option>
-                        <option value="5">Grade 5</option>
-                        <option value="6">Grade 6</option>
-                        <option value="7">Grade 7</option>
-                        <option value="8">Grade 8</option>
-                        <option value="9">Grade 9</option>
-                        <option value="10">Grade 10</option>
-                    </select>
+                </div>
+                <div id="students-table-container">
+                    <div class="loading-message">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--primary-teal);"></i>
+                        <p style="margin-top: 16px;">Loading students...</p>
+                    </div>
                 </div>
             </div>
-            <div id="students-table-container">
-                <div class="loading-message">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--primary-teal);"></i>
-                    <p style="margin-top: 16px;">Loading students...</p>
+        </div>
+
+        <!-- Courses View -->
+        <div class="view-section" id="courses-view">
+            <div class="grades-container">
+                <div class="grades-header">
+                    <h3>Available Courses</h3>
+                    <button class="btn-primary-action" id="add-course-btn">
+                        <i class="fas fa-plus"></i> Add Course
+                    </button>
+                </div>
+                <div style="padding: 32px;">
+                    <div class="course-card">
+                        <div class="course-header">
+                            <div>
+                                <div class="course-title">Programming Fundamentals</div>
+                                <p style="color: var(--text-medium); margin-top: 8px;">Introduction to programming concepts and logic</p>
+                            </div>
+                            <span class="grade-badge grade-1">All Grades</span>
+                        </div>
+                        <div class="course-stats">
+                            <div class="course-stat">
+                                <i class="fas fa-book"></i>
+                                <span>12 Lessons</span>
+                            </div>
+                            <div class="course-stat">
+                                <i class="fas fa-users"></i>
+                                <span id="course-students-1">0 Students</span>
+                            </div>
+                            <div class="course-stat">
+                                <i class="fas fa-clock"></i>
+                                <span>8 Hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div class="course-header">
+                            <div>
+                                <div class="course-title">Web Development Basics</div>
+                                <p style="color: var(--text-medium); margin-top: 8px;">HTML, CSS, and JavaScript fundamentals</p>
+                            </div>
+                            <span class="grade-badge grade-7">Grade 7+</span>
+                        </div>
+                        <div class="course-stats">
+                            <div class="course-stat">
+                                <i class="fas fa-book"></i>
+                                <span>18 Lessons</span>
+                            </div>
+                            <div class="course-stat">
+                                <i class="fas fa-users"></i>
+                                <span id="course-students-2">0 Students</span>
+                            </div>
+                            <div class="course-stat">
+                                <i class="fas fa-clock"></i>
+                                <span>12 Hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div class="course-header">
+                            <div>
+                                <div class="course-title">Advanced Algorithms</div>
+                                <p style="color: var(--text-medium); margin-top: 8px;">Data structures and algorithm design</p>
+                            </div>
+                            <span class="grade-badge grade-9">Grade 9+</span>
+                        </div>
+                        <div class="course-stats">
+                            <div class="course-stat">
+                                <i class="fas fa-book"></i>
+                                <span>24 Lessons</span>
+                            </div>
+                            <div class="course-stat">
+                                <i class="fas fa-users"></i>
+                                <span id="course-students-3">0 Students</span>
+                            </div>
+                            <div class="course-stat">
+                                <i class="fas fa-clock"></i>
+                                <span>16 Hours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule View -->
+        <div class="view-section" id="schedule-view">
+            <div class="schedule-container">
+                <h3 style="font-size: 24px; font-weight: 700; color: var(--primary-teal); margin-bottom: 24px;">Class Schedule</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <button class="btn-primary-action" id="prev-month-btn">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <h4 id="current-month-year" style="font-size: 20px; font-weight: 600; color: var(--text-dark);">January 2024</h4>
+                    <button class="btn-primary-action" id="next-month-btn">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid">
+                </div>
+                <div style="margin-top: 32px; padding-top: 24px; border-top: 2px solid var(--border);">
+                    <h4 style="font-size: 18px; font-weight: 600; color: var(--primary-teal); margin-bottom: 16px;">Upcoming Classes</h4>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 16px; padding: 16px; background: rgba(135, 171, 188, 0.1); border-radius: 8px;">
+                            <i class="fas fa-calendar-check" style="color: var(--primary-teal); font-size: 20px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-dark);">Grade 7 - Web Development</div>
+                                <div style="font-size: 14px; color: var(--text-medium);">Monday, 10:00 AM - 11:30 AM</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px; padding: 16px; background: rgba(135, 171, 188, 0.1); border-radius: 8px;">
+                            <i class="fas fa-calendar-check" style="color: var(--primary-teal); font-size: 20px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-dark);">Grade 5 - Programming Fundamentals</div>
+                                <div style="font-size: 14px; color: var(--text-medium);">Wednesday, 2:00 PM - 3:30 PM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="view-section" id="settings-view">
+            <div class="settings-section">
+                <h3>Profile Settings</h3>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Full Name</div>
+                        <div class="settings-value" id="settings-name">Loading...</div>
+                    </div>
+                    <button class="btn-primary-action" id="edit-name-btn">Edit</button>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Email</div>
+                        <div class="settings-value" id="settings-email">Loading...</div>
+                    </div>
+                    <button class="btn-primary-action" id="edit-email-btn">Edit</button>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Account Type</div>
+                        <div class="settings-value">Teacher</div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>Preferences</h3>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Language</div>
+                        <div class="settings-value">English</div>
+                    </div>
+                    <select class="filter-select" id="language-select" style="width: auto;">
+                        <option value="en">English</option>
+                        <option value="ar">Arabic</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Notifications</div>
+                        <div class="settings-value" id="notifications-status">Enabled</div>
+                    </div>
+                    <label style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                        <input type="checkbox" id="notifications-toggle" checked style="opacity: 0; width: 0; height: 0;">
+                        <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary-teal); border-radius: 26px; transition: 0.3s;">
+                            <span style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.3s; transform: translateX(0);"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>System</h3>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Version</div>
+                        <div class="settings-value">1.0.0</div>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Last Login</div>
+                        <div class="settings-value" id="last-login">-</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -699,6 +1050,10 @@
                 filteredStudents = [...allStudents];
                 renderStudentsTable(filteredStudents);
                 
+                if (document.getElementById('courses-view')?.classList.contains('active')) {
+                    updateCourseStats();
+                }
+                
             } catch (error) {
                 console.error('Error loading students:', error);
                 console.error('Error code:', error.code);
@@ -776,6 +1131,13 @@ match /users/{userId} {
                         const teacherData = teacherDoc.data();
                         const teacherName = `${teacherData.firstName} ${teacherData.lastName}`;
                         
+                        // Store current user info
+                        currentUser = {
+                            name: teacherName,
+                            email: user.email,
+                            uid: user.uid
+                        };
+                        
                         document.getElementById('teacher-name').textContent = teacherName;
                         
                         const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(teacherName)}&background=115879&color=fff`;
@@ -811,16 +1173,282 @@ match /users/{userId} {
             }
         });
 
-        document.getElementById('search-input').addEventListener('input', filterStudents);
-        document.getElementById('grade-filter').addEventListener('change', filterStudents);
+        // View switching functionality
+        function switchView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            // Show selected view
+            const targetView = document.getElementById(`${viewName}-view`);
+            if (targetView) {
+                targetView.classList.add('active');
+            }
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'students': 'Students',
+                'courses': 'Courses',
+                'schedule': 'Schedule',
+                'settings': 'Settings'
+            };
+            document.getElementById('page-title').textContent = titles[viewName] || 'Dashboard';
+            
+            // Load view-specific data
+            if (viewName === 'students') {
+                // Students view is already loaded, just ensure it's visible
+            } else if (viewName === 'courses') {
+                updateCourseStats();
+            } else if (viewName === 'schedule') {
+                renderCalendar();
+            } else if (viewName === 'settings') {
+                loadSettings();
+            }
+        }
 
+        // Navigation item click handlers
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
             item.addEventListener('click', function() {
-                navItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
+                const viewName = this.getAttribute('data-view');
+                if (viewName) {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    switchView(viewName);
+                }
             });
         });
+
+        // Search and filter for students view
+        const searchInput = document.getElementById('search-input');
+        const gradeFilter = document.getElementById('grade-filter');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', filterStudents);
+        }
+        if (gradeFilter) {
+            gradeFilter.addEventListener('change', filterStudents);
+        }
+
+        // Courses functionality
+        function updateCourseStats() {
+            // Update student counts for each course
+            const course1Students = allStudents.filter(s => parseInt(s.grade) <= 6).length;
+            const course2Students = allStudents.filter(s => parseInt(s.grade) >= 7 && parseInt(s.grade) <= 8).length;
+            const course3Students = allStudents.filter(s => parseInt(s.grade) >= 9).length;
+            
+            const course1El = document.getElementById('course-students-1');
+            const course2El = document.getElementById('course-students-2');
+            const course3El = document.getElementById('course-students-3');
+            
+            if (course1El) course1El.textContent = `${course1Students} Students`;
+            if (course2El) course2El.textContent = `${course2Students} Students`;
+            if (course3El) course3El.textContent = `${course3Students} Students`;
+        }
+
+        document.getElementById('add-course-btn')?.addEventListener('click', () => {
+            alert('Add Course functionality will be implemented soon!');
+        });
+
+        // Schedule/Calendar functionality
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        function renderCalendar() {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const monthYearEl = document.getElementById('current-month-year');
+            
+            if (!calendarGrid || !monthYearEl) return;
+            
+            // Update month/year display
+            monthYearEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+            
+            // Clear calendar
+            calendarGrid.innerHTML = '';
+            
+            // Add day headers
+            dayNames.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.textContent = day;
+                dayHeader.style.fontWeight = '700';
+                dayHeader.style.color = 'var(--primary-teal)';
+                dayHeader.style.textAlign = 'center';
+                dayHeader.style.padding = '8px';
+                calendarGrid.appendChild(dayHeader);
+            });
+            
+            // Add previous month days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = daysInPrevMonth - i;
+                calendarGrid.appendChild(day);
+            }
+            
+            // Add current month days
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+                
+                // Highlight today
+                if (i === today.getDate() && 
+                    currentMonth === today.getMonth() && 
+                    currentYear === today.getFullYear()) {
+                    day.classList.add('today');
+                }
+                
+                day.addEventListener('click', () => {
+                    alert(`Selected: ${monthNames[currentMonth]} ${i}, ${currentYear}`);
+                });
+                
+                calendarGrid.appendChild(day);
+            }
+            
+            // Fill remaining cells
+            const totalCells = calendarGrid.children.length;
+            const remainingCells = 42 - totalCells; // 6 rows * 7 days
+            for (let i = 1; i <= remainingCells; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = i;
+                calendarGrid.appendChild(day);
+            }
+        }
+
+        document.getElementById('prev-month-btn')?.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+
+        document.getElementById('next-month-btn')?.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+
+        // Settings functionality
+        let currentUser = null;
+        function loadSettings() {
+            if (currentUser) {
+                const nameEl = document.getElementById('settings-name');
+                const emailEl = document.getElementById('settings-email');
+                const lastLoginEl = document.getElementById('last-login');
+                
+                if (nameEl && currentUser.name) nameEl.textContent = currentUser.name;
+                if (emailEl && currentUser.email) emailEl.textContent = currentUser.email;
+                if (lastLoginEl) {
+                    lastLoginEl.textContent = new Date().toLocaleString();
+                }
+            }
+        }
+
+        document.getElementById('edit-name-btn')?.addEventListener('click', () => {
+            const newName = prompt('Enter new name:');
+            if (newName) {
+                alert('Name update functionality will be implemented soon!');
+            }
+        });
+
+        document.getElementById('edit-email-btn')?.addEventListener('click', () => {
+            alert('Email update functionality requires authentication. This will be implemented soon!');
+        });
+
+        document.getElementById('language-select')?.addEventListener('change', (e) => {
+            localStorage.setItem('userLanguage', e.target.value);
+            alert(`Language changed to ${e.target.value === 'en' ? 'English' : 'Arabic'}. Page will reload.`);
+            location.reload();
+        });
+
+        document.getElementById('notifications-toggle')?.addEventListener('change', (e) => {
+            localStorage.setItem('notificationsEnabled', e.target.checked);
+            const statusEl = document.getElementById('notifications-status');
+            if (statusEl) {
+                statusEl.textContent = e.target.checked ? 'Enabled' : 'Disabled';
+            }
+            // Update toggle switch visual
+            const toggleSpan = e.target.nextElementSibling;
+            if (toggleSpan) {
+                const toggleCircle = toggleSpan.querySelector('span');
+                if (toggleCircle) {
+                    toggleCircle.style.transform = e.target.checked ? 'translateX(24px)' : 'translateX(0)';
+                }
+                toggleSpan.style.backgroundColor = e.target.checked ? 'var(--primary-teal)' : '#ccc';
+            }
+            console.log('Notifications:', e.target.checked ? 'Enabled' : 'Disabled');
+        });
+        
+        // Initialize toggle switch state
+        const notificationsToggle = document.getElementById('notifications-toggle');
+        if (notificationsToggle) {
+            const isEnabled = localStorage.getItem('notificationsEnabled') !== 'false';
+            notificationsToggle.checked = isEnabled;
+            const toggleSpan = notificationsToggle.nextElementSibling;
+            if (toggleSpan) {
+                const toggleCircle = toggleSpan.querySelector('span');
+                if (toggleCircle) {
+                    toggleCircle.style.transform = isEnabled ? 'translateX(24px)' : 'translateX(0)';
+                }
+                toggleSpan.style.backgroundColor = isEnabled ? 'var(--primary-teal)' : '#ccc';
+            }
+            const statusEl = document.getElementById('notifications-status');
+            if (statusEl) {
+                statusEl.textContent = isEnabled ? 'Enabled' : 'Disabled';
+            }
+        }
+    </script>
+    <script src="toast-notifications.js"></script>
+    <script src="keyboard-shortcuts.js"></script>
+    <script src="dark-mode.js"></script>
+    <script src="analytics.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="mobile-gestures.js"></script>
+    <script src="mobile-menu.js"></script>
+    <!-- Dark Mode Toggle Button -->
+    <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
+      <i class="fas fa-moon" id="dark-mode-icon"></i>
+    </button>
+    <script>
+      // Update dark mode icon
+      window.addEventListener('darkModeChanged', (e) => {
+        const icon = document.getElementById('dark-mode-icon');
+        if (icon) {
+          icon.className = e.detail.isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+      });
+      // Initialize dark mode icon
+      if (document.getElementById('dark-mode-icon')) {
+        document.getElementById('dark-mode-icon').className = darkMode.isEnabled() ? 'fas fa-sun' : 'fas fa-moon';
+      }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(reg => console.log('Service Worker registered'))
+            .catch(err => console.log('Service Worker registration failed'));
+        });
+      }
     </script>
 </body>
 </html>

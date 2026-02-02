@@ -248,30 +248,6 @@ body {
     box-shadow: 0 10px 30px rgba(252,212,10,0.4);
 }
 .btn-gradient:hover .btn-shine { left: 100%; }
-
-/* .divider-creative {
-    text-align: center;
-    position: relative;
-    margin: 1.5rem 0;
-}
-.divider-creative span {
-    background: rgba(255,255,255,0.98);
-    padding: 0 1rem;
-    color: #999;
-    font-size: 0.85rem;
-    position: relative;
-    z-index: 1;
-}
-.divider-creative::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
-} */
-
 .social-buttons {
     display: flex;
     gap: 1rem;

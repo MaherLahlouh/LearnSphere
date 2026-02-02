@@ -1,0 +1,163 @@
+
+@media print {
+    * {
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #000;
+        background: #fff;
+    }
+
+    .sidebar,
+    .nav-links,
+    .logout-section,
+    .quick-actions,
+    .action-btn,
+    .chart-container,
+    .activity-feed,
+    .bulk-actions,
+    .sort-controls,
+    .search-filter,
+    .back-btn,
+    .lang-toggle,
+    .dark-mode-toggle,
+    .toast-container,
+    .modal,
+    .student-details-modal,
+    button:not(.print-button),
+    .no-print {
+        display: none !important;
+    }
+
+    /* Layout adjustments */
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Headers and titles */
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid;
+        color: #000 !important;
+    }
+
+    .page-title,
+    .header h2 {
+        font-size: 18pt;
+        margin-bottom: 12pt;
+        color: #000 !important;
+    }
+
+    /* Tables */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-footer-group;
+    }
+
+    th, td {
+        border: 1px solid #000;
+        padding: 8pt;
+        text-align: left;
+    }
+
+    th {
+        background: #f0f0f0 !important;
+        font-weight: bold;
+    }
+
+    .stat-card,
+    .grades-container,
+    .card {
+        border: 1px solid #000;
+        padding: 12pt;
+        margin-bottom: 12pt;
+        page-break-inside: avoid;
+    }
+
+    a {
+        color: #000 !important;
+        text-decoration: underline;
+    }
+
+    a[href^="http"]:after {
+        content: " (" attr(href) ")";
+        font-size: 10pt;
+    }
+
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+        page-break-inside: avoid;
+    }
+
+    .page-break-before {
+        page-break-before: always;
+    }
+
+    .page-break-after {
+        page-break-after: always;
+    }
+
+    .page-break-inside-avoid {
+        page-break-inside: avoid;
+    }
+
+    .progress-bar-mini,
+    .progress-fill-mini {
+        display: none !important;
+    }
+
+    .progress-text::after {
+        content: " (" attr(data-progress) "%)";
+    }
+
+    .fas, .far, .fab {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    @page {
+        margin: 2cm;
+        @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-size: 10pt;
+            color: #666;
+        }
+    }
+
+    @page :first {
+        margin-top: 3cm;
+    }
+
+    .lesson-item,
+    .activity-item,
+    .detail-card {
+        page-break-inside: avoid;
+    }
+}
+
+

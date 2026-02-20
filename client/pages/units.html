@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Units - Taa Academy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#115879">
+  <link rel="stylesheet" href="../css/toast-notifications.css">
+  <link rel="stylesheet" href="../css/loading-animations.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/print-styles.css" media="print">
+  <link rel="stylesheet" href="../css/units.css">
+</head>
+<body>
+  <div class="units-wrapper">
+    <div class="top-bar">
+      <a href="dashboard.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> <span id="backText">Back to Dashboard</span>
+      </a>
+      <button class="lang-toggle" id="langToggle">
+        🌐 <span id="langText">AR</span>
+      </button>
+    </div>
+    
+    <div class="page-header">
+      <h1 id="gradeTitle">Grade X Units</h1>
+      <p id="selectUnitText">Select a unit to begin your lesson</p>
+    </div>
+    <div class="units-grid" id="unitsContainer">
+    </div>
+  </div>
+
+  <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
+    <i class="fas fa-moon" id="dark-mode-icon"></i>
+  </button>
+
+  <script src="../js/toast-notifications.js"></script>
+  <script src="../js/dark-mode.js"></script>
+  <script src="../js/mobile-gestures.js"></script>
+  <script src="../js/units.js"></script>
+</body>
+</html>

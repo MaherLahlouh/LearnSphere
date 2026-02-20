@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Courses</title>
+    <link rel="stylesheet" href="../css/teacher_courses.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <main class="main-content">
+        <header class="header">
+            <div class="header-left">
+                <a href="teacher_dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <h1><i class="fas fa-book-open"></i> Teacher Courses</h1>
+                <p>Stay up-to-date with the latest teaching methods and technologies</p>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search courses...">
+                </div>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>24</h3>
+                    <p>Available Courses</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>8</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>3</h3>
+                    <p>In Progress</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>5</h3>
+                    <p>Certificates</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="tab-btn active" data-filter="all">All Courses</button>
+            <button class="tab-btn" data-filter="in-progress">In Progress</button>
+            <button class="tab-btn" data-filter="completed">Completed</button>
+            <button class="tab-btn" data-filter="not-started">Not Started</button>
+        </div>
+
+        <div class="courses-container">
+            <div class="courses-grid" id="courses-grid">
+                <div class="course-card" data-status="in-progress">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/320x180/667eea/ffffff?text=AI+Teaching" alt="AI Teaching">
+                        <span class="course-status-badge in-progress">In Progress</span>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-category">
+                            <span><i class="fas fa-tag"></i> Technology</span>
+                            <span><i class="fas fa-chart-line"></i> Intermediate</span>
+                        </div>
+                        <h3>AI in Education: Transforming Classrooms</h3>
+                        <p class="course-description">Learn how to integrate artificial intelligence tools into your teaching practice to enhance student engagement and personalize learning.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 6 hours</span>
+                            <span><i class="fas fa-video"></i> 24 lessons</span>
+                        </div>
+                        <div class="course-progress-bar">
+                            <div class="progress-label">
+                                <span>Progress</span>
+                                <span>45%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 45%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-footer">
+                        <button class="btn btn-primary btn-block">
+                            <i class="fas fa-play"></i> Continue Learning
+                        </button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-status="not-started">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/320x180/764ba2/ffffff?text=Online+Teaching" alt="Online Teaching">
+                        <span class="course-status-badge not-started">Not Started</span>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-category">
+                            <span><i class="fas fa-tag"></i> Pedagogy</span>
+                            <span><i class="fas fa-chart-line"></i> Beginner</span>
+                        </div>
+                        <h3>Mastering Online Teaching Platforms</h3>
+                        <p class="course-description">Discover the best practices for delivering engaging online lessons using popular educational platforms and tools.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 4 hours</span>
+                            <span><i class="fas fa-video"></i> 16 lessons</span>
+                        </div>
+                    </div>
+                    <div class="course-footer">
+                        <button class="btn btn-primary btn-block">
+                            <i class="fas fa-play"></i> Start Course
+                        </button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-status="completed">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/320x180/4CAF50/ffffff?text=Assessment" alt="Assessment">
+                        <span class="course-status-badge completed">Completed</span>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-category">
+                            <span><i class="fas fa-tag"></i> Assessment</span>
+                            <span><i class="fas fa-chart-line"></i> Advanced</span>
+                        </div>
+                        <h3>Modern Assessment Strategies</h3>
+                        <p class="course-description">Explore innovative assessment methods that provide meaningful feedback and support student growth.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 5 hours</span>
+                            <span><i class="fas fa-video"></i> 20 lessons</span>
+                        </div>
+                        <div class="course-completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Course Completed</span>
+                        </div>
+                    </div>
+                    <div class="course-footer">
+                        <button class="btn btn-outline btn-block">
+                            <i class="fas fa-redo"></i> Review Course
+                        </button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-status="not-started">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/320x180/FF9800/ffffff?text=Classroom+Mgmt" alt="Classroom Management">
+                        <span class="course-status-badge not-started">Not Started</span>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-category">
+                            <span><i class="fas fa-tag"></i> Classroom Management</span>
+                            <span><i class="fas fa-chart-line"></i> Intermediate</span>
+                        </div>
+                        <h3>Positive Classroom Management Techniques</h3>
+                        <p class="course-description">Learn evidence-based strategies to create a positive, inclusive, and productive learning environment.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 3 hours</span>
+                            <span><i class="fas fa-video"></i> 12 lessons</span>
+                        </div>
+                    </div>
+                    <div class="course-footer">
+                        <button class="btn btn-primary btn-block">
+                            <i class="fas fa-play"></i> Start Course
+                        </button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-status="not-started">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/320x180/E91E63/ffffff?text=EdTech" alt="EdTech">
+                        <span class="course-status-badge not-started">Not Started</span>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-category">
+                            <span><i class="fas fa-tag"></i> Technology</span>
+                            <span><i class="fas fa-chart-line"></i> Beginner</span>
+                        </div>
+                        <h3>Essential EdTech Tools for 2026</h3>
+                        <p class="course-description">Stay current with the latest educational technology tools and platforms that enhance teaching and learning.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 4 hours</span>
+                            <span><i class="fas fa-video"></i> 18 lessons</span>
+                        </div>
+                    </div>
+                    <div class="course-footer">
+                        <button class="btn btn-primary btn-block">
+                            <i class="fas fa-play"></i> Start Course
+                        </button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-status="in-progress">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/320x180/2196F3/ffffff?text=Inclusive+Ed" alt="Inclusive Education">
+                        <span class="course-status-badge in-progress">In Progress</span>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-category">
+                            <span><i class="fas fa-tag"></i> Inclusive Education</span>
+                            <span><i class="fas fa-chart-line"></i> Intermediate</span>
+                        </div>
+                        <h3>Creating Inclusive Learning Environments</h3>
+                        <p class="course-description">Develop strategies to support diverse learners and create an inclusive classroom where every student thrives.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 5 hours</span>
+                            <span><i class="fas fa-video"></i> 22 lessons</span>
+                        </div>
+                        <div class="course-progress-bar">
+                            <div class="progress-label">
+                                <span>Progress</span>
+                                <span>68%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 68%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-footer">
+                        <button class="btn btn-primary btn-block">
+                            <i class="fas fa-play"></i> Continue Learning
+                        </button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-status="not-started">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/320x180/9C27B0/ffffff?text=Gamification" alt="Gamification">
+                        <span class="course-status-badge not-started">Not Started</span>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-category">
+                            <span><i class="fas fa-tag"></i> Engagement</span>
+                            <span><i class="fas fa-chart-line"></i> Beginner</span>
+                        </div>
+                        <h3>Gamification in Education</h3>
+                        <p class="course-description">Learn how to use game-based elements to increase student motivation and engagement in your classroom.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 3 hours</span>
+                            <span><i class="fas fa-video"></i> 14 lessons</span>
+                        </div>
+                    </div>
+                    <div class="course-footer">
+                        <button class="btn btn-primary btn-block">
+                            <i class="fas fa-play"></i> Start Course
+                        </button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-status="completed">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/320x180/3F51B5/ffffff?text=SEL" alt="Social Emotional Learning">
+                        <span class="course-status-badge completed">Completed</span>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-category">
+                            <span><i class="fas fa-tag"></i> Social-Emotional Learning</span>
+                            <span><i class="fas fa-chart-line"></i> Advanced</span>
+                        </div>
+                        <h3>Social-Emotional Learning for Educators</h3>
+                        <p class="course-description">Understand and implement SEL strategies to support students' emotional well-being and academic success.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 6 hours</span>
+                            <span><i class="fas fa-video"></i> 25 lessons</span>
+                        </div>
+                        <div class="course-completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Course Completed</span>
+                        </div>
+                    </div>
+                    <div class="course-footer">
+                        <button class="btn btn-outline btn-block">
+                            <i class="fas fa-redo"></i> Review Course
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

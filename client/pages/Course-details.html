@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Details</title>
+  <link rel="stylesheet" href="../css/teacher-dashboard-styles.css">
+  <link rel="stylesheet" href="../css/course-details.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <main class="main-content">
+      <header class="content-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          
+          <div class="header-content">
+            <div class="breadcrumb">
+              <a href="teacher_dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+              <span>/</span>
+              <a href="#">Courses</a>
+            </div>
+            <h1 id="course-title">Course Details</h1>
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <button class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+          
+          <div class="user-profile">
+            <div id="teacher-avatar" class="user-avatar">T</div>
+            <span id="teacher-name">Teacher</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="course-details-container">
+        <div class="card course-info-card">
+          <div class="course-header">
+            <div class="course-icon" id="course-icon">
+              <i class="fas fa-book"></i>
+            </div>
+            <div class="course-meta">
+              <h2 id="course-name">Loading...</h2>
+              <p id="course-description">Loading course information...</p>
+              <div class="course-stats">
+                <div class="stat-item">
+                  <i class="fas fa-users"></i>
+                  <span id="enrolled-count">0 Students</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-graduation-cap"></i>
+                  <span id="course-grade">Grade 0</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-video"></i>
+                  <span id="lessons-count">0 Lessons</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn-manage-students" id="manage-students-btn">
+              <i class="fas fa-user-plus"></i>
+              Manage Students
+            </button>
+          </div>
+        </div>
+
+        <div class="card students-table-card">
+          <div class="card-header">
+            <h3>Enrolled Students</h3>
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="student-search" placeholder="Search students...">
+            </div>
+          </div>
+          
+          <div class="table-container" id="students-table-container">
+            <div class="loading-spinner">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Loading students...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card lessons-card">
+          <div class="card-header">
+            <h3>Course Lessons</h3>
+            <span class="lessons-badge" id="total-lessons-badge">0 Lessons</span>
+          </div>
+          
+          <div class="lessons-container" id="lessons-container">
+            <div class="loading-spinner">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Loading lessons...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="manage-students-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Manage Students</h2>
+        <button class="close-modal" id="close-modal-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="search-section">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="modal-student-search" placeholder="Search students by name or email...">
+          </div>
+          <select id="grade-filter" class="grade-filter">
+            <option value="all">All Grades</option>
+            <option value="1">Grade 1</option>
+            <option value="2">Grade 2</option>
+            <option value="3">Grade 3</option>
+            <option value="4">Grade 4</option>
+            <option value="5">Grade 5</option>
+            <option value="6">Grade 6</option>
+            <option value="7">Grade 7</option>
+            <option value="8">Grade 8</option>
+            <option value="9">Grade 9</option>
+            <option value="10">Grade 10</option>
+            <option value="11">Grade 11</option>
+            <option value="12">Grade 12</option>
+          </select>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="available">
+            Available Students
+            <span class="tab-count" id="available-count">0</span>
+          </button>
+          <button class="tab-btn" data-tab="enrolled">
+            Enrolled Students
+            <span class="tab-count" id="enrolled-tab-count">0</span>
+          </button>
+        </div>
+
+        <div class="tab-content active" id="available-tab">
+          <div id="available-students-list" class="students-list">
+          </div>
+        </div>
+
+        <div class="tab-content" id="enrolled-tab">
+          <div id="enrolled-students-list" class="students-list">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="cancel-btn">Cancel</button>
+        <button class="btn-primary" id="save-changes-btn">
+          <i class="fas fa-save"></i>
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/course-details.js"></script>
+</body>
+</html>

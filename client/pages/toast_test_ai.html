@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toast Notifications</title>
+  <style>
+    /* Base toast styles */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+      max-width: 350px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      background: #fff;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .toast:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .toast-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .toast-icon svg {
+      width: 20px;
+      height: 20px;
+      color: white;
+    }
+
+    /* Success toast */
+    .success {
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    }
+
+    .success .toast-icon {
+      background-color: #28a745;
+    }
+
+    /* Error toast */
+    .error {
+      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    }
+
+    .error .toast-icon {
+      background-color: #dc3545;
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-content h3 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #212529;
+    }
+
+    .toast-content p {
+      margin: 0;
+      font-size: 14px;
+      color: #495057;
+      line-height: 1.4;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: #6c757d;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-left: 8px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Toast container (place this in your HTML) -->
+  <div class="toast-container"></div>
+
+  <script>
+    // Create toast function
+    function showToast(type, title, message) {
+      const container = document.querySelector('.toast-container');
+      
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      // Add toast content
+      toast.innerHTML = `
+        <div class="toast-icon">
+          ${type === 'success' ? 
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17L4 12" /></svg>' :
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+          }
+        </div>
+        <div class="toast-content">
+          <h3>${title}</h3>
+          <p>${message}</p>
+        </div>
+        <button class="toast-close">&times;</button>
+      `;
+      
+      // Add close functionality
+      toast.querySelector('.toast-close').addEventListener('click', () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => toast.remove(), 300);
+      });
+      
+      // Add to container
+      container.appendChild(toast);
+      
+      // Auto-dismiss success toasts after 5 seconds
+      if (type === 'success') {
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-10px)';
+          setTimeout(() => toast.remove(), 300);
+        }, 5000);
+      }
+    }
+
+    // Example usage (trigger when needed)
+    document.addEventListener('DOMContentLoaded', () => {
+      // Show success toast
+      showToast(
+        'success',
+        'Files uploaded successfully',
+        'You will receive review results in your email in 2-4 days'
+      );
+      
+      // Show error toast
+      showToast(
+        'error',
+        'Files are larger than 5 MB',
+        'Try to compress your files and upload them again'
+      );
+    });
+  </script>
+</body>
+</html>

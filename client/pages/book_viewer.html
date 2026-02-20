@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عارض الكتاب التفاعلي</title>
+  <link rel="stylesheet" href="../css/book_viewer.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- ── TOP BAR ── -->
+  <header class="top-bar">
+    <div class="top-bar-title">
+      <span class="book-icon">📖</span>
+      <span id="bookTitle">الكتاب التفاعلي</span>
+    </div>
+
+    <div class="top-bar-center">
+      <div class="page-nav">
+        <button id="prevPageBtn" title="الصفحة السابقة"><i class="fas fa-chevron-right"></i></button>
+        <span class="page-info">
+          صفحة <strong id="currentPageNum">1</strong> من <strong id="totalPagesNum">3</strong>
+        </span>
+        <button id="nextPageBtn" title="الصفحة التالية"><i class="fas fa-chevron-left"></i></button>
+      </div>
+    </div>
+
+    <div class="top-bar-actions">
+      <div class="mode-toggle" id="modeToggle">
+        <button class="active" id="teacherModeBtn" onclick="setMode('teacher')">
+          <i class="fas fa-chalkboard-teacher"></i> معلم
+        </button>
+        <button id="studentModeBtn" onclick="setMode('student')">
+          <i class="fas fa-user-graduate"></i> طالب
+        </button>
+      </div>
+      <button class="btn btn-accent" id="addInteractionBtn" onclick="startDrawing()" style="display:none;">
+        <i class="fas fa-plus"></i> أضف سؤالاً
+      </button>
+      <button class="btn btn-primary" id="submitAnswersBtn" onclick="submitAllAnswers()" style="display:none;">
+        <i class="fas fa-paper-plane"></i> تسليم
+      </button>
+    </div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <div class="main-content">
+
+    <!-- ── VIEWER PANEL ── -->
+    <div class="viewer-panel" id="viewerPanel">
+      <div class="book-page-wrapper" id="bookPageWrapper">
+
+        <!-- Book page image -->
+        <img class="book-page-image" id="bookPageImage" src="" alt="صفحة الكتاب" />
+
+        <!-- No image placeholder -->
+        <div class="no-image-placeholder" id="noImagePlaceholder" style="display:none;">
+          <div class="placeholder-icon">🖼️</div>
+          <p>لا توجد صورة لهذه الصفحة</p>
+        </div>
+
+        <!-- Placed images layer (drag from bank) -->
+        <div class="placed-images-layer" id="placedImagesLayer"></div>
+
+        <!-- Question overlays layer -->
+        <div class="interactions-layer" id="interactionsLayer"></div>
+
+        <!-- Drawing selection box (teacher) -->
+        <div class="selection-box" id="selectionBox" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar-panel" id="sidebarPanel">
+
+      <!-- ══ TEACHER SIDEBAR ══ -->
+      <div id="teacherSidebar">
+        <div class="sidebar-header">
+          <h3><i class="fas fa-cog"></i> لوحة المعلم</h3>
+          <p>أضف أسئلة تفاعلية فوق صفحات الكتاب</p>
+        </div>
+        <div class="sidebar-body">
+
+          <div class="add-interaction-guide" id="drawingGuide">
+            <div class="guide-icon">🖊️</div>
+            <p>اضغط <strong>"أضف سؤالاً"</strong> ثم ارسم مربعاً فوق المنطقة التي تريد إضافة السؤال فيها</p>
+          </div>
+
+          <div id="interactionForm" style="display:none;">
+            <div class="section-divider">نوع السؤال</div>
+            <div class="type-selector">
+              <button class="type-btn active" data-type="fill" onclick="selectType('fill')">
+                <span class="type-icon">✏️</span><span class="type-label">تعبئة فراغ</span>
+              </button>
+              <button class="type-btn" data-type="mc" onclick="selectType('mc')">
+                <span class="type-icon">☑️</span><span class="type-label">اختيار متعدد</span>
+              </button>
+              <button class="type-btn" data-type="click" onclick="selectType('click')">
+                <span class="type-icon">👆</span><span class="type-label">منطقة النقر</span>
+              </button>
+            </div>
+
+            <!-- Fill fields -->
+            <div id="fillFields" style="margin-top:10px;">
+              <div class="form-group">
+                <label>تسمية الفراغ</label>
+                <input type="text" id="fillLabel" placeholder="مثال: اكتب اسم الجهاز" />
+              </div>
+              <div class="form-group">
+                <label>الإجابة الصحيحة</label>
+                <input type="text" id="fillAnswer" placeholder="الإجابة الصحيحة" />
+              </div>
+              <div class="form-group">
+                <label>نص التلميح</label>
+                <input type="text" id="fillPlaceholder" placeholder="اكتب هنا..." />
+              </div>
+            </div>
+
+            <!-- MC fields -->
+            <div id="mcFields" style="display:none; margin-top:10px;">
+              <div class="form-group">
+                <label>نص السؤال</label>
+                <textarea id="mcQuestion" rows="2" placeholder="اكتب السؤال هنا..."></textarea>
+              </div>
+              <div class="section-divider" style="margin-top:8px;">الخيارات</div>
+              <div class="mc-options-list" id="mcOptionsList"></div>
+              <button class="btn btn-ghost" onclick="addMcOption()" style="width:100%;margin-top:6px;font-size:0.8rem;">
+                <i class="fas fa-plus"></i> أضف خياراً
+              </button>
+            </div>
+
+            <!-- Click zone fields -->
+            <div id="clickFields" style="display:none; margin-top:10px;">
+              <div class="form-group">
+                <label>وصف منطقة النقر</label>
+                <input type="text" id="clickLabel" placeholder="مثال: انقر على الشاشة" />
+              </div>
+              <div class="form-group">
+                <label>هل هذه الإجابة الصحيحة؟</label>
+                <select id="clickCorrect">
+                  <option value="true">نعم — إجابة صحيحة</option>
+                  <option value="false">لا — إجابة خاطئة</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn btn-primary" onclick="saveInteraction()" style="flex:1;">
+                <i class="fas fa-save"></i> حفظ
+              </button>
+              <button class="btn btn-ghost" onclick="cancelInteraction()" style="flex:1;">إلغاء</button>
+            </div>
+          </div>
+
+          <div id="existingInteractions" style="margin-top:4px;">
+            <div class="section-divider">
+              الأسئلة على هذه الصفحة <span class="badge" id="interactionCountBadge">0</span>
+            </div>
+            <div class="interactions-list" id="interactionsList">
+              <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>لا توجد أسئلة بعد على هذه الصفحة</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /teacherSidebar -->
+
+      <!-- ══ STUDENT SIDEBAR ══ -->
+      <div id="studentSidebar" style="display:none;">
+
+        <!-- Progress section -->
+        <div class="sidebar-header">
+          <h3><i class="fas fa-tasks"></i> التقدم</h3>
+          <p>أجب عن الأسئلة وألصق الصور في مكانها</p>
+        </div>
+        <div class="sidebar-body">
+
+          <div class="student-progress-bar">
+            <div class="student-progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+          <div class="student-stats">
+            <span id="statAnswered">0 / 0 سؤال</span>
+            <span id="statScore">النتيجة: —</span>
+          </div>
+          <div class="interactions-list" id="studentInteractionsList"></div>
+
+          <div id="resultsSummary" style="display:none;">
+            <div class="section-divider">النتيجة النهائية</div>
+            <div style="text-align:center;padding:16px;">
+              <div style="font-size:2.5rem;margin-bottom:6px;" id="resultEmoji">🎉</div>
+              <div style="font-size:1.4rem;font-weight:800;color:var(--primary);" id="resultScore">0%</div>
+              <div style="font-size:0.85rem;color:var(--text-muted);margin-top:4px;" id="resultDetail">0 من 0</div>
+            </div>
+          </div>
+
+          <!-- ── IMAGE BANK ── -->
+          <div class="image-bank-section">
+            <div class="section-divider" style="margin-bottom:10px;">
+              <i class="fas fa-images" style="color:var(--accent);"></i>
+              بنك الصور — اسحب صورة وضعها على الصفحة
+            </div>
+            <p class="bank-hint">اسحب أي صورة من هنا وأفلتها فوق الصفحة 📌</p>
+            <div class="image-bank-grid" id="imageBankGrid">
+              <!-- Built by JS -->
+            </div>
+            <div class="bank-actions">
+              <button class="btn btn-ghost" onclick="clearAllPlacedImages()" style="width:100%;font-size:0.78rem;">
+                <i class="fas fa-trash-alt"></i> مسح كل الصور المُلصقة
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /studentSidebar -->
+
+    </aside>
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- ── MC POPUP ── -->
+<div class="mc-popup-overlay" id="mcPopupOverlay" style="display:none;" onclick="closeMcPopup(event)">
+  <div class="mc-popup">
+    <div class="mc-popup-header">
+      <h4 id="mcPopupQuestion">نص السؤال</h4>
+      <button class="popup-close" onclick="closeMcPopupDirect()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="mc-popup-body" id="mcPopupChoices"></div>
+    <div class="feedback-banner" id="mcFeedback" style="display:none;"></div>
+    <div class="mc-popup-footer">
+      <button class="btn btn-ghost" onclick="closeMcPopupDirect()">إغلاق</button>
+      <button class="btn btn-primary" id="mcSubmitBtn" onclick="submitMcAnswer()">تحقق</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="notification" id="notification"></div>
+
+<script src="../js/book_viewer.js"></script>
+</body>
+</html>

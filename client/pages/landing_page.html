@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">LearnWithTaa - Programming Community for Kids</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="manifest" href="../../manifest.json">
+    <meta name="theme-color" content="#115879">
+    <link rel="stylesheet" href="../css/toast-notifications.css">
+    <link rel="stylesheet" href="../css/loading-animations.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+    <link rel="stylesheet" href="../css/print-styles.css" media="print">
+    <link rel="stylesheet" href="../css/landing_page.css">
+    <link rel="stylesheet" href="../css/landing_page.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="../icons/img.png" alt="Logo 1" class="logo-image">
+            <img src="../icons/logo_al_manhal.jpeg" alt="Logo Al Manhal" class="logo-image">
+            <div class="logo-text">عالمي الرقمي</div>
+        </div>
+        <div class="header-right">
+            <a href="login.html" class="login-btn" id="login-btn">Login</a>
+            <button class="lang-btn" id="lang-btn">🌐 EN</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge" id="hero-badge"></div>
+            <h1 class="hero-title" id="hero-title">
+                Programming <span>Community</span> for Kids
+            </h1>
+            <p class="hero-subtitle" id="hero-subtitle">
+                A unique educational experience designed specifically to spark your child's creativity
+            </p>
+            <ul class="hero-features" id="hero-features">
+                <li>Develop their thinking skills</li>
+                <li>Improve their communication skills</li>
+                <li>Enhance their academic skills</li>
+            </ul>
+        </div>
+
+        <div class="hero-visual">
+            <div class="visual-container">
+                <div class="floating-card card-1">
+                    <div class="card-icon">🎯</div>
+                    <span class="card-text">Interactive</span>
+                </div>
+                
+                <div class="device-mockup">
+                    <div class="device-screen">
+                        <div class="code-preview">
+                            &lt;code&gt;<br>
+                            &nbsp;&nbsp;Learn to code<br>
+                            &nbsp;&nbsp;Have fun!<br>
+                            &lt;/code&gt;
+                        </div>
+                        <div class="play-button"></div>
+                    </div>
+                </div>
+
+                <div class="floating-card card-2">
+                    <div class="card-icon">🚀</div>
+                    <span class="card-text">Fun Learning</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-section">
+            <div class="logo">
+                <div class="logo-text">عالمي الرقمي</div>
+            </div>
+            <p style="margin-top: 1rem;" id="footer-tagline">
+                A world of learning at your fingertips
+            </p>
+            <div class="social-links">
+                <a href="https://web.facebook.com/ta2ai" target="_blank" aria-label="Facebook">
+                    <img src="../icons/facebook.png" alt="Facebook" class="social-icon">
+                </a>
+                <a href="https://www.instagram.com/taa_academy?igsh=YnV3eXU3ZnFueXFk" target="_blank" aria-label="Instagram">
+                    <img src="../icons/instagram.png" alt="Instagram" class="social-icon">
+                </a>
+                <a href="https://wa.me/962799670628" target="_blank" aria-label="WhatsApp">
+                    <img src="../icons/whatsapp.png" alt="WhatsApp" class="social-icon">
+                </a>
+                <a href="https://maps.google.com/?cid=3240599870435748634" target="_blank" rel="noopener" aria-label="Location">
+                    <img src="../icons/location.png" alt="Location" class="social-icon">
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3 id="useful-links"></h3>
+            <div id="useful-links-list"></div>
+        </div>
+
+        <div class="footer-section">
+            <h3 id="contact-us">Contact Us</h3>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span>📞</span>
+                    <span>0799670628</span>
+                </div>
+                <div class="contact-item">
+                    <span>✉️</span>
+                    <span>geek_amal@hotmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <span>📍</span>
+                    <span id="address"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3 id="newsletter">Newsletter</h3>
+            <p id="subscribe-text">Subscribe to our newsletter for the latest updates and promotions</p>
+            <form class="newsletter-form">
+                <input type="email" id="newsletter-input" class="newsletter-input" required>
+                <button type="submit" id="newsletter-btn" class="newsletter-btn"></button>
+            </form>
+        </div>
+    </footer>
+
+    <script src="../js/landing_page.js"></script>
+
+    <script src="../js/toast-notifications.js"></script>
+    <script src="../js/dark-mode.js"></script>
+    <script src="../js/mobile-gestures.js"></script>
+    
+    <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
+      <i class="fas fa-moon" id="dark-mode-icon"></i>
+    </button>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Sign Up - Taa Academy</title>
+    <link rel="stylesheet" href="../css/signup.css">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#115879">
+    <link rel="stylesheet" href="../css/toast-notifications.css">
+    <link rel="stylesheet" href="../css/loading-animations.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+    <link rel="stylesheet" href="../css/print-styles.css" media="print">
+</head>
+<body>
+    <div class="background-animation">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        <div class="floating-shape shape-4"></div>
+        <div class="floating-shape shape-5"></div>
+        <div class="floating-shape shape-6"></div>
+    </div>
+    
+    <div class="container">
+        <div class="card-3d">
+            <div class="card-inner">
+                <div class="card-face card-front">
+                    <div class="brand-header">
+                        <div class="logo-circle">
+                            <span class="logo-text">TAA</span>
+                            <div class="logo-rings">
+                                <div class="ring ring-1"></div>
+                                <div class="ring ring-2"></div>
+                            </div>
+                        </div>
+                        <h1 id="join-title">عالمي الرقمي</h1>
+                        <p class="tagline" id="tagline">Start your STEM journey today!</p>
+                    </div>
+
+                    <div class="user-type-toggle">
+                        <button type="button" class="type-btn active" data-type="student" id="student-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                            </svg>
+                            <span id="student-text">Student</span>
+                        </button>
+                        <button type="button" class="type-btn" data-type="teacher" id="teacher-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span id="teacher-text">Teacher</span>
+                        </button>
+                    </div>
+                    
+                    <form class="form-creative" id="signup-form">
+                        <div class="name-row">
+                            <div class="input-creative">
+                                <div class="input-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <input type="text" id="first-name" name="firstName" placeholder="First Name" required>
+                                <div class="input-line"></div>
+                            </div>
+                            <div class="input-creative">
+                                <div class="input-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <input type="text" id="last-name" name="lastName" placeholder="Last Name" required>
+                                <div class="input-line"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-creative">
+                            <div class="input-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 22 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <input type="email" id="email" name="email" placeholder="Email Address" required>
+                            <div class="input-line"></div>
+                        </div>
+
+                        <div class="teacher-fields" id="teacher-fields" style="display: none;">
+                            <div class="input-creative">
+                                <div class="input-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                </div>
+                                <input type="tel" id="phone" name="phone" placeholder="Phone Number">
+                                <div class="input-line"></div>
+                            </div>
+
+                            <div class="input-creative">
+                                <div class="input-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 20v-6M6 20V10M18 20V4"></path>
+                                    </svg>
+                                </div>
+                                <select id="specialization" name="specialization">
+                                    <option value="" disabled selected id="select-specialization">Select Specialization</option>
+                                    <option value="mathematics" id="opt-math">Mathematics</option>
+                                    <option value="science" id="opt-science">Science</option>
+                                    <option value="technology" id="opt-tech">Technology</option>
+                                    <option value="engineering" id="opt-eng">Engineering</option>
+                                    <option value="other" id="opt-other">Other</option>
+                                </select>
+                                <div class="input-line"></div>
+                            </div>
+
+                            <div class="input-creative">
+                                <div class="input-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </div>
+                                <input type="text" id="qualifications" name="qualifications" placeholder="Qualifications (e.g., BSc, MSc)">
+                                <div class="input-line"></div>
+                            </div>
+
+                            <div class="input-creative">
+                                <div class="input-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                </div>
+                                <input type="number" id="experience" name="experienceYears" placeholder="Years of Experience" min="0">
+                                <div class="input-line"></div>
+                            </div>
+                        </div>
+
+                        <div class="student-fields" id="student-fields">
+                            <div class="input-creative">
+                                <div class="input-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                    </svg>
+                                </div>
+                                <select id="grade-level" name="gradeLevel">
+                                    <option value="" disabled selected id="select-grade">Select Your Grade</option>
+                                    <option value="1" id="opt-grade1">Grade 1</option>
+                                    <option value="2" id="opt-grade2">Grade 2</option>
+                                    <option value="3" id="opt-grade3">Grade 3</option>
+                                    <option value="4" id="opt-grade4">Grade 4</option>
+                                    <option value="5" id="opt-grade5">Grade 5</option>
+                                    <option value="6" id="opt-grade6">Grade 6</option>
+                                    <option value="7" id="opt-grade7">Grade 7</option>
+                                    <option value="8" id="opt-grade8">Grade 8</option>
+                                    <option value="9" id="opt-grade9">Grade 9</option>
+                                    <option value="10" id="opt-grade10">Grade 10</option>
+                                </select>
+                                <div class="input-line"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-creative">
+                            <div class="input-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
+                            <input type="password" id="password" name="password" placeholder="Password" required>
+                            <div class="input-line"></div>
+                            <div class="password-strength">
+                                <div class="strength-bar" id="strength-bar"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-creative">
+                            <div class="input-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
+                            <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm Password" required>
+                            <div class="input-line"></div>
+                        </div>
+                        
+                        <label class="terms-label">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <span class="custom-checkbox"></span>
+                            <span class="terms-text" id="terms-text">
+                                I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>
+                            </span>
+                        </label>
+                        
+                        <button type="submit" class="btn-gradient" id="submit-btn">
+                            <span id="create-account-text">Create Account</span>
+                            <div class="btn-shine"></div>
+                            <div class="btn-particles">
+                                <span class="particle"></span>
+                                <span class="particle"></span>
+                                <span class="particle"></span>
+                            </div>
+                        </button>
+                        
+                        <p class="login-text">
+                            <span id="already-have-text">Already have an account?</span> 
+                            <a href="/login.html" class="login-link" id="login-link-text">Login</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/signup.js"></script>
+    <script src="../js/toast-notifications.js"></script>
+    <script src="../js/dark-mode.js"></script>
+    <script src="../js/mobile-gestures.js"></script>
+    <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
+      <i class="fas fa-moon" id="dark-mode-icon"></i>
+    </button>
+</body>
+</html>

@@ -12,10 +12,10 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#115879">
     <!-- Enhancement CSS Files -->
-    <link rel="stylesheet" href="toast-notifications.css">
-    <link rel="stylesheet" href="loading-animations.css">
-    <link rel="stylesheet" href="dark-mode.css">
-    <link rel="stylesheet" href="print-styles.css" media="print">
+    <link rel="stylesheet" href="client/css/toast-notifications.css">
+    <link rel="stylesheet" href="client/css/loading-animations.css">
+    <link rel="stylesheet" href="client/css/dark-mode.css">
+    <link rel="stylesheet" href="client/css/print-styles.css" media="print">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -1254,13 +1254,10 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
         console.log('Grade:', userGrade);
         console.log('Allowed Languages:', allowedLanguages);
     </script>
-    <!-- Enhancement JavaScript Files -->
-    <script src="toast-notifications.js"></script>
-    <script src="keyboard-shortcuts.js"></script>
-    <script src="dark-mode.js"></script>
-    <script src="analytics.js"></script>
-    <script src="accessibility.js"></script>
-    <script src="mobile-gestures.js"></script>
+    <!--JavaScript Files -->
+    <script src="client/js/toast-notifications.js"></script>
+    <script src="client/js/dark-mode.js"></script>
+    <script src="client/js/mobile-gestures.js"></script>
     <!-- Dark Mode Toggle Button -->
     <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
       <i class="fas fa-moon" id="dark-mode-icon"></i>
@@ -1276,16 +1273,6 @@ print(f'\n🔢 Fibonacci(10): {fibonacci(10)}')</textarea>
       // Initialize dark mode icon
       if (document.getElementById('dark-mode-icon')) {
         document.getElementById('dark-mode-icon').className = darkMode.isEnabled() ? 'fas fa-sun' : 'fas fa-moon';
-      }
-    </script>
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(reg => console.log('Service Worker registered'))
-            .catch(err => console.log('Service Worker registration failed'));
-        });
       }
     </script>
 </body>

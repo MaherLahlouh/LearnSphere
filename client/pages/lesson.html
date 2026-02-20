@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lesson - Taa Academy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#115879">
+  <link rel="stylesheet" href="../css/toast-notifications.css">
+  <link rel="stylesheet" href="../css/loading-animations.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/mobile-menu.css">
+  <link rel="stylesheet" href="../css/print-styles.css" media="print">
+  <link rel="stylesheet" href="../css/lesson.css">
+</head>
+<body>
+  <div class="lesson-wrapper">
+    <div class="lesson-header">
+      <h1 class="page-title" id="unitTitle">Grade X - Unit Y</h1>
+      <a href="#" class="back-btn" id="backBtn">
+        <i class="fas fa-arrow-left"></i> Back to Units
+      </a>
+    </div>
+    
+    <div class="lesson-layout">
+      <div class="lessons-sidebar">
+        <div class="sidebar-header">Lessons</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div id="lessonsList"></div>
+      </div>
+      
+      <div class="main-content">
+        <div class="book-container" id="bookContainer" style="display: none;">
+          <div class="book-header">
+            <h3><i class="fas fa-book-open"></i> <span id="bookTitle">Digital Book</span></h3>
+            <div class="page-info" id="pageInfo">Pages: 1-10</div>
+          </div>
+          
+          <div class="pdf-viewer-container" id="pdfViewerContainer" style="display: none;">
+            <div class="pdf-restriction-notice" id="pdfRestrictionNotice">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>You can only view pages <span id="allowedPagesText"></span> for this lesson</span>
+            </div>
+            <div class="pdf-controls">
+              <div class="pdf-nav">
+                <button id="prevPage"><i class="fas fa-chevron-left"></i> Previous</button>
+                <span class="pdf-page-info">
+                  Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                </span>
+                <button id="nextPage">Next <i class="fas fa-chevron-right"></i></button>
+              </div>
+              <div class="pdf-zoom">
+                <button id="zoomOut"><i class="fas fa-search-minus"></i></button>
+                <span id="zoomLevel">100%</span>
+                <button id="zoomIn"><i class="fas fa-search-plus"></i></button>
+              </div>
+            </div>
+            <div id="pdf-canvas-wrapper">
+              <canvas id="pdf-canvas"></canvas>
+            </div>
+          </div>
+          
+          <iframe id="lessonBook" src="" allowfullscreen style="display: none;"></iframe>
+        </div>
+        
+        <div class="video-container" id="videoContainer" style="display: none;">
+          <iframe id="lessonVideo" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+        
+        <div class="quiz-container" id="quizContainer">
+          <div class="quiz-header">
+            <h3><i class="fas fa-question-circle"></i> Quiz</h3>
+            <div class="quiz-progress" id="quizProgress">Question 1 of 3</div>
+          </div>
+          <div class="question-container">
+            <div class="question-text" id="questionText">Loading question...</div>
+            <div class="answers-list" id="answersList"></div>
+            <div id="feedbackMessage"></div>
+          </div>
+          <div class="quiz-actions">
+            <button class="quiz-btn check-answer-btn" id="checkAnswerBtn" disabled>
+              <i class="fas fa-check"></i> Check My Answer
+            </button>
+            <button class="quiz-btn next-question-btn" id="nextQuestionBtn" disabled style="display: none;">
+              <i class="fas fa-arrow-right"></i> Next Question
+            </button>
+          </div>
+        </div>
+        
+        <div class="lesson-details">
+          <div class="details-header">
+            <h2 id="currentLessonTitle">Select a lesson to begin</h2>
+          </div>
+          <div class="steps" id="lessonSteps">
+            <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
+              Click on a lesson from the list to view its content.
+            </p>
+          </div>
+          <div class="actions">
+            <button class="finish-btn" id="finishBtn" disabled>
+              <i class="fas fa-flag-checkered"></i> Mark as Completed
+            </button>
+            <button class="try-compiler-btn" id="tryCompilerBtn" style="display: none;">
+              <i class="fas fa-code"></i> Try on Compiler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/lesson.js"></script>
+  
+  <script src="../js/toast-notifications.js"></script>
+  <script src="../js/dark-mode.js"></script>
+  <script src="../js/mobile-gestures.js"></script>
+  <script src="../js/mobile-menu.js"></script>
+  
+  <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
+    <i class="fas fa-moon" id="dark-mode-icon"></i>
+  </button>
+</body>
+</html>

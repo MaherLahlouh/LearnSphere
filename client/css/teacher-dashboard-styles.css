@@ -1,0 +1,291 @@
+/* Teacher Dashboard - Classes & Students Styling */
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-state i {
+    margin-bottom: 20px;
+}
+
+.empty-state p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #115879;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-top: 20px;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background: #0d4461;
+}
+
+.btn-primary i {
+    margin-right: 8px;
+}
+
+/* Classes Grid */
+.classes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+    padding: 20px;
+}
+
+/* Class Card */
+.class-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.class-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.class-header {
+    background: linear-gradient(135deg, #115879 0%, #1a7ba8 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.class-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.grade-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.class-body {
+    padding: 20px;
+}
+
+.class-body .subject {
+    color: #115879;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.class-body .subject i {
+    margin-right: 8px;
+}
+
+.class-body .description {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.class-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: #888;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.class-stats span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.class-stats i {
+    color: #115879;
+}
+
+.class-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-view,
+.btn-manage {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-view {
+    background: white;
+    color: #115879;
+    border: 1px solid #115879;
+}
+
+.btn-view:hover {
+    background: #115879;
+    color: white;
+}
+
+.btn-manage {
+    background: #115879;
+    color: white;
+}
+
+.btn-manage:hover {
+    background: #0d4461;
+}
+
+/* Students Table */
+.students-list {
+    padding: 20px;
+}
+
+.students-list h3 {
+    color: #115879;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.students-table {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.students-table thead {
+    background: #115879;
+    color: white;
+}
+
+.students-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.students-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.students-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.students-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: #333;
+}
+
+.students-table td:first-child {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #115879 0%, #1a7ba8 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.students-table .grade-badge {
+    background: #e3f2fd;
+    color: #115879;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .classes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .class-footer {
+        flex-direction: column;
+    }
+
+    .students-table {
+        font-size: 12px;
+    }
+
+    .students-table th,
+    .students-table td {
+        padding: 12px 8px;
+    }
+
+    .student-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+}
+
+/* Loading State */
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+}
+
+.loading-spinner i {
+    font-size: 48px;
+    color: #115879;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

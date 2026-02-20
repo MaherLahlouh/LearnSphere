@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title data-i18n="dashboard_title">Dashboard - Taa Academy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#115879">
+  <link rel="stylesheet" href="../css/toast-notifications.css">
+  <link rel="stylesheet" href="../css/loading-animations.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/mobile-menu.css">
+  <link rel="stylesheet" href="../css/print-styles.css" media="print">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <div class="dashboard-wrapper">
+    <nav class="top-nav">
+      <div class="nav-container">
+        <div class="logo-section">
+          <div class="logo-text">
+            <h3>عالمي الرقمي</h3>
+            <p data-i18n="student_portal">Student Portal</p>
+          </div>
+        </div>
+        
+        <div class="nav-actions">
+          <div class="user-info">
+            <div class="user-avatar" id="userAvatar">S</div>
+            <div class="user-details">
+              <h4 id="userName">Student Name</h4>
+            </div>
+          </div>
+          <button class="lang-btn" id="langToggle">
+            <i class="fas fa-globe"></i>
+            <span data-i18n="lang_btn">EN</span>
+          </button>
+          <button class="logout-btn" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span data-i18n="logout">Logout</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="dashboard-header">
+        <h1 data-i18n="welcome_dashboard">Welcome Back, Student!</h1>
+        <p data-i18n="dashboard_subtitle">Continue your learning journey and explore new coding concepts</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon yellow">
+            <i class="fas fa-book-open"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="lessonsCompleted">12</h3>
+            <p data-i18n="lessons_completed">Lessons Completed</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="achievementsEarned">8</h3>
+            <p data-i18n="achievements">Achievements Earned</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="studyStreak">15</h3>
+            <p data-i18n="day_streak">Day Streak</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h2 data-i18n="your_grades">Your Grade Level</h2>
+        <p data-i18n="select_grade_text">Select a unit to access lessons and activities</p>
+      </div>
+
+      <div class="grades-grid" id="gradesContainer"></div>
+    </main>
+  </div>
+
+  <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
+    <i class="fas fa-moon" id="dark-mode-icon"></i>
+  </button>
+
+  <script type="module" src="../js/dashboard.js"></script>
+  
+  <script src="../js/toast-notifications.js"></script>
+  <script src="../js/dark-mode.js"></script>
+  <script src="../js/mobile-gestures.js"></script>
+  <script src="../js/mobile-menu.js"></script>
+</body>
+</html>

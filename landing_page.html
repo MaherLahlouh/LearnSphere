@@ -788,37 +788,13 @@
             loadTranslations(currentLang);
         });
     </script>
-    <!-- Enhancement JavaScript Files -->
+    <!--JavaScript Files -->
     <script src="toast-notifications.js"></script>
-    <script src="keyboard-shortcuts.js"></script>
-    <script src="dark-mode.js"></script>
-    <script src="analytics.js"></script>
-    <script src="accessibility.js"></script>
+    <script src="dark-mode.js"></script>->
     <script src="mobile-gestures.js"></script>
     <!-- Dark Mode Toggle Button -->
     <button class="dark-mode-toggle" onclick="darkMode.toggle()" aria-label="Toggle dark mode">
       <i class="fas fa-moon" id="dark-mode-icon"></i>
     </button>
-    <script>
-      // Update dark mode icon
-      window.addEventListener('darkModeChanged', (e) => {
-        const icon = document.getElementById('dark-mode-icon');
-        if (icon) {
-          icon.className = e.detail.isDark ? 'fas fa-sun' : 'fas fa-moon';
-        }
-      });
-      if (document.getElementById('dark-mode-icon')) {
-        document.getElementById('dark-mode-icon').className = darkMode.isEnabled() ? 'fas fa-sun' : 'fas fa-moon';
-      }
-    </script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(reg => console.log('Service Worker registered'))
-            .catch(err => console.log('Service Worker registration failed'));
-        });
-      }
-    </script>
 </body>
 </html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Quiz Question Manager</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/teacher-dashboard-styles.css">
+  <link rel="stylesheet" href="../css/admin-quiz.css">
+</head>
+<body>
+  <main class="admin-quiz-main">
+    <header class="admin-quiz-header">
+      <a href="teacher_dashboard.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+      <h1>Quiz Question Manager</h1>
+      <p>Create and edit quiz questions for lessons. Questions appear on the student lesson page after saving.</p>
+    </header>
+
+    <section class="admin-quiz-section">
+      <h2>1. Select lesson</h2>
+      <div class="form-row">
+        <label>Grade</label>
+        <select id="adminGrade">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Unit</label>
+        <select id="adminUnit">
+          <option value="">-- Select grade first --</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Lesson</label>
+        <select id="adminLesson">
+          <option value="">-- Select unit first --</option>
+        </select>
+      </div>
+      <button type="button" class="btn btn-secondary" id="loadQuestionsBtn">Load existing questions</button>
+    </section>
+
+    <section class="admin-quiz-section" id="existingQuestionsSection" style="display: none;">
+      <h2>Existing questions for this lesson</h2>
+      <ul id="existingQuestionsList"></ul>
+    </section>
+
+    <section class="admin-quiz-section">
+      <h2>2. Add new question</h2>
+      <div class="form-row">
+        <label>Question type</label>
+        <select id="questionType">
+          <option value="multiple-choice">Multiple choice</option>
+          <option value="image-selection">Image selection</option>
+          <option value="drag-drop">Drag & drop</option>
+          <option value="matching">Matching</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Question text</label>
+        <textarea id="questionText" rows="3" placeholder="Enter the question text..."></textarea>
+      </div>
+      <div class="form-row">
+        <label>Explanation (optional)</label>
+        <input type="text" id="questionExplanation" placeholder="Shown after answering">
+      </div>
+      <div class="form-row">
+        <label>Question order</label>
+        <input type="number" id="questionOrder" value="0" min="0">
+      </div>
+
+      <div id="typeMultipleChoice" class="type-panel">
+        <h3>Multiple choice answers</h3>
+        <p>Add options and check the correct one.</p>
+        <div id="mcAnswers"></div>
+        <button type="button" class="btn btn-small" id="addMcAnswer">+ Add option</button>
+        <div class="form-row">
+          <label>Correct answer index (0-based)</label>
+          <input type="number" id="correctAnswerIndex" value="0" min="0">
+        </div>
+      </div>
+
+      <div id="typeImageSelection" class="type-panel" style="display: none;">
+        <h3>Image selection options</h3>
+        <p>Image URL and label; check the correct option.</p>
+        <div id="imageOptions"></div>
+        <button type="button" class="btn btn-small" id="addImageOption">+ Add option</button>
+      </div>
+
+      <div id="typeDragDrop" class="type-panel" style="display: none;">
+        <h3>Drag-and-drop</h3>
+        <p>Items: text and the zone id they belong to. Zones: id and label.</p>
+        <div class="form-row">
+          <label>Items (one per line: <code>text|zoneId</code>)</label>
+          <textarea id="dragDropItems" rows="4" placeholder="Keyboard|input\nScreen|output"></textarea>
+        </div>
+        <div class="form-row">
+          <label>Zones (one per line: <code>id|label</code>)</label>
+          <textarea id="dragDropZones" rows="3" placeholder="input|Input devices\noutput|Output devices"></textarea>
+        </div>
+      </div>
+
+      <div id="typeMatching" class="type-panel" style="display: none;">
+        <h3>Matching pairs</h3>
+        <p>One pair per line: <code>left item|right item</code></p>
+        <textarea id="matchingPairs" rows="5" placeholder="HTML|Markup language\nCSS|Styling"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" id="saveQuestionBtn">Save question</button>
+        <span id="saveStatus"></span>
+      </div>
+    </section>
+  </main>
+  <script src="../js/admin-quiz.js"></script>
+</body>
+</html>

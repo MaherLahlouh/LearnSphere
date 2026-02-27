@@ -156,6 +156,7 @@ const classRoutes = require('./routes/classes');
 const enrollmentRoutes = require('./routes/enrollments');
 const lessonRoutes = require('./routes/lessons');
 const unitsRoutes = require('./routes/Units');
+const quizRoutes = require('./routes/Quizzes');
 const bookInteractionRoutes = require('./routes/book_interactions'); // ← NEW
 
 // CONFIGURATION
@@ -170,6 +171,7 @@ app.use('/icons', express.static(path.join(ROOT_DIR, 'client', 'icons')));
 app.use('/lang', express.static(path.join(ROOT_DIR, 'client', 'lang')));
 app.use('/manifest.json', express.static(path.join(ROOT_DIR, 'client', 'manifest.json')));
 app.use('/books', express.static(path.join(ROOT_DIR, 'client', 'books'))); // ← NEW: serve book images
+app.use('/pdfs', express.static(path.join(ROOT_DIR, 'pdfs')));
 
 // API ROUTES
 app.use('/api/auth', authRoutes);
@@ -179,6 +181,7 @@ app.use('/api/classes', classRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/units', unitsRoutes);
+app.use('/api/quizzes', quizRoutes);
 app.use('/api/book', bookInteractionRoutes); // ← NEW
 
 // Health check - to see if server is up (e.g. for monitoring)
@@ -240,6 +243,16 @@ app.get('/landing_page.html', (req, res) => {
 // Book viewer page
 app.get('/book_viewer.html', (req, res) => {
     res.sendFile(path.join(ROOT_DIR, 'client', 'pages', 'book_viewer.html'));
+});
+
+// Admin quiz question manager (teachers/admins)
+app.get('/admin-quiz.html', (req, res) => {
+    res.sendFile(path.join(ROOT_DIR, 'client', 'pages', 'admin-quiz.html'));
+});
+
+// Compiler page (lives at project root)
+app.get('/code_editor_python.html', (req, res) => {
+    res.sendFile(path.join(ROOT_DIR, 'code_editor_python.html'));
 });
 
 // Any other .html - try to find it in pages folder

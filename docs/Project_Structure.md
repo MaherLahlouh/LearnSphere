@@ -1,123 +1,146 @@
 # LearnWithTaa Project Structure
 
-This document outlines the directory structure of the LearnWithTaa project, providing a clear overview of where to find different parts of the application.
+This document outlines the directory structure of the LearnWithTaa project and matches the current codebase.
+
+---
+
+## Root Directory Layout
 
 ```
-/
-├── client/
-│   ├── css/
-│   ├── js/
-│   ├── pages/
-│   ├── icons/
-│   ├── lang/
-│   └── books/
-│
-├── server/
-│   ├── config/
-│   ├── middleware/
-│   ├── routes/
-│   ├── data/
-│   └── app.js
-│
-├── docs/
-├── pdfs/
-├── .env
+LearnWithTaa/
+├── client/                 # Frontend: HTML, CSS, JS, assets
+├── server/                 # Backend: Node.js + Express
+├── docs/                   # Project documentation
+├── pdfs/                   # PDF lesson materials (grades 7–10)
+├── code_editor_python.html # Python compiler page (served at /code_editor_python.html)
+├── FIX_LOG.md              # Log of admin/compiler/PDF fixes and new features
 ├── package.json
-└── package-lock.json
+├── package-lock.json
+└── .env                    # Environment variables (DB credentials, etc.)
 ```
 
-### Root Directory
-
--   **`client/`**: Contains all frontend code and static assets that are served to the user's browser.
--   **`server/`**: Contains the backend Node.js and Express application, including API routes, configuration, and middleware.
--   **`docs/`**: Contains project documentation files including API documentation, database structure, and project notes.
--   **`pdfs/`**: Stores PDF files used by the application.
--   **`.env`**: Environment variables configuration file for sensitive data like database credentials and API keys.
--   **`package.json`**: Node.js project configuration file defining dependencies and scripts.
--   **`package-lock.json`**: Locked dependency versions for consistent installations.
+- **`client/`** – All frontend code and static assets served to the browser.
+- **`server/`** – Express app: API routes, config, middleware.
+- **`docs/`** – Documentation (structure, database, API, fixes).
+- **`pdfs/`** – PDF files for lesson books; served under `/pdfs`.
+- **`code_editor_python.html`** – Standalone compiler page; served at `/code_editor_python.html`.
+- **`FIX_LOG.md`** – Summary of Admin Quiz Manager, compiler 404, and PDF loading fixes.
+- **`.env`** – Optional; DB and other env config (see `server/config/database.js`).
 
 ---
 
-### `/client`
+## `/client`
 
-The client directory houses all the assets that make up the user interface.
+### `client/css/`
+Stylesheets for the app.
 
--   **`css/`**: Contains all CSS stylesheets for styling the application.
-    -   `Book_viewer.css`, `course-details.css`, `dashboard.css`, `dark-mode.css`, `landing_page.css`, `lesson.css`, `login.css`, `signup.css`, `teacher_courses.css`, `teacher-create-class.css`, `teacher-dashboard.css`, `teacher-dashboard-styles.css`, `units.css`
-    -   `loading-animations.css`, `mobile-menu.css`, `print-styles.css`, `toast-notifications.css`
+| File | Purpose |
+|------|--------|
+| `admin-quiz.css` | Admin Quiz Question Manager form and list |
+| `Book_viewer.css` | Book viewer layout |
+| `course-details.css` | Course details page |
+| `dashboard.css` | Student dashboard |
+| `dark-mode.css` | Dark theme |
+| `landing_page.css` | Landing page |
+| `lesson.css` | Lesson page, quiz UI, PDF viewer, matching/drag-drop |
+| `login.css`, `signup.css` | Auth pages |
+| `teacher-dashboard.css`, `teacher-dashboard-styles.css` | Teacher dashboard and shared teacher styles |
+| `teacher_courses.css`, `teacher-create-class.css` | Teacher courses and create-class |
+| `units.css` | Units list page |
+| `loading-animations.css`, `mobile-menu.css`, `print-styles.css`, `toast-notifications.css` | Shared UI |
 
--   **`js/`**: Contains all client-side JavaScript files.
-    -   `dashboard.js`, `teacher-dashboard.js`, `teacher-dashboard-loader.js`: Logic for student and teacher dashboards.
-    -   `login.js`, `signup.js`: Handles user authentication logic.
-    -   `lesson.js`, `units.js`: Core logic for displaying lessons and units.
-    -   `book_viewer.js`: Handles book viewing functionality.
-    -   `course-details.js`: Manages course detail pages.
-    -   `teacher_courses.js`, `teacher-create-class.js`: Teacher course management functionality.
-    -   `dark-mode.js`: Dark mode toggle functionality.
-    -   `landing_page.js`: Landing page interactions.
-    -   `mobile-menu.js`, `mobile-gestures.js`: Mobile navigation and gesture handling.
-    -   `toast-notifications.js`: Toast notification system.
+### `client/js/`
+Client-side logic.
 
--   **`pages/`**: Contains the main HTML files of the application.
-    -   `landing_page.html`, `dashboard.html`, `login.html`, `sign_up.html`
-    -   `lesson.html`, `units.html`, `Course-details.html`
-    -   `teacher_dashboard.html`, `teacher_courses.html`, `teacher-create-class.html`
-    -   `book_viewer.html`, `toast_test_ai.html`
+| File | Purpose |
+|------|--------|
+| `admin-quiz.js` | Admin quiz: units/lessons, load/save/delete questions |
+| `book_viewer.js` | Book viewer behavior |
+| `course-details.js` | Course details page |
+| `dashboard.js` | Student dashboard |
+| `lesson.js` | Lessons, quiz (API + fallback), PDF, matching/drag-drop, compiler button |
+| `units.js` | Units list and API |
+| `login.js`, `signup.js` | Auth |
+| `teacher-dashboard.js`, `teacher-dashboard-loader.js` | Teacher dashboard |
+| `teacher_courses.js`, `teacher-create-class.js` | Teacher courses and create-class |
+| `landing_page.js`, `dark-mode.js`, `mobile-menu.js`, `mobile-gestures.js`, `toast-notifications.js` | Shared / landing |
 
--   **`icons/`**: Stores icon images and logos.
-    -   Social media icons (facebook.png, google.png, instagram.png, linkedin.png, whatsapp.png)
-    -   Application icons (logo_al_manhal.jpeg, logout.png, location.png, img.png)
+### `client/pages/`
+HTML entry points (served via Express routes).
 
--   **`lang/`**: Contains JSON files for internationalization (i18n) and language translations.
-    -   `en.json`: English translations
-    -   `ar.json`: Arabic translations
+| Page | Route | Purpose |
+|------|--------|--------|
+| `landing_page.html` | `/`, `/landing_page.html` | Home |
+| `login.html`, `sign_up.html` | `/login.html`, `/sign_up.html` | Auth |
+| `dashboard.html` | `/dashboard.html` | Student dashboard |
+| `units.html` | `/units.html` | Units for a grade |
+| `lesson.html` | `/lesson.html` | Lesson content + quiz + PDF + compiler link |
+| `book_viewer.html` | `/book_viewer.html` | Book viewer |
+| `teacher_dashboard.html` | `/teacher_dashboard.html` | Teacher dashboard (includes Quiz Manager link) |
+| `teacher-create-class.html`, `teacher_courses.html` | Same-name routes | Teacher class/course management |
+| `course-details.html`, `Course-details.html` | `/course-details.html`, `/class-details.html` | Course/class details |
+| `admin-quiz.html` | `/admin-quiz.html` | Admin Quiz Question Manager |
+| `toast_test_ai.html` | Via catch-all `/*.html` | Toast test |
 
--   **`books/`**: Contains book-related images and assets.
-    -   Book images (16.jpg, 17.jpg, 18.jpg)
-    -   Device icons (headphone.png, keyboard.png, laptop.png, mouse.png, printer.png, scanner.png, screen.png, small_printer.png)
+### `client/icons/`, `client/lang/`, `client/books/`
+- **icons/** – Logos, social icons (e.g. facebook, google, logout).
+- **lang/** – `en.json`, `ar.json` for i18n.
+- **books/** – Book images and device icons.
 
----
-
-### `/server`
-
-The server directory contains the backend logic built with Node.js and Express.
-
--   **`app.js`**: The main entry point for the server. It initializes Express, sets up static file serving, and starts the server.
-
--   **`config/`**: Configuration files for the server.
-    -   `database.js`: Sets up the connection to the MySQL database.
-
--   **`middleware/`**: Custom Express middleware.
-    -   `auth.js`: Middleware for handling user authentication and token verification.
-
--   **`routes/`**: Defines the API endpoints for the application.
-    -   `auth.js`: Routes for user registration and login.
-    -   `users.js`: API routes for user management.
-    -   `teachers.js`: API routes for teacher management.
-    -   `classes.js`: API routes for class management.
-    -   `Quizzes.js`: Dynamically serves quiz content from a database instead of hardcoding questions in the frontend or backend logic.
-    -   `Units.js`: Dynamically serves the entire curriculum structure (units, lessons, steps) from a database instead of hardcoding educational content. It's the content backbone that pairs with the quiz system to create a fully dynamic learning platform.
-    -   `lessons.js`: API routes for lesson management.
-    -   `enrollments.js`: API routes for student enrollment management.
-    -   `book_interactions.js`: API routes for book interaction tracking.
-    -   `teacher_courses.js`: API routes for teacher course management.
-
--   **`data/`**: Contains data files used by the server.
-    -   `book_interactions.json`: Stores book interaction data.
+### `client/manifest.json`
+Web app manifest (PWA).
 
 ---
 
-### `/docs`
+## `/server`
 
-Documentation directory containing project documentation files.
+### `server/app.js`
+- Express app setup, CORS, JSON/urlencoded.
+- Static: `/css`, `/js`, `/pages`, `/icons`, `/lang`, `/books`, `/pdfs`.
+- API: `/api/auth`, `/api/users`, `/api/teachers`, `/api/classes`, `/api/enrollments`, `/api/lessons`, `/api/units`, `/api/quizzes`, `/api/book`.
+- Page routes: explicit routes for each HTML page plus `GET /code_editor_python.html`, `GET /admin-quiz.html`, and catch-all for other `*.html` from `client/pages`.
+- Default port: `3001` (or `process.env.PORT`).
 
--   `Project_Structure.md`: This file - outlines the project structure.
--   `Database_Structure.md`: Database schema and structure documentation.
--   `API Endpoints Documentation.md`: API endpoint documentation.
--   `new_files_names_and_purposes_2_5_2026.md`: Notes about new files and their purposes.
+### `server/config/`
+- **`database.js`** – MySQL/MariaDB pool for `learning_platform` (can use `.env`).
+
+### `server/middleware/`
+- **`auth.js`** – Auth/token verification middleware.
+
+### `server/routes/`
+| File | Mount | Purpose |
+|------|--------|--------|
+| `auth.js` | `/api/auth` | Login, register, logout, user by ID |
+| `users.js` | `/api/users` | User CRUD |
+| `teachers.js` | `/api/teachers` | Teachers list/add |
+| `classes.js` | `/api/classes` | Class CRUD, enrollments, roster |
+| `enrollments.js` | `/api/enrollments` | Enrollments by class, add/remove |
+| `lessons.js` | `/api/lessons` | Lessons by unit or grade |
+| `Units.js` | `/api/units` | Units by grade, lessons by unit, create unit/lesson |
+| `Quizzes.js` | `/api/quizzes` | Quiz by grade/unit/lesson, progress, create/delete question |
+| `book_interactions.js` | `/api/book` | Book interactions and answers |
+
+### `server/data/`
+- **`book_interactions.json`** – File-backed storage for book interactions.
 
 ---
 
-### `/pdfs`
+## `/docs`
 
-Directory containing PDF files used by the application for educational content or documentation.
+| Document | Purpose |
+|----------|--------|
+| **Project_Structure.md** | This file – project layout and structure |
+| **Database_Structure.md** | Database schema and table descriptions |
+| **API Endpoints Documentation.md** | All API endpoints and usage |
+| **QUIZ_AND_COMPILER_FIXES.md** | Quiz DB column names, compiler button, troubleshooting |
+
+---
+
+## Static and Page Routes Summary
+
+- **Static:** `/css`, `/js`, `/pages`, `/icons`, `/lang`, `/books`, `/pdfs` → mapped to `client/` or `pdfs/`.
+- **HTML pages:** Explicit routes for main pages; `code_editor_python.html` from project root; `admin-quiz.html` from `client/pages`; other `*.html` from `client/pages` via catch-all.
+
+---
+
+*Last updated to match the current project structure.*

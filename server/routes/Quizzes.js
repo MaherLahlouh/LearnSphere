@@ -2,22 +2,74 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
 
+/**
+ * Resolve (grade, unit_number, lesson_number) to (unit_id, lesson_id).
+ * Params can be strings; they are parsed as integers for unit_number and lesson_number.
+ * Returns { unitId, lessonId } or null if not found.
+ */
+async function resolveUnitAndLesson(grade, unitNumber, lessonNumber) {
+    const uNum = parseInt(unitNumber, 10);
+    const lNum = parseInt(lessonNumber, 10);
+    if (isNaN(uNum) || isNaN(lNum)) return null;
+    const [units] = await db.execute(
+        'SELECT unit_id FROM units WHERE grade_level = ? AND unit_number = ? LIMIT 1',
+        [grade, uNum]
+    );
+    if (!units || units.length === 0) return null;
+    const unitId = units[0].unit_id;
+    const [lessons] = await db.execute(
+        'SELECT lesson_id FROM lessons WHERE unit_id = ? AND lesson_number = ? LIMIT 1',
+        [unitId, lNum]
+    );
+    if (!lessons || lessons.length === 0) return null;
+    return { unitId, lessonId: lessons[0].lesson_id };
+}
+
+/**
+ * Get or create a quiz row for the given lesson. quiz_questions requires a valid quiz_id (FK to quizzes).
+ * Returns quiz_id.
+ */
+async function getOrCreateQuizId(grade, unitId, lessonId) {
+    const [existing] = await db.execute(
+        'SELECT quiz_id FROM quizzes WHERE lesson_id = ? LIMIT 1',
+        [lessonId]
+    );
+    if (existing && existing.length > 0) {
+        return existing[0].quiz_id;
+    }
+    const [result] = await db.execute(
+        `INSERT INTO quizzes (grade_level, unit_id, lesson_id, is_active)
+         VALUES (?, ?, ?, 1)`,
+        [grade, unitId, lessonId]
+    );
+    return result.insertId;
+}
+
 router.get('/:grade/:unit/:lesson', async (req, res) => {
     try {
         const { grade, unit, lesson } = req.params;
 
-        // Get all questions for this lesson
+        // Resolve unit_number and lesson_number (from URL) to unit_id and lesson_id
+        const resolved = await resolveUnitAndLesson(grade, unit, lesson);
+        if (!resolved) {
+            return res.json({ success: true, data: [] });
+        }
+        const { unitId, lessonId } = resolved;
+
+        // Get all questions for this lesson (quiz_questions uses unit_id_ref, lesson_id_ref)
         const [questions] = await db.execute(
-            `SELECT id, question_type, question_text, correct_answer, explanation, question_order
+            `SELECT question_id, question_type, question_text, correct_answer, explanation, question_order
              FROM quiz_questions
-             WHERE grade = ? AND unit_id = ? AND lesson_id = ?
+             WHERE grade = ? AND unit_id_ref = ? AND lesson_id_ref = ?
              ORDER BY question_order ASC`,
-            [grade, unit, lesson]
+            [grade, unitId, lessonId]
         );
 
         // For each question, get its specific data based on type
         const quizData = await Promise.all(questions.map(async (question) => {
+            const qId = question.question_id;
             const questionData = {
+                id: qId,
                 type: question.question_type,
                 question: question.question_text,
                 explanation: question.explanation
@@ -30,7 +82,7 @@ router.get('/:grade/:unit/:lesson', async (req, res) => {
                      FROM quiz_answers
                      WHERE question_id = ?
                      ORDER BY answer_order ASC`,
-                    [question.id]
+                    [qId]
                 );
                 
                 questionData.answers = answers.map(a => a.answer_text);
@@ -45,7 +97,7 @@ router.get('/:grade/:unit/:lesson', async (req, res) => {
                      FROM quiz_answers
                      WHERE question_id = ?
                      ORDER BY answer_order ASC`,
-                    [question.id]
+                    [qId]
                 );
                 
                 questionData.options = options.map(opt => ({
@@ -61,7 +113,7 @@ router.get('/:grade/:unit/:lesson', async (req, res) => {
                      FROM drag_drop_items
                      WHERE question_id = ?
                      ORDER BY item_order ASC`,
-                    [question.id]
+                    [qId]
                 );
                 
                 // Get drop zones
@@ -70,11 +122,24 @@ router.get('/:grade/:unit/:lesson', async (req, res) => {
                      FROM drop_zones
                      WHERE question_id = ?
                      ORDER BY zone_order ASC`,
-                    [question.id]
+                    [qId]
                 );
                 
                 questionData.items = items;
                 questionData.zones = zones;
+            } else if (question.question_type === 'matching') {
+                // Get matching pairs (stored in quiz_answers: answer_text = left, label = right)
+                const [pairsRows] = await db.execute(
+                    `SELECT answer_text, label
+                     FROM quiz_answers
+                     WHERE question_id = ?
+                     ORDER BY answer_order ASC`,
+                    [qId]
+                );
+                questionData.pairs = (pairsRows || []).map(row => ({
+                    left: row.answer_text || '',
+                    right: row.label || ''
+                }));
             }
 
             return questionData;
@@ -181,23 +246,36 @@ router.post('/question', async (req, res) => {
             language,
             answers,
             dragDropItems,
-            dropZones
+            dropZones,
+            matchingPairs
         } = req.body;
 
         // Validate required fields
-        if (!grade || !unitId || !lessonId || !questionType || !questionText) {
+        if (!grade || unitId === undefined || unitId === '' || lessonId === undefined || lessonId === '' || !questionType || !questionText) {
             return res.status(400).json({
                 success: false,
-                message: 'Missing required fields'
+                message: 'Missing required fields (grade, unit, lesson, question type, question text)'
             });
         }
 
-        // Insert question
+        // Resolve unit_number and lesson_number (from admin dropdowns) to unit_id and lesson_id
+        const resolved = await resolveUnitAndLesson(grade, unitId, lessonId);
+        if (!resolved) {
+            return res.status(400).json({
+                success: false,
+                message: 'Unit or lesson not found. Please select a valid grade, unit, and lesson.'
+            });
+        }
+        const { unitId: resolvedUnitId, lessonId: resolvedLessonId } = resolved;
+
+        const quizId = await getOrCreateQuizId(grade, resolvedUnitId, resolvedLessonId);
+
+        // Insert question (quiz_questions requires quiz_id FK; also store grade, unit_id_ref, lesson_id_ref for lookups)
         const [result] = await db.execute(
             `INSERT INTO quiz_questions 
-             (grade, unit_id, lesson_id, question_type, question_text, correct_answer, explanation, question_order, language)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [grade, unitId, lessonId, questionType, questionText, correctAnswer || null, explanation || null, questionOrder, language || 'en']
+             (quiz_id, grade, unit_id_ref, lesson_id_ref, question_type, question_text, correct_answer, explanation, question_order, language)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [quizId, grade, resolvedUnitId, resolvedLessonId, questionType, questionText, correctAnswer ?? null, explanation || null, questionOrder, language || 'en']
         );
 
         const questionId = result.insertId;
@@ -252,6 +330,23 @@ router.post('/question', async (req, res) => {
             );
         }
 
+        // Insert matching pairs if provided (answer_text = left, label = right)
+        if (questionType === 'matching' && matchingPairs && Array.isArray(matchingPairs) && matchingPairs.length > 0) {
+            const pairValues = matchingPairs.map((pair, index) => [
+                questionId,
+                index,
+                pair.left || null,
+                null,
+                pair.right || null,
+                false
+            ]);
+            await db.query(
+                `INSERT INTO quiz_answers (question_id, answer_order, answer_text, image_url, label, is_correct)
+                 VALUES ?`,
+                [pairValues]
+            );
+        }
+
         res.status(201).json({
             success: true,
             message: 'Quiz question created successfully',
@@ -283,7 +378,7 @@ router.delete('/question/:id', async (req, res) => {
 
         // Delete question (answers, items, and zones will be cascade deleted)
         const [result] = await db.execute(
-            `DELETE FROM quiz_questions WHERE id = ?`,
+            `DELETE FROM quiz_questions WHERE question_id = ?`,
             [id]
         );
 

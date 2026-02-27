@@ -25,20 +25,20 @@ const bookUrls = {
   '5': 'https://www.manhal.com/platform/books/1587/index.html?o=qr',
   '6': 'https://www.manhal.com/platform/books/1597/index.html?o=qr',
   '7': {
-    'ar': '../../pdfs/arabic/my_digital_world_ar_7.pdf',
-    'en': '../../pdfs/english/my_digital_world_7.pdf'
+    'ar': '/pdfs/arabic/my_digital_world_ar_7.pdf',
+    'en': '/pdfs/english/my_digital_world_7.pdf'
   },
   '8': {
-    'ar': '../../pdfs/arabic/my_digital_world_ar_8.pdf',
-    'en': '../../pdfs/english/my_digital_world_8.pdf'
+    'ar': '/pdfs/arabic/my_digital_world_ar_8.pdf',
+    'en': '/pdfs/english/my_digital_world_8.pdf'
   },
   '9': {
-    'ar': '../../pdfs/arabic/my_digital_world_ar_9.pdf',
-    'en': '../../pdfs/english/my_digital_world_9.pdf'
+    'ar': '/pdfs/arabic/my_digital_world_ar_9.pdf',
+    'en': '/pdfs/english/my_digital_world_9.pdf'
   },
   '10': {
-    'ar': '../../pdfs/arabic/my_digital_world_ar_10.pdf',
-    'en': '../../pdfs/english/my_digital_world_10.pdf'
+    'ar': '/pdfs/arabic/my_digital_world_ar_10.pdf',
+    'en': '/pdfs/english/my_digital_world_10.pdf'
   }
 };
 
@@ -1300,16 +1300,31 @@ function updateProgress() {
   progressBar.style.width = `${percentage}%`;
 }
 
-function loadQuiz(lessonId) {
+async function loadQuiz(lessonId) {
+  const quizContainerEl = document.getElementById('quizContainer');
+  try {
+    const res = await fetch(`/api/quizzes/${encodeURIComponent(grade)}/${encodeURIComponent(unitId)}/${encodeURIComponent(lessonId)}`, { headers: { Accept: 'application/json' } });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+        currentQuizData = json.data;
+        quizContainerEl.style.display = 'block';
+        currentQuestionIndex = 0;
+        quizCompleted = false;
+        displayQuestion();
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('Quiz API not available, using fallback data:', e);
+  }
   currentQuizData = quizData[grade]?.[unitId]?.[lessonId] || [];
-  
   if (currentQuizData.length === 0) {
-    document.getElementById('quizContainer').style.display = 'none';
+    quizContainerEl.style.display = 'none';
     finishBtn.disabled = false;
     return;
   }
-  
-  document.getElementById('quizContainer').style.display = 'block';
+  quizContainerEl.style.display = 'block';
   currentQuestionIndex = 0;
   quizCompleted = false;
   displayQuestion();
@@ -1440,6 +1455,97 @@ function renderDragDrop(question) {
   
   setupDragAndDrop();
   checkAnswerBtn.disabled = true;
+}
+
+function renderMatching(question) {
+  if (!question.pairs || question.pairs.length === 0) {
+    answersList.innerHTML = '<p class="no-options">No matching pairs defined.</p>';
+    checkAnswerBtn.disabled = true;
+    return;
+  }
+  matchingState = { selected: null, matched: [], pairs: question.pairs };
+  const rightItems = question.pairs.map(p => p.right);
+  for (let i = rightItems.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rightItems[i], rightItems[j]] = [rightItems[j], rightItems[i]];
+  }
+  const leftHTML = question.pairs.map((p, i) => {
+    const safe = (s) => String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<div class="matching-left-item" data-index="${i}">${safe(p.left)}</div>`;
+  }).join('');
+  const rightHTML = rightItems.map((r, i) => {
+    const safe = (s) => String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<div class="matching-right-item" data-value="${safe(r)}">${safe(r)}</div>`;
+  }).join('');
+  answersList.innerHTML = `
+    <div class="matching-container">
+      <div class="matching-column">
+        <h4>Match the items</h4>
+        <div class="matching-left-list">${leftHTML}</div>
+      </div>
+      <div class="matching-column">
+        <h4>Options</h4>
+        <div class="matching-right-list">${rightHTML}</div>
+      </div>
+      <div class="matching-matches" id="matchingMatches"></div>
+    </div>
+  `;
+  document.querySelectorAll('.matching-left-item').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.matching-left-item').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+      matchingState.selected = parseInt(el.dataset.index);
+    });
+  });
+  document.querySelectorAll('.matching-right-item').forEach(el => {
+    el.addEventListener('click', () => {
+      if (matchingState.selected === null) return;
+      const leftIdx = matchingState.selected;
+      const rightVal = el.dataset.value;
+      matchingState.matched[leftIdx] = rightVal;
+      const leftText = question.pairs[leftIdx].left;
+      const matchesEl = document.getElementById('matchingMatches');
+      let row = document.querySelector(`[data-left-idx="${leftIdx}"]`);
+      if (!row) {
+        row = document.createElement('div');
+        row.className = 'matching-pair-row';
+        row.dataset.leftIdx = leftIdx;
+        matchesEl.appendChild(row);
+      }
+      row.textContent = `${leftText} → ${rightVal}`;
+      document.querySelectorAll('.matching-left-item').forEach(x => x.classList.remove('selected'));
+      matchingState.selected = null;
+      const allMatched = question.pairs.every((_, i) => matchingState.matched[i] != null);
+      checkAnswerBtn.disabled = !allMatched;
+    });
+  });
+  checkAnswerBtn.disabled = true;
+}
+
+function checkMatching(question) {
+  let allCorrect = true;
+  (question.pairs || []).forEach((p, i) => {
+    if (matchingState.matched[i] !== p.right) allCorrect = false;
+  });
+  const leftItems = document.querySelectorAll('.matching-left-item');
+  const matchRows = document.querySelectorAll('.matching-pair-row');
+  leftItems.forEach((el, i) => {
+    el.style.pointerEvents = 'none';
+    if (matchingState.matched[i] === question.pairs[i].right) {
+      el.classList.add('correct');
+    } else if (matchingState.matched[i]) {
+      el.classList.add('incorrect');
+    }
+  });
+  matchRows.forEach(row => {
+    const idx = parseInt(row.dataset.leftIdx);
+    if (question.pairs[idx] && matchingState.matched[idx] === question.pairs[idx].right) {
+      row.classList.add('correct');
+    } else {
+      row.classList.add('incorrect');
+    }
+  });
+  showFeedback(allCorrect);
 }
 
 function setupDragAndDrop() {
@@ -1712,9 +1818,10 @@ function loadLesson(lesson) {
     ? '<i class="fas fa-check-circle"></i> Completed'
     : '<i class="fas fa-flag-checkered"></i> Mark as Completed';
   
-  // Show compiler button based on grade with URL parameter
-  const showCompiler = ['4', '5', '6', '7', '8', '9', '10'].includes(grade);
-  tryCompilerBtn.style.display = showCompiler ? 'flex' : 'none';
+  // Show compiler button based on grade (4–10)
+  const gradeStr = String(grade);
+  const showCompiler = ['4', '5', '6', '7', '8', '9', '10'].includes(gradeStr);
+  if (tryCompilerBtn) tryCompilerBtn.style.display = showCompiler ? 'flex' : 'none';
 }
 
 finishBtn.addEventListener('click', () => {
@@ -1728,8 +1835,9 @@ finishBtn.addEventListener('click', () => {
 });
 
 tryCompilerBtn.addEventListener('click', () => {
-  // Open compiler with grade parameter
-  window.open(`code_editor_python.html?grade=${grade}`, '_blank');
+  // Open compiler with grade parameter (root-relative so it works from any route)
+  const compilerUrl = `${window.location.origin}/code_editor_python.html?grade=${grade}`;
+  window.open(compilerUrl, '_blank');
 });
 
 if (lessons.length > 0) {
@@ -1738,6 +1846,15 @@ if (lessons.length > 0) {
   currentLessonTitleEl.textContent = 'No lessons available for this unit';
   lessonStepsEl.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No lessons found for this grade and unit.</p>';
 }
+
+// Ensure "Try on Compiler" is visible for grades 4–10 as soon as page is ready
+(function ensureCompilerButtonVisible() {
+  const g = String(grade);
+  if (['4', '5', '6', '7', '8', '9', '10'].includes(g)) {
+    const btn = document.getElementById('tryCompilerBtn');
+    if (btn) btn.style.display = 'flex';
+  }
+})();
 
 renderLessonList();
 updateProgress();

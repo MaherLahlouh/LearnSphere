@@ -1,17 +1,11 @@
-// ============================================================
-// CONFIGURATION
-// Read URL params to know which book and page to start on.
-// Fall back to defaults if not provided.
-// ============================================================
+//Configuration         
 const params     = new URLSearchParams(window.location.search);
 const BOOK_ID    = params.get('book')  || 'grade1';
 const START_PAGE = parseInt(params.get('page') || '1');
 const STUDENT_ID = localStorage.getItem('userId') || 'student_guest';
 
-// ============================================================
-// BOOK DATA
+// Book Data
 // Maps book IDs to their page image URLs and display titles.
-// ============================================================
 const BOOK_PAGES = {
   grade1: [
     '/books/16.jpg',
@@ -24,11 +18,9 @@ const BOOK_TITLES = {
   grade1: 'كتاب الصف الأول — تقنية المعلومات',
 };
 
-// ============================================================
-// IMAGE BANK
+// Image Bank
 // All images students can drag onto book pages.
 // Each item has a unique id, image src, and Arabic label.
-// ============================================================
 const IMAGE_BANK = [
   { id: 'img_mouse',         src: '/books/mouse.png',         label: 'الفأرة'          },
   { id: 'img_keyboard',      src: '/books/keyboard.png',      label: 'لوحة المفاتيح'   },
@@ -40,9 +32,7 @@ const IMAGE_BANK = [
   { id: 'img_small_printer', src: '/books/small_printer.png', label: 'طابعة صغيرة'    },
 ];
 
-// ============================================================
-// APPLICATION STATE
-// ============================================================
+// Application State
 
 // Current mode: 'teacher' can add/edit questions, 'student' answers them
 let currentMode = 'teacher';
@@ -64,7 +54,7 @@ let submitted = false;
 // Format: { [pageNumber]: [{ instanceId, imageId, src, label, x, y, w, h }] }
 let placedImages = {};
 
-// ---- Teacher drawing state ----
+//Teacher drawing state 
 let isDrawing    = false;
 let drawStart    = null;
 let pendingRect  = null;   // the drawn rectangle waiting to be saved as a question
@@ -72,17 +62,15 @@ let selectedType = 'fill'; // question type: 'fill' | 'mc' | 'click'
 let mcOptions    = [];     // options array for multiple-choice questions
 let editingId    = null;   // ID of an interaction being edited (reserved for future edit UI)
 
-// ---- MC popup state ----
+//MC popup state
 let mcPopupInteraction = null; // the interaction object currently shown in the popup
 let mcSelectedChoice   = null; // index of the option the student clicked
 
-// ---- Drag state ----
-// Tracks which image bank item is being dragged onto the page
+//Drag state
+//Tracks which image bank item is being dragged onto the page
 let draggingBankItem = null; // { imageId, src, label }
 
-// ============================================================
 // INIT — runs once the DOM is ready
-// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('bookTitle').textContent = BOOK_TITLES[BOOK_ID] || BOOK_ID;
   initMcOptions();
@@ -92,10 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setMode('teacher');
 });
 
-// ============================================================
 // PAGE LOADING
 // Loads the book page image and fetches its questions.
-// ============================================================
 async function loadPage(pageNum) {
   // Clamp page number to valid range
   currentPage = Math.max(1, Math.min(pageNum, totalPages));
@@ -145,10 +131,7 @@ async function loadPage(pageNum) {
 document.getElementById('prevPageBtn').addEventListener('click', () => loadPage(currentPage - 1));
 document.getElementById('nextPageBtn').addEventListener('click', () => loadPage(currentPage + 1));
 
-// ============================================================
-// SERVER CALLS
-// ============================================================
-
+// Server Calls
 // Fetch all interactions (questions) for the current book page
 async function fetchInteractions() {
   try {
@@ -177,9 +160,7 @@ async function fetchStudentAnswers() {
   }
 }
 
-// ============================================================
-// MODE SWITCHING — Teacher vs Student
-// ============================================================
+// Mode Switching — Teacher vs Student
 function setMode(mode) {
   currentMode = mode;
 
@@ -217,9 +198,7 @@ function setMode(mode) {
   renderSidebar();
 }
 
-// ============================================================
-// IMAGE BANK — Build sidebar grid and handle drag-from-bank
-// ============================================================
+// Image Bank — Build sidebar grid and handle drag-from-bank
 function buildImageBank() {
   const container = document.getElementById('imageBankGrid');
   if (!container) return;
@@ -263,9 +242,7 @@ function onBankDragEnd(e) {
   draggingBankItem = null;
 }
 
-// ============================================================
-// PAGE DROP ZONE — Accept images dragged from the bank
-// ============================================================
+// Page Drop Zone — Accept images dragged from the bank
 function setupPageDropZone() {
   const wrapper = document.getElementById('bookPageWrapper');
 
@@ -304,10 +281,7 @@ function setupPageDropZone() {
   });
 }
 
-// ============================================================
-// PLACED IMAGES — Add, render, move, and remove images on page
-// ============================================================
-
+// Placed Images — Add, render, move, and remove images on page
 // Add a new image instance to the current page at the given position
 function placeImage(imageId, src, label, xPct, yPct) {
   if (!placedImages[currentPage]) placedImages[currentPage] = [];
@@ -436,9 +410,7 @@ function updateImageBankUsed() {
   });
 }
 
-// ============================================================
-// DRAWING MODE — Teacher drags a box to define a question area
-// ============================================================
+// Drawing Mode — Teacher drags a box to define a question area
 function startDrawing() {
   isDrawing = true;
   document.getElementById('viewerPanel').classList.add('drawing-mode');
@@ -518,10 +490,8 @@ function onMouseUp(e) {
   showNotification('تم تحديد الموقع ✅ — اختر نوع السؤال وأدخل البيانات', 'success');
 }
 
-// ============================================================
-// QUESTION TYPE SELECTOR
+// Question Type Selector
 // Switches the form fields shown based on selected question type
-// ============================================================
 function selectType(type) {
   selectedType = type;
   document.querySelectorAll('.type-btn').forEach(b => {
@@ -532,10 +502,7 @@ function selectType(type) {
   document.getElementById('clickFields').style.display = type === 'click' ? 'block' : 'none';
 }
 
-// ============================================================
-// MULTIPLE CHOICE OPTIONS BUILDER
-// ============================================================
-
+// Multiple Choice Options Builder
 // Set up a default 3-option MC form
 function initMcOptions() {
   mcOptions = [
@@ -580,9 +547,7 @@ function setCorrectOption(i) {
   mcOptions.forEach((o, idx) => o.correct = idx === i);
 }
 
-// ============================================================
-// SAVE / CANCEL INTERACTION (Teacher)
-// ============================================================
+//Save / Cancel Interaction (Teacher)
 async function saveInteraction() {
   // Must draw a box first (unless editing an existing interaction)
   if (!pendingRect && !editingId) {
@@ -644,7 +609,7 @@ async function saveInteraction() {
   renderSidebar();
 }
 
-// Reset the interaction form back to its initial state
+//Reset the interaction form back to its initial state
 function cancelInteraction() {
   pendingRect = null;
   editingId   = null;
@@ -660,9 +625,7 @@ function cancelInteraction() {
   stopDrawing();
 }
 
-// ============================================================
-// DELETE INTERACTION (Teacher)
-// ============================================================
+//Delete Interaction (Teacher)
 async function deleteInteraction(id) {
   if (!confirm('هل أنت متأكد من حذف هذا السؤال؟')) return;
   try {
@@ -677,9 +640,7 @@ async function deleteInteraction(id) {
   renderSidebar();
 }
 
-// ============================================================
-// RENDER QUESTION OVERLAYS ON THE PAGE
-// ============================================================
+//Render Question Overlays On The Page
 function renderInteractions() {
   const layer = document.getElementById('interactionsLayer');
   layer.innerHTML = '';
@@ -705,7 +666,7 @@ function renderInteractions() {
   });
 }
 
-// Fill-in-the-blank: render a text input inside the widget
+//Fill-in-the-blank: render a text input inside the widget
 function renderFillWidget(el, interaction) {
   el.classList.add('widget-fill');
   const ans = studentAnswers[interaction.id];
@@ -729,7 +690,7 @@ function renderFillWidget(el, interaction) {
   el.appendChild(input);
 }
 
-// Multiple choice: render a clickable widget that opens a popup
+//Multiple choice: render a clickable widget that opens a popup
 function renderMcWidget(el, interaction) {
   el.classList.add('widget-mc');
   const ans = studentAnswers[interaction.id];
@@ -830,9 +791,7 @@ function makeDraggable(el, interaction) {
   });
 }
 
-// ============================================================
 // MULTIPLE CHOICE POPUP
-// ============================================================
 function openMcPopup(interaction) {
   mcPopupInteraction = interaction;
   mcSelectedChoice   = null;
@@ -922,9 +881,7 @@ function closeMcPopupDirect() {
   mcSelectedChoice   = null;
 }
 
-// ============================================================
-// SUBMIT ALL ANSWERS (Student)
-// ============================================================
+//Submit All Answers (Student)
 async function submitAllAnswers() {
   if (submitted) return;
   submitted = true;
@@ -967,9 +924,7 @@ async function submitAllAnswers() {
   document.getElementById('submitAnswersBtn').disabled = true;
 }
 
-// ============================================================
-// STUDENT PROGRESS BAR & SCORE
-// ============================================================
+//Student Progress Bar & Score
 function updateStudentProgress(showResults = false) {
   const total    = interactions.length;
   const answered = Object.keys(studentAnswers)
@@ -994,7 +949,7 @@ function updateStudentProgress(showResults = false) {
   renderStudentList();
 }
 
-// Render the per-question status list in the student sidebar
+//Render the per-question status list in the student sidebar
 function renderStudentList() {
   const list = document.getElementById('studentInteractionsList');
   if (!list) return;
@@ -1028,9 +983,7 @@ function renderStudentList() {
   }).join('');
 }
 
-// ============================================================
-// TEACHER SIDEBAR — List of questions with delete controls
-// ============================================================
+//Teacher Sidebar — List of questions with delete controls
 function renderSidebar() {
   if (currentMode !== 'teacher') return;
 
@@ -1075,9 +1028,7 @@ function highlightInteraction(id) {
   setTimeout(() => { el.style.outline = ''; }, 2000);
 }
 
-// ============================================================
-// CLEAR ALL PLACED IMAGES (Student)
-// ============================================================
+//Clear All Placed Images (Student)
 function clearAllPlacedImages() {
   if (!placedImages[currentPage] || placedImages[currentPage].length === 0) {
     showNotification('لا توجد صور مُلصقة على هذه الصفحة', '');
@@ -1090,11 +1041,8 @@ function clearAllPlacedImages() {
   showNotification('تم مسح كل الصور', 'success');
 }
 
-// ============================================================
-// UTILITIES
-// ============================================================
-
-// Escape special HTML characters to prevent XSS when injecting user content into innerHTML
+//Utilities
+//Escape special HTML characters to prevent XSS when injecting user content into innerHTML
 function escHtml(str = '') {
   return String(str)
     .replace(/&/g, '&amp;')

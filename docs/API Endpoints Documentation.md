@@ -96,16 +96,23 @@ This document provides a comprehensive list of all API endpoints available in th
 
 | Endpoint | Method | Purpose | Request Body | Response |
 |----------|--------|---------|--------------|----------|
-| `/:grade/:unit/:lesson` | GET | Get quiz questions for a lesson | None | `{ success: true, data: [{ type, question, explanation, answers?, correct?, options?, items?, zones? }, ...] }` |
+| `/:grade/:unit/:lesson` | GET | Get quiz questions for a lesson | None | `{ success: true, data: [{ id, type, question, explanation, answers?, correct?, options?, items?, zones?, pairs? }, ...] }` |
 | `/progress` | POST | Save user's quiz progress/completion | `{ userId, grade, unitId, lessonId }` | `{ success: true, message: "Progress saved successfully" }` |
 | `/progress/:userId/:grade` | GET | Get user's progress for a specific grade | None | `{ success: true, data: [{ unit_number, lesson_number, completed_at }, ...] }` |
-| `/question` | POST | Create a new quiz question (Admin only) | `{ grade, unitId, lessonId, questionType, questionText, correctAnswer?, explanation?, questionOrder, language?, answers?: [{ text?, imageUrl?, label?, isCorrect }, ...], dragDropItems?: [{ text, category }, ...], dropZones?: [{ id, label }, ...] }` | `{ success: true, message: "Quiz question created successfully", data: { questionId, grade, unitId, lessonId } }` |
-| `/question/:id` | DELETE | Delete a quiz question (Admin only) | None | `{ success: true, message: "Quiz question deleted successfully" }` |
+| `/question` | POST | Create a new quiz question (Admin only) | See below | `{ success: true, message: "Quiz question created successfully", data: { questionId, grade, unitId, lessonId } }` |
+| `/question/:id` | DELETE | Delete a quiz question (Admin only; `id` = `question_id`) | None | `{ success: true, message: "Quiz question deleted successfully" }` |
+
+**POST `/question` body:**  
+`grade`, `unitId`, `lessonId`, `questionType`, `questionText`, `correctAnswer?`, `explanation?`, `questionOrder`, `language?` (default `'en'`), plus type-specific fields:
+- **multiple-choice / image-selection:** `answers`: `[{ text?, imageUrl?, label?, isCorrect }]`
+- **drag-drop:** `dragDropItems`: `[{ text, category }]`, `dropZones`: `[{ id, label }]`
+- **matching:** `matchingPairs`: `[{ left, right }]`
 
 **Notes:**
-- Question types: `multiple-choice`, `image-selection`, `drag-drop`
-- Progress is automatically tracked when quizzes are completed
-- Questions support multiple languages (default: 'en')
+- Question types: `multiple-choice`, `image-selection`, `drag-drop`, `matching`
+- GET response includes `id` (question_id) for each question for admin delete
+- Questions are stored in `quiz_questions` with `unit_id_ref`, `lesson_id_ref` (see Database_Structure.md)
+- Progress is stored in `user_progress`; questions support multiple languages (default: `'en'`)
 
 ---
 
@@ -189,4 +196,4 @@ All API responses follow a consistent format:
 
 ---
 
-**Last Updated:** February 19, 2026
+**Last Updated:** February 2026 (aligned with current routes and quiz schema)

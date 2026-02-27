@@ -27,7 +27,7 @@ function formatDate(dateString) {
   }
 }
 
-// Authentication Check
+//Authentication Check
 function checkAuth() {
   const userData = localStorage.getItem('currentUser');
 
@@ -57,7 +57,7 @@ function checkAuth() {
   }
 }
 
-// Initialize Teacher Profile
+//Initialize Teacher Profile
 function initializeTeacherProfile() {
   if (!currentUser) return;
 
@@ -75,7 +75,7 @@ function initializeTeacherProfile() {
   // that falls back to getInitials(currentUser.first_name, currentUser.last_name)
 }
 
-// Get Course ID from URL
+//Get Course ID from URL
 function getCourseIdFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const courseId = urlParams.get('id');
@@ -90,7 +90,7 @@ function getCourseIdFromURL() {
   return courseId;
 }
 
-// Load Course Details
+//Load Course Details
 async function loadCourseDetails(courseId) {
   try {
     const response = await fetch(`${API_BASE_URL}/classes/${courseId}`, {

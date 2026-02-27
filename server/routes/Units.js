@@ -2,6 +2,26 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
 
+/**
+ * Parse the lessons.lesson_steps column (longtext, typically JSON array).
+ * Expects [{ heading, content }] or [{ heading, text }]. Returns array of { heading, text }.
+ */
+function parseLessonStepsColumn(lessonSteps) {
+    if (lessonSteps == null || (typeof lessonSteps === 'string' && lessonSteps.trim() === '')) {
+        return [];
+    }
+    try {
+        const parsed = typeof lessonSteps === 'string' ? JSON.parse(lessonSteps) : lessonSteps;
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map((step) => ({
+            heading: step.heading || '',
+            text: step.content != null ? step.content : (step.text != null ? step.text : '')
+        }));
+    } catch {
+        return [];
+    }
+}
+
 /*
 GET /api/units/:grade
  Get all units for a specific grade
@@ -56,41 +76,49 @@ router.get('/:grade/:unitNumber/lessons', async (req, res) => {
     try {
         const { grade, unitNumber } = req.params;
 
-        // Get lessons
-        const [lessons] = await db.execute(
-            `SELECT lesson_id, lesson_number, title, description, 
-                    video_url, book_pages, page_range_start, page_range_end
-             FROM lessons
-             WHERE grade = ? AND unit_number = ?
-             ORDER BY lesson_number ASC`,
+        // Get lessons: join units; use lessons.lesson_steps column (longtext/JSON), not a separate table
+        let [lessons] = await db.execute(
+            `SELECT l.lesson_id, l.lesson_number, l.lesson_title, l.lesson_description,
+                    l.video_url, l.book_pages, l.page_range_start, l.page_range_end,
+                    l.lesson_steps
+             FROM lessons l
+             INNER JOIN units u ON l.unit_id = u.unit_id
+             WHERE u.grade_level = ? AND u.unit_number = ?
+             ORDER BY l.lesson_number ASC`,
             [grade, unitNumber]
         );
 
-        const lessonsWithSteps = await Promise.all(lessons.map(async (lesson) => {
-            const [steps] = await db.execute(
-                `SELECT heading, content
-                 FROM lesson_steps
-                 WHERE lesson_id = ?
-                 ORDER BY step_order ASC`,
-                [lesson.lesson_id]
+        if (lessons.length === 0) {
+            const [unitRows] = await db.execute(
+                `SELECT unit_id FROM units WHERE grade_level = ? AND unit_number = ? LIMIT 1`,
+                [grade, unitNumber]
             );
+            if (unitRows.length > 0) {
+                [lessons] = await db.execute(
+                    `SELECT lesson_id, lesson_number, lesson_title, lesson_description,
+                            video_url, book_pages, page_range_start, page_range_end,
+                            lesson_steps
+                     FROM lessons WHERE unit_id = ? ORDER BY lesson_number ASC`,
+                    [unitRows[0].unit_id]
+                );
+            }
+        }
 
+        const lessonsWithSteps = lessons.map((lesson) => {
+            const steps = parseLessonStepsColumn(lesson.lesson_steps);
             return {
                 id: lesson.lesson_number,
-                title: lesson.title,
-                desc: lesson.description,
+                title: lesson.lesson_title || '',
+                desc: lesson.lesson_description || '',
                 video: lesson.video_url,
                 bookPages: lesson.book_pages,
                 pageRange: {
                     start: lesson.page_range_start,
                     end: lesson.page_range_end
                 },
-                steps: steps.map(step => ({
-                    heading: step.heading,
-                    text: step.content
-                }))
+                steps
             };
-        }));
+        });
 
         res.json({
             success: true,
@@ -112,12 +140,14 @@ router.get('/:grade/:unitNumber/lessons/:lessonNumber', async (req, res) => {
     try {
         const { grade, unitNumber, lessonNumber } = req.params;
 
-        // Get lesson
+        // Get lesson: use lessons.lesson_steps column (longtext/JSON), not a separate table
         const [lessons] = await db.execute(
-            `SELECT lesson_id, lesson_number, title, description, 
-                    video_url, book_pages, page_range_start, page_range_end
-             FROM lessons
-             WHERE grade = ? AND unit_number = ? AND lesson_number = ?`,
+            `SELECT l.lesson_id, l.lesson_number, l.lesson_title, l.lesson_description,
+                    l.video_url, l.book_pages, l.page_range_start, l.page_range_end,
+                    l.lesson_steps
+             FROM lessons l
+             INNER JOIN units u ON l.unit_id = u.unit_id
+             WHERE u.grade_level = ? AND u.unit_number = ? AND l.lesson_number = ?`,
             [grade, unitNumber, lessonNumber]
         );
 
@@ -129,30 +159,19 @@ router.get('/:grade/:unitNumber/lessons/:lessonNumber', async (req, res) => {
         }
 
         const lesson = lessons[0];
-
-        // Get steps
-        const [steps] = await db.execute(
-            `SELECT heading, content
-             FROM lesson_steps
-             WHERE lesson_id = ?
-             ORDER BY step_order ASC`,
-            [lesson.lesson_id]
-        );
+        const steps = parseLessonStepsColumn(lesson.lesson_steps);
 
         const lessonData = {
             id: lesson.lesson_number,
-            title: lesson.title,
-            desc: lesson.description,
+            title: lesson.lesson_title,
+            desc: lesson.lesson_description,
             video: lesson.video_url,
             bookPages: lesson.book_pages,
             pageRange: {
                 start: lesson.page_range_start,
                 end: lesson.page_range_end
             },
-            steps: steps.map(step => ({
-                heading: step.heading,
-                text: step.content
-            }))
+            steps
         };
 
         res.json({
@@ -240,7 +259,7 @@ router.post('/:grade/:unitNumber/lessons', async (req, res) => {
         }
 
         const [units] = await db.execute(
-            `SELECT unit_id FROM units WHERE grade = ? AND unit_number = ?`,
+            `SELECT unit_id FROM units WHERE grade_level = ? AND unit_number = ?`,
             [grade, unitNumber]
         );
 
@@ -252,31 +271,19 @@ router.post('/:grade/:unitNumber/lessons', async (req, res) => {
         }
 
         const unitId = units[0].unit_id;
+        const lessonStepsJson = (steps && Array.isArray(steps) && steps.length > 0)
+            ? JSON.stringify(steps.map((step) => ({ heading: step.heading, content: step.text || step.content })))
+            : null;
 
         const [result] = await db.execute(
-            `INSERT INTO lessons (unit_id, grade, unit_number, lesson_number, title, description, 
-                                 video_url, book_pages, page_range_start, page_range_end)
+            `INSERT INTO lessons (unit_id, grade_level, lesson_number, lesson_title, lesson_description,
+                                 video_url, book_pages, page_range_start, page_range_end, lesson_steps)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [unitId, grade, unitNumber, lessonNumber, title, description || null, 
-             videoUrl || null, bookPages || null, pageRangeStart || null, pageRangeEnd || null]
+            [unitId, grade, lessonNumber, title, description || null,
+             videoUrl || null, bookPages || null, pageRangeStart || null, pageRangeEnd || null, lessonStepsJson]
         );
 
         const lessonId = result.insertId;
-
-        if (steps && Array.isArray(steps) && steps.length > 0) {
-            const stepValues = steps.map((step, index) => [
-                lessonId,
-                index + 1,
-                step.heading,
-                step.text || step.content
-            ]);
-
-            await db.query(
-                `INSERT INTO lesson_steps (lesson_id, step_order, heading, content)
-                 VALUES ?`,
-                [stepValues]
-            );
-        }
 
         res.status(201).json({
             success: true,

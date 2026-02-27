@@ -1048,6 +1048,80 @@ body::before {
   outline-offset: 2px;
 }
 
+/* Matching question type */
+.matching-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.matching-column {
+  flex: 1;
+  min-width: 180px;
+}
+
+.matching-column h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.matching-left-list,
+.matching-right-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.matching-left-item,
+.matching-right-item {
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--card-bg, #fff);
+}
+
+.matching-left-item:hover,
+.matching-right-item:hover {
+  border-color: var(--primary-blue, #115879);
+  background: rgba(17, 88, 121, 0.06);
+}
+
+.matching-left-item.selected {
+  border-color: var(--primary-blue);
+  background: rgba(17, 88, 121, 0.12);
+  box-shadow: 0 0 0 2px rgba(17, 88, 121, 0.3);
+}
+
+.matching-left-item.correct,
+.matching-pair-row.correct {
+  border-color: var(--success-green);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.matching-left-item.incorrect,
+.matching-pair-row.incorrect {
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.matching-matches {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.matching-pair-row {
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.35rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+}
+
 .progress-bar {
   height: 6px;
   background: rgba(203, 213, 225, 0.3);

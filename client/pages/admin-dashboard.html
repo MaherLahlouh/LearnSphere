@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الأدمن - LearnWithTaa</title>
+    <link rel="stylesheet" href="../css/admin-dashboard.css">
+</head>
+<body>
+    <div id="admin-dashboard-root">
+        <!-- سيتم تحميل المحتوى بعد التحقق من التوكن -->
+        <div class="admin-dashboard" style="display: none;">
+            <header class="admin-header">
+                <h1>لوحة تحكم الأدمن</h1>
+                <div class="admin-header-actions">
+                    <a href="/" class="btn btn-secondary">الرئيسية</a>
+                    <button type="button" class="btn btn-secondary" id="admin-logout-btn">تسجيل الخروج</button>
+                </div>
+            </header>
+
+            <div class="tabs">
+                <button type="button" class="tab-btn active" data-tab="units">إدارة الوحدات</button>
+                <button type="button" class="tab-btn" data-tab="lessons">إدارة الدروس</button>
+                <button type="button" class="tab-btn" data-tab="quizzes">إدارة الاختبارات</button>
+            </div>
+
+            <!-- تبويب الوحدات -->
+            <div id="tab-units" class="tab-content active">
+                <h2>إدارة الوحدات</h2>
+                <p id="units-msg" class="msg" style="display: none;"></p>
+                <form id="form-unit" class="form-grid">
+                    <div class="form-group">
+                        <label for="unit-grade">الصف الدراسي (grade_level)</label>
+                        <input type="number" id="unit-grade" min="1" max="12" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit-number">رقم الوحدة</label>
+                        <input type="number" id="unit-number" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit-title">عنوان الوحدة</label>
+                        <input type="text" id="unit-title" required placeholder="عنوان الوحدة">
+                    </div>
+                    <div class="form-group">
+                        <label for="unit-description">الوصف (اختياري)</label>
+                        <input type="text" id="unit-description" placeholder="وصف قصير">
+                    </div>
+                </form>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="unit-add-btn">إضافة وحدة</button>
+                </div>
+                <div class="table-wrap">
+                    <table id="units-table">
+                        <thead>
+                            <tr>
+                                <th>unit_id</th>
+                                <th>الصف</th>
+                                <th>رقم الوحدة</th>
+                                <th>العنوان</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="units-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- تبويب الدروس -->
+            <div id="tab-lessons" class="tab-content">
+                <h2>إدارة الدروس</h2>
+                <p id="lessons-msg" class="msg" style="display: none;"></p>
+                <form id="form-lesson" class="form-grid">
+                    <div class="form-group">
+                        <label for="lesson-unit-id">الوحدة (unit_id)</label>
+                        <select id="lesson-unit-id" required>
+                            <option value="">-- اختر الوحدة --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="lesson-grade">الصف (اختياري)</label>
+                        <input type="number" id="lesson-grade" min="1" max="12" placeholder="مثل 1">
+                    </div>
+                    <div class="form-group">
+                        <label for="lesson-number">رقم الدرس</label>
+                        <input type="number" id="lesson-number" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lesson-title">عنوان الدرس</label>
+                        <input type="text" id="lesson-title" required placeholder="عنوان الدرس">
+                    </div>
+                    <div class="form-group">
+                        <label for="lesson-description">الوصف (اختياري)</label>
+                        <input type="text" id="lesson-description" placeholder="وصف الدرس">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="lesson-video-url">رابط الفيديو (اختياري)</label>
+                        <input type="url" id="lesson-video-url" placeholder="https://...">
+                    </div>
+                </form>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="lesson-add-btn">إضافة درس</button>
+                </div>
+                <div class="table-wrap">
+                    <table id="lessons-table">
+                        <thead>
+                            <tr>
+                                <th>lesson_id</th>
+                                <th>unit_id</th>
+                                <th>رقم الدرس</th>
+                                <th>العنوان</th>
+                                <th>رابط الفيديو</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lessons-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- تبويب الاختبارات -->
+            <div id="tab-quizzes" class="tab-content">
+                <h2>إدارة الاختبارات</h2>
+                <p id="quizzes-msg" class="msg" style="display: none;"></p>
+                <h3 style="margin: 1rem 0 0.5rem;">إنشاء اختبار لدرس</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="quiz-unit-id">الوحدة</label>
+                        <select id="quiz-unit-id">
+                            <option value="">-- اختر الوحدة --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quiz-lesson-id">الدرس</label>
+                        <select id="quiz-lesson-id">
+                            <option value="">-- اختر الدرس --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quiz-grade">الصف (اختياري)</label>
+                        <input type="number" id="quiz-grade" min="1" placeholder="1">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="quiz-create-btn">إنشاء اختبار للدرس</button>
+                </div>
+
+                <h3 style="margin: 1.5rem 0 0.5rem;">إضافة سؤال (اختيار من متعدد)</h3>
+                <p>اختر الاختبار (الدرس) ثم أضف نص السؤال والإجابات وحدد الإجابة الصحيحة.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="question-quiz-id">الاختبار (quiz_id)</label>
+                        <select id="question-quiz-id">
+                            <option value="">-- اختر اختبارًا --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="question-text">نص السؤال</label>
+                        <input type="text" id="question-text" placeholder="نص السؤال">
+                    </div>
+                    <div class="form-group">
+                        <label for="question-type">نوع السؤال</label>
+                        <select id="question-type">
+                            <option value="multiple-choice">اختيار من متعدد</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="correct-answer-index">رقم الإجابة الصحيحة (0 للأولى، 1 للثانية، ...)</label>
+                        <input type="number" id="correct-answer-index" min="0" value="0">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>الإجابات (سطر واحد لكل إجابة)</label>
+                    <textarea id="question-answers-text" rows="4" placeholder="الإجابة الأولى&#10;الإجابة الثانية&#10;الإجابة الصحيحة"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="question-add-btn">إضافة سؤال</button>
+                </div>
+
+                <h3 style="margin: 1.5rem 0 0.5rem;">أسئلة اختبار محدد</h3>
+                <div class="form-group">
+                    <label for="view-questions-quiz-id">عرض أسئلة الاختبار</label>
+                    <select id="view-questions-quiz-id">
+                        <option value="">-- اختر quiz_id --</option>
+                    </select>
+                </div>
+                <ul id="quiz-questions-list" class="quiz-questions-list"></ul>
+            </div>
+        </div>
+
+        <div class="unauthorized" style="display: none;">
+            <p>يجب تسجيل الدخول كأدمن للوصول لهذه الصفحة.</p>
+            <a href="/admin-login.html">تسجيل دخول الأدمن</a>
+        </div>
+    </div>
+    <script src="../js/admin-dashboard.js"></script>
+</body>
+</html>

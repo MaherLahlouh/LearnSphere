@@ -137,11 +137,15 @@
 //     console.log('╚════════════════════════════════════════════════════════════╝\n');
 // }); 
 
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const app = express();
-   
+
+const { requireAdmin } = require('./middleware/adminAuth');
+const adminAuthRoutes = require('./routes/adminAuth');
+const adminRoutes = require('./routes/admin');
 
 app.use(cors());
 
@@ -183,6 +187,11 @@ app.use('/api/lessons', lessonRoutes);
 app.use('/api/units', unitsRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/book', bookInteractionRoutes); // ← NEW
+
+// Admin: تسجيل الدخول/الخروج (بدون توكن)
+app.use('/api/admin', adminAuthRoutes);
+// Admin: إدارة الوحدات والدروس والاختبارات (يتطلب توكن أدمن)
+app.use('/api/admin', requireAdmin, adminRoutes);
 
 // Health check - to see if server is up (e.g. for monitoring)
 app.get('/api/health', (req, res) => {
@@ -248,6 +257,15 @@ app.get('/book_viewer.html', (req, res) => {
 // Admin quiz question manager (teachers/admins)
 app.get('/admin-quiz.html', (req, res) => {
     res.sendFile(path.join(ROOT_DIR, 'client', 'pages', 'admin-quiz.html'));
+});
+
+// Admin login page (hardcoded admin credentials)
+app.get('/admin-login.html', (req, res) => {
+    res.sendFile(path.join(ROOT_DIR, 'client', 'pages', 'admin-login.html'));
+});
+// Admin dashboard (manage units, lessons, quizzes)
+app.get('/admin-dashboard.html', (req, res) => {
+    res.sendFile(path.join(ROOT_DIR, 'client', 'pages', 'admin-dashboard.html'));
 });
 
 // Compiler page (lives at project root)

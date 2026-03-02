@@ -37,6 +37,8 @@ Stylesheets for the app.
 | File | Purpose |
 |------|--------|
 | `admin-quiz.css` | Admin Quiz Question Manager form and list |
+| `admin-login.css` | Admin login page styling |
+| `admin-dashboard.css` | Admin dashboard (units, lessons, quizzes) styling |
 | `Book_viewer.css` | Book viewer layout |
 | `course-details.css` | Course details page |
 | `dashboard.css` | Student dashboard |
@@ -55,6 +57,8 @@ Client-side logic.
 | File | Purpose |
 |------|--------|
 | `admin-quiz.js` | Admin quiz: units/lessons, load/save/delete questions |
+| `admin-login.js` | Admin login: send email/password, store JWT, redirect to dashboard |
+| `admin-dashboard.js` | Admin dashboard: CRUD units, lessons, quizzes, questions (with auth header) |
 | `book_viewer.js` | Book viewer behavior |
 | `course-details.js` | Course details page |
 | `dashboard.js` | Student dashboard |
@@ -80,6 +84,8 @@ HTML entry points (served via Express routes).
 | `teacher-create-class.html`, `teacher_courses.html` | Same-name routes | Teacher class/course management |
 | `course-details.html`, `Course-details.html` | `/course-details.html`, `/class-details.html` | Course/class details |
 | `admin-quiz.html` | `/admin-quiz.html` | Admin Quiz Question Manager |
+| `admin-login.html` | `/admin-login.html` | Admin login (email + password; credentials in `.env`) |
+| `admin-dashboard.html` | `/admin-dashboard.html` | Admin dashboard: manage units, lessons, quizzes |
 | `toast_test_ai.html` | Via catch-all `/*.html` | Toast test |
 
 ### `client/icons/`, `client/lang/`, `client/books/`
@@ -95,17 +101,19 @@ Web app manifest (PWA).
 ## `/server`
 
 ### `server/app.js`
+- Loads `dotenv` first so `.env` (including `ADMIN_EMAIL`, `ADMIN_PASSWORD`) is available.
 - Express app setup, CORS, JSON/urlencoded.
-- Static: `/css`, `/js`, `/pages`, `/icons`, `/lang`, `/books`, `/pdfs`.
-- API: `/api/auth`, `/api/users`, `/api/teachers`, `/api/classes`, `/api/enrollments`, `/api/lessons`, `/api/units`, `/api/quizzes`, `/api/book`.
-- Page routes: explicit routes for each HTML page plus `GET /code_editor_python.html`, `GET /admin-quiz.html`, and catch-all for other `*.html` from `client/pages`.
+- Static: `/css`, `/js`, `/pages`, `/icons`, `/lang`, `/manifest.json`, `/books`, `/pdfs`.
+- API: `/api/auth`, `/api/users`, `/api/teachers`, `/api/classes`, `/api/enrollments`, `/api/lessons`, `/api/units`, `/api/quizzes`, `/api/book`, `/api/admin` (login + protected CRUD).
+- Page routes: explicit routes for each HTML page including `admin-login.html`, `admin-dashboard.html`, `GET /code_editor_python.html`, `GET /admin-quiz.html`, and catch-all for other `*.html` from `client/pages`.
 - Default port: `3001` (or `process.env.PORT`).
 
 ### `server/config/`
 - **`database.js`** – MySQL/MariaDB pool for `learning_platform` (can use `.env`).
 
 ### `server/middleware/`
-- **`auth.js`** – Auth/token verification middleware.
+- **`auth.js`** – JWT verification for general auth.
+- **`adminAuth.js`** – Admin JWT verification (`requireAdmin`); ensures `role === 'admin'`.
 
 ### `server/routes/`
 | File | Mount | Purpose |
@@ -119,6 +127,8 @@ Web app manifest (PWA).
 | `Units.js` | `/api/units` | Units by grade, lessons by unit, create unit/lesson |
 | `Quizzes.js` | `/api/quizzes` | Quiz by grade/unit/lesson, progress, create/delete question |
 | `book_interactions.js` | `/api/book` | Book interactions and answers |
+| `adminAuth.js` | `/api/admin` | Admin login/logout (no token); reads `ADMIN_EMAIL`, `ADMIN_PASSWORD` from env |
+| `admin.js` | `/api/admin` (with `requireAdmin`) | Admin CRUD: units, lessons, quizzes, quiz questions |
 
 ### `server/data/`
 - **`book_interactions.json`** – File-backed storage for book interactions.
@@ -131,7 +141,8 @@ Web app manifest (PWA).
 |----------|--------|
 | **Project_Structure.md** | This file – project layout and structure |
 | **Database_Structure.md** | Database schema and table descriptions |
-| **API Endpoints Documentation.md** | All API endpoints and usage |
+| **API Endpoints Documentation.md** | All API endpoints (including Admin API) and usage |
+| **Admin Only.md** | Admin login credentials (email/password); keep private |
 | **QUIZ_AND_COMPILER_FIXES.md** | Quiz DB column names, compiler button, troubleshooting |
 
 ---
@@ -143,4 +154,4 @@ Web app manifest (PWA).
 
 ---
 
-*Last updated to match the current project structure.*
+*Last updated: admin login/dashboard pages and routes, admin middleware, Admin Only.md, manifest/dotenv.*

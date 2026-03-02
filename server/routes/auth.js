@@ -32,16 +32,20 @@ router.post('/login', async (req, res) => {
         
         const user = users[0];
         
-        // Check if account is active
-        if (!user.is_active) {
+        // Check if account is active (support tables with or without is_active column)
+        if (user.is_active === false) {
             return res.status(403).json({ 
                 success: false,
                 message: 'Account is deactivated. Please contact support.' 
             });
         }
         
-        // Verify password
-        const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+        // Verify password (support both password_hash and password column names)
+        const storedHash = user.password_hash || user.password;
+        if (!storedHash) {
+            return res.status(500).json({ success: false, message: 'Server configuration error: no password stored.' });
+        }
+        const isPasswordValid = await bcrypt.compare(password, storedHash);
         
         if (!isPasswordValid) {
             return res.status(401).json({ 
@@ -50,17 +54,18 @@ router.post('/login', async (req, res) => {
             });
         }
         
-        // Return user data (without sensitive info)
+        // Return user data (without sensitive info); support alternate column names
         res.json({
             success: true,
             message: 'Login successful!',
             user: {
                 user_id: user.user_id,
                 email: user.email,
-                user_type: user.user_type,
-                first_name: user.first_name,
-                last_name: user.last_name,
-                is_verified: user.is_verified
+                user_type: user.user_type || user.role,
+                first_name: user.first_name || user.full_name || '',
+                last_name: user.last_name || '',
+                is_verified: user.is_verified,
+                grade_level: user.grade_level
             }
         });
         

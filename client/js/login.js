@@ -75,30 +75,39 @@ loginForm.addEventListener('submit', async function (e) {
             body: JSON.stringify({ email, password })
         });
 
-        const data = await response.json();
+        // Parse JSON safely to avoid "Uncaught (in promise)" when response is not JSON
+        let data;
+        try {
+            const text = await response.text();
+            data = text ? JSON.parse(text) : {};
+        } catch (_) {
+            data = { success: false, message: 'Invalid response from server.' };
+        }
 
         // Put button back to normal
         loginBtn.disabled = false;
         loginBtn.style.opacity = '1';
         loginBtn.innerHTML = `Login<div class="btn-shine"></div>`;
         
-        // If server said no or success is false, show error
+        // If server said no or success is false, show error (no throw - prevents unhandled rejection)
         if (!response.ok || !data.success) {
             let errorMsg = data.message || 'Login failed. Please try again.';
-            if (data.error) {
-                errorMsg += `\n\nDevelopment Error: ${data.error}`;
+            if (data.error && (typeof data.error === 'string')) {
+                errorMsg += ' ' + data.error;
             }
             // Translate some known messages to Arabic
             if (currentLang === 'ar') {
-                if (errorMsg.includes('Invalid email or password')) {
-                    errorMsg = 'بريد إلكتروني أو كلمة مرور غير صحيحة';
+                if (errorMsg.includes('Invalid email or password') || errorMsg.includes('invalid')) {
+                    errorMsg = 'بريد إلكتروني أو كلمة مرور غير صحيحة. إن كنت أدمنًا استخدم صفحة دخول الأدمن.';
                 } else if (errorMsg.includes('Account locked')) {
                     errorMsg = 'الحساب مقفل بسبب محاولات فاشلة كثيرة. حاول لاحقًا.';
                 } else if (errorMsg.includes('deactivated')) {
                     errorMsg = 'الحساب غير مفعل. يرجى الاتصال بالدعم.';
-                } else if (errorMsg.includes('Server error')) {
+                } else if (errorMsg.includes('Server error') || errorMsg.includes('server')) {
                     errorMsg = 'خطأ في الخادم. يرجى المحاولة مرة أخرى.';
                 }
+            } else if (errorMsg.includes('Invalid email or password') || errorMsg.includes('invalid')) {
+                errorMsg = 'Invalid email or password. Use admin login page for admin account.';
             }
             
             alert(errorMsg);

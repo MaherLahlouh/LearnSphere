@@ -4,6 +4,8 @@
 
 The **`learning_platform`** database (MySQL/MariaDB) supports an educational LMS with **students** and **teachers**. It covers users, classes, enrollments, units, lessons, quizzes, progress, and notifications.
 
+**Admin accounts are not stored in this database.** Admin login uses credentials from the application (hardcoded or `.env`: `ADMIN_EMAIL`, `ADMIN_PASSWORD`). See `docs/Admin Only.md` and `SUMMARY.md` for admin access.
+
 This document describes the schema as used by the application. Table and column names match the current codebase (e.g. **`quiz_questions`** uses **`question_id`**, **`unit_id_ref`**, **`lesson_id_ref`**).
 
 ---
@@ -11,9 +13,10 @@ This document describes the schema as used by the application. Table and column 
 ## Tables (as used in the application)
 
 ### 1. `users`
-Central table for all users (students and teachers).
+Central table for all users (students and teachers). **Does not include admin;** admin login is separate (see `docs/Admin Only.md`).
 
-- **Key fields:** `user_id` (PK), `user_type` (`student` | `teacher`), `grade_level` (students), `specialization`, `qualifications`, `experience_years` (teachers), `is_active`, `is_verified`, `email`, `first_name`, `last_name`, etc.
+- **Key fields:** `user_id` (PK), `user_type` (`student` | `teacher`) or `role`, `grade_level` (students), `specialization`, `qualifications`, `experience_years` (teachers), `is_active`, `is_verified`, `email`, `first_name`, `last_name`, etc.
+- **Password:** The app supports either `password_hash` or `password` column (bcrypt-hashed). Login uses whichever is present.
 
 ---
 
@@ -184,4 +187,4 @@ quiz_questions
 
 ---
 
-*Last updated to match the current project schema and Quizzes/Units routes.*
+*Last updated: admin noted as out-of-DB; users table password column flexibility; Quizzes/Units/Admin routes.*

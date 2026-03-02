@@ -6,9 +6,11 @@ This document provides a comprehensive list of all API endpoints available in th
 
 ## 🔐 Authentication (`/api/auth`)
 
+**Note:** This is for **students and teachers** only (stored in the `users` table). For **admin** login, use `/api/admin/login` and the admin login page (see Admin section below).
+
 | Endpoint | Method | Purpose | Request Body | Response |
 |----------|--------|---------|--------------|----------|
-| `/login` | POST | User login | `{ email, password }` | `{ success: true, message: "Login successful!", user: { user_id, email, user_type, first_name, last_name, is_verified } }` |
+| `/login` | POST | User login (student/teacher) | `{ email, password }` | `{ success: true, message: "Login successful!", user: { user_id, email, user_type, first_name, last_name, is_verified, grade_level } }` |
 | `/register` | POST | Create new account | `{ email, password, firstName, lastName, userType, gradeLevel?, phone?, specialization?, qualifications?, experienceYears? }` | `{ success: true, message: "Account created successfully!", user: { ... } }` |
 | `/logout` | POST | Logout user | None | `{ success: true, message: "Logged out successfully" }` |
 | `/user/:id` | GET | Get user profile by ID | None | `{ success: true, user: { user_id, email, user_type, first_name, last_name, grade_level, phone, specialization, qualifications, experience_years, created_at } }` |
@@ -18,6 +20,7 @@ This document provides a comprehensive list of all API endpoints available in th
 - For students: `gradeLevel` is required (1-10)
 - For teachers: `phone`, `specialization`, `qualifications`, `experienceYears` are optional
 - Password must be at least 6 characters long
+- Auth supports both `password_hash` and `password` column names in `users` table
 
 ---
 
@@ -150,6 +153,34 @@ This document provides a comprehensive list of all API endpoints available in th
 
 ---
 
+---
+
+## 🔒 Admin (`/api/admin`)
+
+**Authentication:** Admin credentials are **not** stored in the database. They are configured in code or in `.env` (`ADMIN_EMAIL`, `ADMIN_PASSWORD`). After login, send the JWT in the header: `Authorization: Bearer <token>` for all admin CRUD endpoints.
+
+| Endpoint | Method | Auth | Purpose | Request Body | Response |
+|----------|--------|------|---------|--------------|----------|
+| `/login` | POST | No | Admin login | `{ email, password }` | `{ success: true, token, admin: { email, role: "admin" } }` |
+| `/logout` | POST | No | Admin logout (client clears token) | None | `{ success: true, message: "..." }` |
+| `/units` | GET | Yes | List all units (optional `?grade_level=`) | None | `{ success: true, data: [...] }` |
+| `/units` | POST | Yes | Create unit | `{ grade_level, unit_number, unit_title, unit_description? }` | `{ success: true, data: { unit_id, ... } }` |
+| `/units/:id` | PUT | Yes | Update unit | `{ grade_level?, unit_number?, unit_title, unit_description? }` | `{ success: true }` |
+| `/units/:id` | DELETE | Yes | Delete unit | None | `{ success: true }` |
+| `/lessons` | GET | Yes | List lessons (optional `?unit_id=`, `?grade_level=`) | None | `{ success: true, data: [...] }` |
+| `/lessons` | POST | Yes | Create lesson | `{ unit_id, grade_level?, lesson_number, lesson_title, lesson_description?, video_url?, lesson_steps? }` | `{ success: true, data: { lesson_id, ... } }` |
+| `/lessons/:id` | PUT | Yes | Update lesson | Same fields as POST | `{ success: true }` |
+| `/lessons/:id` | DELETE | Yes | Delete lesson | None | `{ success: true }` |
+| `/quizzes` | GET | Yes | List quizzes (optional `?lesson_id=`, `?unit_id=`) | None | `{ success: true, data: [...] }` |
+| `/quizzes` | POST | Yes | Create quiz for a lesson | `{ grade_level?, unit_id, lesson_id }` | `{ success: true, data: { quiz_id, ... } }` |
+| `/quizzes/:quizId/questions` | GET | Yes | Get questions for a quiz | None | `{ success: true, data: [{ question_id, question_text, answers: [...], ... }, ...] }` |
+| `/quizzes/:quizId/questions` | POST | Yes | Add question (e.g. multiple choice) | `{ question_type, question_text, correct_answer?, answers?: [{ answer_text, is_correct }] }` | `{ success: true, data: { question_id, quiz_id } }` |
+| `/quizzes/questions/:questionId` | DELETE | Yes | Delete a question | None | `{ success: true }` |
+
+**Admin pages:** `/admin-login.html`, `/admin-dashboard.html`. See `docs/Admin Only.md` for default credentials.
+
+---
+
 ## 🌐 Health Check (`/api/health`)
 
 | Endpoint | Method | Purpose | Request Body | Response |
@@ -182,9 +213,9 @@ All API responses follow a consistent format:
 
 ## 🔒 Authentication & Authorization
 
-- Most endpoints do not require authentication (currently)
-- Some endpoints are marked as "Admin only" but authentication middleware may not be implemented yet
-- User type validation is performed for certain operations (e.g., only teachers can create classes)
+- **Regular users (students/teachers):** Login via `/api/auth/login`; credentials are in the `users` table. No Bearer token is required for most public endpoints currently.
+- **Admin:** Login via `/api/admin/login` with email/password from `.env` (see `docs/Admin Only.md`). All `/api/admin/*` CRUD routes (units, lessons, quizzes, questions) require the JWT in `Authorization: Bearer <token>`.
+- User type validation is performed for certain operations (e.g., only teachers can create classes).
 
 ## 📝 Notes
 
@@ -196,4 +227,4 @@ All API responses follow a consistent format:
 
 ---
 
-**Last Updated:** February 2026 (aligned with current routes and quiz schema)
+**Last Updated:** February 2026 (admin API, auth notes, admin-only endpoints documented)

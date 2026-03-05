@@ -1,6 +1,6 @@
-# LearnWithTaa Documentation
+#LearnSphere Documentation
 
-This folder contains documentation for the LearnWithTaa learning platform.
+This folder contains documentation for the LearnSphere learning platform.
 
 | Document | Description |
 |----------|-------------|

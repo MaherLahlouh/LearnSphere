@@ -1,7 +1,4 @@
-//Note : ~85% Reduction excpeted after moving booksUrls,quizData, and unitLessons this file gonna be around 255 lines.
-
-// Initialize PDF.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+//Note : ~85% Reduction excpeted after moving quizData and unitLessons this file gonna be around 255 lines.
 
 const urlParams = new URLSearchParams(window.location.search);
 const grade = urlParams.get('grade') || '1';
@@ -17,43 +14,6 @@ const currentLanguage = localStorage.getItem('language') || 'ar';
 console.log('🌍 Current Language:', currentLanguage);
 console.log('📚 Current Grade:', grade, 'Unit:', unitId);
 
-const bookUrls = {
-  '1': 'https://www.manhal.com/platform/books/1595/index.html?o=qr',
-  '2': 'https://www.manhal.com/platform/books/1596/index.html?o=qr',
-  '3': 'https://www.manhal.com/platform/books/1588/index.html?o=qr',
-  '4': 'https://www.manhal.com/platform/books/1586/index.html?o=qr',
-  '5': 'https://www.manhal.com/platform/books/1587/index.html?o=qr',
-  '6': 'https://www.manhal.com/platform/books/1597/index.html?o=qr',
-  '7': {
-    'ar': '/pdfs/arabic/my_digital_world_ar_7.pdf',
-    'en': '/pdfs/english/my_digital_world_7.pdf'
-  },
-  '8': {
-    'ar': '/pdfs/arabic/my_digital_world_ar_8.pdf',
-    'en': '/pdfs/english/my_digital_world_8.pdf'
-  },
-  '9': {
-    'ar': '/pdfs/arabic/my_digital_world_ar_9.pdf',
-    'en': '/pdfs/english/my_digital_world_9.pdf'
-  },
-  '10': {
-    'ar': '/pdfs/arabic/my_digital_world_ar_10.pdf',
-    'en': '/pdfs/english/my_digital_world_10.pdf'
-  }
-};
-
-function getBookUrl(grade, language) {
-  const bookData = bookUrls[grade];
-  if (typeof bookData === 'string') {
-    return bookData;
-  }
-  if (typeof bookData === 'object' && bookData !== null) {
-    const url = bookData[language] || bookData['ar'];
-    return url;
-  }
-  return null;
-}
-
 function getYouTubeEmbedUrl(url) {
   if (!url) return '';
   if (url.includes('youtube.com/embed/')) return url;
@@ -68,148 +28,6 @@ function getYouTubeEmbedUrl(url) {
   }
   return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
 }
-
-let pdfDoc = null;
-let currentPageNum = 1;
-let pageIsRendering = false;
-let pageNumIsPending = null;
-let zoomScale = 1.5;
-let allowedPageRange = { start: 1, end: 999 };
-
-const pdfCanvas = document.getElementById('pdf-canvas');
-const ctx = pdfCanvas.getContext('2d');
-const prevPageBtn = document.getElementById('prevPage');
-const nextPageBtn = document.getElementById('nextPage');
-const currentPageSpan = document.getElementById('currentPage');
-const totalPagesSpan = document.getElementById('totalPages');
-const zoomInBtn = document.getElementById('zoomIn');
-const zoomOutBtn = document.getElementById('zoomOut');
-const zoomLevelSpan = document.getElementById('zoomLevel');
-const pdfRestrictionNotice = document.getElementById('pdfRestrictionNotice');
-const allowedPagesText = document.getElementById('allowedPagesText');
-
-const renderPage = num => {
-  if (num < allowedPageRange.start || num > allowedPageRange.end) {
-    pdfRestrictionNotice.classList.add('show');
-    setTimeout(() => {
-      pdfRestrictionNotice.classList.remove('show');
-    }, 3000);
-    return;
-  }
-  
-  pageIsRendering = true;
-  pdfDoc.getPage(num).then(page => {
-    const viewport = page.getViewport({ scale: zoomScale });
-    pdfCanvas.height = viewport.height;
-    pdfCanvas.width = viewport.width;
-    
-    const renderCtx = {
-      canvasContext: ctx,
-      viewport
-    };
-    
-    page.render(renderCtx).promise.then(() => {
-      pageIsRendering = false;
-      if (pageNumIsPending !== null) {
-        renderPage(pageNumIsPending);
-        pageNumIsPending = null;
-      }
-    });
-    currentPageSpan.textContent = num;
-  });
-};
-
-const queueRenderPage = num => {
-  if (pageIsRendering) {
-    pageNumIsPending = num;
-  } else {
-    renderPage(num);
-  }
-};
-
-// Show prev page
-const showPrevPage = () => {
-  if (currentPageNum <= allowedPageRange.start) {
-    pdfRestrictionNotice.classList.add('show');
-    setTimeout(() => {
-      pdfRestrictionNotice.classList.remove('show');
-    }, 3000);
-    return;
-  }
-  currentPageNum--;
-  queueRenderPage(currentPageNum);
-};
-
-// Show next page
-const showNextPage = () => {
-  if (currentPageNum >= allowedPageRange.end) {
-    pdfRestrictionNotice.classList.add('show');
-    setTimeout(() => {
-      pdfRestrictionNotice.classList.remove('show');
-    }, 3000);
-    return;
-  }
-  currentPageNum++;
-  queueRenderPage(currentPageNum);
-};
-
-// Zoom in
-const zoomIn = () => {
-  if (zoomScale < 3) {
-    zoomScale += 0.25;
-    zoomLevelSpan.textContent = Math.round(zoomScale * 100) + '%';
-    queueRenderPage(currentPageNum);
-  }
-};
-
-// Zoom out
-const zoomOut = () => {
-  if (zoomScale > 0.5) {
-    zoomScale -= 0.25;
-    zoomLevelSpan.textContent = Math.round(zoomScale * 100) + '%';
-    queueRenderPage(currentPageNum);
-  }
-};
-
-prevPageBtn.addEventListener('click', showPrevPage);
-nextPageBtn.addEventListener('click', showNextPage);
-zoomInBtn.addEventListener('click', zoomIn);
-zoomOutBtn.addEventListener('click', zoomOut);
-
-// Disable right-click on PDF canvas to prevent easy downloads
-pdfCanvas.addEventListener('contextmenu', e => {
-  e.preventDefault();
-  return false;
-});
-
-// Load PDF with page restrictions
-const loadPDFWithRestrictions = (url, pageRange) => {
-  allowedPageRange = pageRange;
-  currentPageNum = pageRange.start;
-  zoomScale = 1.5;
-  zoomLevelSpan.textContent = '150%';
-  allowedPagesText.textContent = `${pageRange.start}-${pageRange.end}`;
-  
-  // Prevent download by loading with specific options
-  const loadingTask = pdfjsLib.getDocument({
-    url: url,
-    disableAutoFetch: true,
-    disableStream: true
-  });
-  
-  loadingTask.promise.then(pdf => {
-    pdfDoc = pdf;
-    totalPagesSpan.textContent = pdf.numPages;
-    renderPage(currentPageNum);
-    
-    // Update button states
-    prevPageBtn.disabled = currentPageNum <= allowedPageRange.start;
-    nextPageBtn.disabled = currentPageNum >= allowedPageRange.end;
-  }).catch(err => {
-    console.error('Error loading PDF:', err);
-    alert('Error loading PDF. Please try again.');
-  });
-};
 
 const quizData = {
       '1': {
@@ -1250,16 +1068,11 @@ const lessonsListEl = document.getElementById('lessonsList');
 const currentLessonTitleEl = document.getElementById('currentLessonTitle');
 const lessonStepsEl = document.getElementById('lessonSteps');
 const lessonVideoEl = document.getElementById('lessonVideo');
-const lessonBookEl = document.getElementById('lessonBook');
-const bookContainerEl = document.getElementById('bookContainer');
 const videoContainerEl = document.getElementById('videoContainer');
-const bookTitleEl = document.getElementById('bookTitle');
-const pageInfoEl = document.getElementById('pageInfo');
 const finishBtn = document.getElementById('finishBtn');
 const backBtn = document.getElementById('backBtn');
 const progressBar = document.getElementById('progressBar');
 const tryCompilerBtn = document.getElementById('tryCompilerBtn');
-const pdfViewerContainer = document.getElementById('pdfViewerContainer');
 const questionText = document.getElementById('questionText');
 const answersList = document.getElementById('answersList');
 const feedbackMessage = document.getElementById('feedbackMessage');
@@ -1769,30 +1582,6 @@ function renderLessonList() {
 
 function loadLesson(lesson) {
   currentLessonTitleEl.textContent = lesson.title;
-  
-  const bookUrl = getBookUrl(grade, currentLanguage);
-  if (bookUrl) {
-    bookContainerEl.style.display = 'flex';
-    bookTitleEl.textContent = currentLanguage === 'ar' ? `عالمي الرقمي ${grade}` : `My Digital World ${grade}`;
-    pageInfoEl.textContent = `Pages: ${lesson.bookPages || 'Full Book'}`;
-    
-    // Check if it's a local PDF (grades 7-10)
-    if (bookUrl.includes('.pdf')) {
-      lessonBookEl.style.display = 'none';
-      pdfViewerContainer.style.display = 'flex';
-      
-      // Load PDF with page restrictions
-      const pageRange = lesson.pageRange || { start: 1, end: 999 };
-      loadPDFWithRestrictions(bookUrl, pageRange);
-    } else {
-      // External book (Manhal - grades 1-6)
-      pdfViewerContainer.style.display = 'none';
-      lessonBookEl.style.display = 'block';
-      lessonBookEl.src = bookUrl;
-    }
-  } else {
-    bookContainerEl.style.display = 'none';
-  }
   
   if (lesson.video) {
     videoContainerEl.style.display = 'block';

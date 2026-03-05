@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lesson - Taa Academy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <link rel="manifest" href="../../manifest.json">
   <meta name="theme-color" content="#115879">
   <link rel="stylesheet" href="../css/toast-notifications.css">
@@ -34,38 +33,6 @@
       </div>
       
       <div class="main-content">
-        <div class="book-container" id="bookContainer" style="display: none;">
-          <div class="book-header">
-            <h3><i class="fas fa-book-open"></i> <span id="bookTitle">Digital Book</span></h3>
-            <div class="page-info" id="pageInfo">Pages: 1-10</div>
-          </div>
-          
-          <div class="pdf-viewer-container" id="pdfViewerContainer" style="display: none;">
-            <div class="pdf-restriction-notice" id="pdfRestrictionNotice">
-              <i class="fas fa-exclamation-triangle"></i>
-              <span>You can only view pages <span id="allowedPagesText"></span> for this lesson</span>
-            </div>
-            <div class="pdf-controls">
-              <div class="pdf-nav">
-                <button id="prevPage"><i class="fas fa-chevron-left"></i> Previous</button>
-                <span class="pdf-page-info">
-                  Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
-                </span>
-                <button id="nextPage">Next <i class="fas fa-chevron-right"></i></button>
-              </div>
-              <div class="pdf-zoom">
-                <button id="zoomOut"><i class="fas fa-search-minus"></i></button>
-                <span id="zoomLevel">100%</span>
-                <button id="zoomIn"><i class="fas fa-search-plus"></i></button>
-              </div>
-            </div>
-            <div id="pdf-canvas-wrapper">
-              <canvas id="pdf-canvas"></canvas>
-            </div>
-          </div>
-          
-          <iframe id="lessonBook" src="" allowfullscreen style="display: none;"></iframe>
-        </div>
         
         <div class="video-container" id="videoContainer" style="display: none;">
           <iframe id="lessonVideo" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>

@@ -174,8 +174,7 @@ app.use('/pages', express.static(path.join(ROOT_DIR, 'client', 'pages')));
 app.use('/icons', express.static(path.join(ROOT_DIR, 'client', 'icons')));
 app.use('/lang', express.static(path.join(ROOT_DIR, 'client', 'lang')));
 app.use('/manifest.json', express.static(path.join(ROOT_DIR, 'client', 'manifest.json')));
-app.use('/books', express.static(path.join(ROOT_DIR, 'client', 'books'))); // ← NEW: serve book images
-app.use('/pdfs', express.static(path.join(ROOT_DIR, 'pdfs')));
+app.use('/books', express.static(path.join(ROOT_DIR, 'client', 'books'))); // serve book images (interactive book viewer)
 
 // API ROUTES
 app.use('/api/auth', authRoutes);

@@ -11,7 +11,6 @@ LearnWithTaa/
 ├── client/                 # Frontend: HTML, CSS, JS, assets
 ├── server/                 # Backend: Node.js + Express
 ├── docs/                   # Project documentation
-├── pdfs/                   # PDF lesson materials (grades 7–10)
 ├── code_editor_python.html # Python compiler page (served at /code_editor_python.html)
 ├── FIX_LOG.md              # Log of admin/compiler/PDF fixes and new features
 ├── package.json
@@ -22,7 +21,6 @@ LearnWithTaa/
 - **`client/`** – All frontend code and static assets served to the browser.
 - **`server/`** – Express app: API routes, config, middleware.
 - **`docs/`** – Documentation (structure, database, API, fixes).
-- **`pdfs/`** – PDF files for lesson books; served under `/pdfs`.
 - **`code_editor_python.html`** – Standalone compiler page; served at `/code_editor_python.html`.
 - **`FIX_LOG.md`** – Summary of Admin Quiz Manager, compiler 404, and PDF loading fixes.
 - **`.env`** – Optional; DB and other env config (see `server/config/database.js`).
@@ -44,7 +42,7 @@ Stylesheets for the app.
 | `dashboard.css` | Student dashboard |
 | `dark-mode.css` | Dark theme |
 | `landing_page.css` | Landing page |
-| `lesson.css` | Lesson page, quiz UI, PDF viewer, matching/drag-drop |
+| `lesson.css` | Lesson page, quiz UI, matching/drag-drop |
 | `login.css`, `signup.css` | Auth pages |
 | `teacher-dashboard.css`, `teacher-dashboard-styles.css` | Teacher dashboard and shared teacher styles |
 | `teacher_courses.css`, `teacher-create-class.css` | Teacher courses and create-class |
@@ -62,7 +60,7 @@ Client-side logic.
 | `book_viewer.js` | Book viewer behavior |
 | `course-details.js` | Course details page |
 | `dashboard.js` | Student dashboard |
-| `lesson.js` | Lessons, quiz (API + fallback), PDF, matching/drag-drop, compiler button |
+| `lesson.js` | Lessons, quiz (API + fallback), matching/drag-drop, compiler button |
 | `units.js` | Units list and API |
 | `login.js`, `signup.js` | Auth |
 | `teacher-dashboard.js`, `teacher-dashboard-loader.js` | Teacher dashboard |
@@ -78,7 +76,7 @@ HTML entry points (served via Express routes).
 | `login.html`, `sign_up.html` | `/login.html`, `/sign_up.html` | Auth |
 | `dashboard.html` | `/dashboard.html` | Student dashboard |
 | `units.html` | `/units.html` | Units for a grade |
-| `lesson.html` | `/lesson.html` | Lesson content + quiz + PDF + compiler link |
+| `lesson.html` | `/lesson.html` | Lesson content + quiz + compiler link |
 | `book_viewer.html` | `/book_viewer.html` | Book viewer |
 | `teacher_dashboard.html` | `/teacher_dashboard.html` | Teacher dashboard (includes Quiz Manager link) |
 | `teacher-create-class.html`, `teacher_courses.html` | Same-name routes | Teacher class/course management |
@@ -103,7 +101,7 @@ Web app manifest (PWA).
 ### `server/app.js`
 - Loads `dotenv` first so `.env` (including `ADMIN_EMAIL`, `ADMIN_PASSWORD`) is available.
 - Express app setup, CORS, JSON/urlencoded.
-- Static: `/css`, `/js`, `/pages`, `/icons`, `/lang`, `/manifest.json`, `/books`, `/pdfs`.
+- Static: `/css`, `/js`, `/pages`, `/icons`, `/lang`, `/manifest.json`, `/books`.
 - API: `/api/auth`, `/api/users`, `/api/teachers`, `/api/classes`, `/api/enrollments`, `/api/lessons`, `/api/units`, `/api/quizzes`, `/api/book`, `/api/admin` (login + protected CRUD).
 - Page routes: explicit routes for each HTML page including `admin-login.html`, `admin-dashboard.html`, `GET /code_editor_python.html`, `GET /admin-quiz.html`, and catch-all for other `*.html` from `client/pages`.
 - Default port: `3001` (or `process.env.PORT`).
@@ -149,7 +147,7 @@ Web app manifest (PWA).
 
 ## Static and Page Routes Summary
 
-- **Static:** `/css`, `/js`, `/pages`, `/icons`, `/lang`, `/books`, `/pdfs` → mapped to `client/` or `pdfs/`.
+- **Static:** `/css`, `/js`, `/pages`, `/icons`, `/lang`, `/books` → mapped to `client/`.
 - **HTML pages:** Explicit routes for main pages; `code_editor_python.html` from project root; `admin-quiz.html` from `client/pages`; other `*.html` from `client/pages` via catch-all.
 
 ---
